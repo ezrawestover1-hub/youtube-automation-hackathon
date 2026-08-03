@@ -18,6 +18,15 @@ This is the competition version we want judges to evaluate quickly:
 - **Transparent execution**: every key step is documented and reproducible.
 - **No secret leakage**: only `.env.example` is committed, never real credentials.
 
+## One-click showcase for judges
+
+- Open the local, recordable highlight deck:
+  - [highlights/dropfix-highlight-showcase.html](C:\\Users\\3ewes\\Documents\\Codex\\2026-08-03\\ok\\highlights\\dropfix-highlight-showcase.html)
+- Run the helper launcher:
+  - [highlights/run-highlight-showcase.ps1](C:\\Users\\3ewes\\Documents\\Codex\\2026-08-03\\ok\\highlights\\run-highlight-showcase.ps1)
+- Use the scene-by-scene talking track:
+  - [highlights/highlight-rundown.md](C:\\Users\\3ewes\\Documents\\Codex\\2026-08-03\\ok\\highlights/highlight-rundown.md)
+
 ## Repository layout
 
 - `backend/` — FastAPI service and core pipeline code
@@ -27,6 +36,7 @@ This is the competition version we want judges to evaluate quickly:
 - `outputs/` — generated run outputs (gitignored)
 - `work/` — scratch notes and experiments (ignored by README references)
 - `local-dev.md` — copy-paste local run + verification commands
+- `highlights/` — polished visual demo and recording helpers
 
 ## Quick start (5-command path)
 
@@ -101,4 +111,3 @@ For full API details, open the backend API docs and the backend README.
 ## Note
 
 This repository is intentionally designed to be judged in a local environment first, then optionally exposed with a frontend later.
-

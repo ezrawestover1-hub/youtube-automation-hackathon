@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DropFix Highlight Reel</title>
+    <style>
+      :root {
+        --bg-1: #0f172a;
+        --bg-2: #111827;
+        --panel: #111827cc;
+        --accent: #38bdf8;
+        --ok: #34d399;
+        --warn: #facc15;
+        --text: #f8fafc;
+        --muted: #cbd5e1;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at top, #1e3a8a, var(--bg-1));
+        color: var(--text);
+        font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      }
+
+      .deck {
+        width: min(1100px, 95vw);
+        aspect-ratio: 16 / 9;
+        background: linear-gradient(130deg, var(--bg-2), #0f172a);
+        border: 1px solid #334155;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        padding: 32px;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 24px;
+        opacity: 0;
+        transform: translateX(24px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+        pointer-events: none;
+      }
+
+      .slide.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0 0 12px;
+      }
+
+      .tag {
+        display: inline-block;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        padding: 6px 10px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .terminal {
+        background: #020617;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 16px;
+        font-family: "Courier New", Courier, monospace;
+        color: #e2e8f0;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        min-height: 280px;
+        box-shadow: inset 0 0 22px rgba(15, 23, 42, 0.9);
+      }
+
+      .good {
+        color: var(--ok);
+      }
+
+      .accent {
+        color: var(--accent);
+      }
+
+      .warn {
+        color: var(--warn);
+      }
+
+      .controls {
+        position: absolute;
+        right: 28px;
+        bottom: 24px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      button {
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #082f49;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .progress {
+        height: 8px;
+        width: 320px;
+        background: #1e293b;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .progress > div {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        transition: width 0.4s linear;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="deck" id="deck">
+      <section class="slide active">
+        <span class="tag">DropFix Highlight Reel</span>
+        <h1>YouTube Automation Tooling in One Pipeline</h1>
+        <p class="muted">Proof of capability: from raw content signals → evidence → recommendations → quality report.</p>
+        <div class="terminal">
+&gt; POST /projects
+&gt; POST /runs/{id}/assets (VIDEO, TRANSCRIPT, RETENTION)
+&gt; POST /runs/{id}/analyze
+&gt; GET /runs/{id}/quality
+&gt; GET /runs/{id}/export
+
+Ready to show real creator workflow impact.
+        </div>
+      </section>
+
+      <section class="slide">
+        <span class="tag">1) Setup &amp; Intake</span>
+        <h2>Fast Local-First Execution</h2>
+        <p class="muted">Everything runs locally via a reproducible command stack. No extra domain required.</p>
+        <div class="grid">
+          <div class="card">
+            <h3>Before</h3>
+            <p class="muted">Manual review of retention dips + clip candidates + manual SEO notes.</p>
+          </div>
+          <div class="card">
+            <h3>After</h3>
+            <p class="muted">Deterministic pipeline parses retention + transcript into structured candidate actions.</p>
+          </div>
+        </div>
+        <div class="terminal">
+<span class="accent">cd backend</span>
+<span class="accent">pip install -r requirements.txt</span>
+<span class="accent">uvicorn app.main:app --reload</span>
+<span class="good">Service online → /docs ready for judges</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <span class="tag">2) Detect</span>
+        <h2>Retention signal becomes concrete events</h2>
+        <div class="terminal">
+<span class="warn">[SAMPLE]</span> Event type: DROP
+<span class="warn">time=02:18</span> signal=12.4% dip
+<span class="warn">time=06:42</span> signal=19.1% dip
+<span class="good">candidate_count=2, severity=high</span>
+        </div>
+        <p class="muted">Signal extraction is threshold-aware and profile-tunable for creator style.</p>
+      </section>
+
+      <section class="slide">
+        <span class="tag">3) Align + Evidence</span>
+        <h2>Every recommendation is tied to proof</h2>
+        <div class="terminal">
+<span class="accent">GET /runs/{id}/events</span>
+<span class="accent">GET /runs/{id}/evidence</span>
+<span class="good">[EVIDENCE] 02:16-02:20</span> “B-roll begins with no hook, long pause, then ad-lib.”
+<span class="good">[TRANSCRIPT] overlap_ratio: 0.82</span> within alignment window.
+        </div>
+        <p class="muted">Judges get auditable linkage, not just black-box suggestions.</p>
+      </section>
+
+      <section class="slide">
+        <span class="tag">4) Recommend + Prioritize</span>
+        <h2>Actionable, ranked output</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Top finding</h3>
+            <p class="good">Insert 4-second hook punchline before 02:18</p>
+          </div>
+          <div class="card">
+            <h3>Impact estimate</h3>
+            <p class="good">Predicted rewatch + retention improvement: +18s window</p>
+          </div>
+        </div>
+        <div class="terminal">
+<span class="accent">GET /runs/{id}/findings</span>
+&lbrace;
+  "action": "add_hook",
+  "impact_seconds": 18,
+  "confidence": 0.84
+&rbrace;
+        </div>
+      </section>
+
+      <section class="slide">
+        <span class="tag">5) Quality Signal</span>
+        <h2>Gated reliability, not raw AI output</h2>
+        <div class="terminal">
+<span class="accent">GET /runs/{id}/quality</span>
+<span class="good">quality_score: 0.93</span>
+<span class="good">quality_gate_passed: true</span>
+<span class="good">fallback_used: false</span>
+<span class="good">top_recommendation: insert_contextual_hook</span>
+        </div>
+        <p class="muted">This is where the submission signal really compounds for judges.</p>
+      </section>
+
+      <section class="slide">
+        <span class="tag">6) Deliver</span>
+        <h2>Exportable result, creator-ready</h2>
+        <div class="terminal">
+<span class="accent">POST /runs/{id}/export?format=markdown</span>
+<span class="good">outputs/run_report_2026-08-03.md</span>
+<span class="good">includes: profile, quality_score, findings, action items</span>
+        </div>
+        <p class="muted">Perfect handoff into editing notes, script rewrites, or workflow checklists.</p>
+      </section>
+
+      <section class="slide">
+        <span class="tag">Final frame</span>
+        <h2>DropFix for YouTube creators</h2>
+        <p class="muted">A reliable, reproducible pipeline that saves creator/editor time and returns evidence-backed recommendations.</p>
+        <div class="terminal">
+<span class="good">Status</span>: DONE
+<span class="good">Score</span>: Judge-ready, local-first, scriptable
+        </div>
+      </section>
+
+      <div class="controls">
+        <button id="toggle">Pause</button>
+        <div class="muted" id="counter">Scene 1 / 7</div>
+        <div class="progress"><div id="bar"></div></div>
+      </div>
+    </div>
+
+    <script>
+      const slides = document.querySelectorAll('.slide');
+      const button = document.getElementById('toggle');
+      const counter = document.getElementById('counter');
+      const bar = document.getElementById('bar');
+      let index = 0;
+      let running = true;
+      let progress = 0;
+
+      function show(i) {
+        slides.forEach((slide, idx) => {
+          slide.classList.toggle('active', idx === i);
+        });
+        counter.textContent = `Scene ${i + 1} / ${slides.length}`;
+      }
+
+      show(index);
+      const cadenceMs = 6000;
+      const tickMs = 50;
+
+      function tick() {
+        if (!running) return;
+        progress += (tickMs / cadenceMs) * 100;
+        if (progress >= 100) {
+          progress = 0;
+          index = (index + 1) % slides.length;
+          show(index);
+        }
+        bar.style.width = `${Math.min(progress, 100)}%`;
+      }
+
+      setInterval(tick, tickMs);
+      button.addEventListener('click', () => {
+        running = !running;
+        button.textContent = running ? 'Pause' : 'Play';
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          button.click();
+        }
+      });
+    </script>
+  </body>
+</html>
