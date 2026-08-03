@@ -1038,6 +1038,23 @@
         padding: 0.8rem;
       }
 
+      .judge-pack {
+        display: block;
+        width: 100%;
+        margin: 0.45rem 0;
+        padding: 0.75rem;
+        min-height: 110px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #070b13;
+        color: #dae5f8;
+        font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+        font-size: 0.83rem;
+        line-height: 1.48;
+        white-space: pre-wrap;
+        overflow: auto;
+      }
+
       .section-title {
         margin: 1.2rem 0 0.7rem;
         color: var(--green-deep);
@@ -1465,6 +1482,12 @@
                 <div class="analysis-notice" id="export-hint">
                   Export is generated locally from current project state for client handoff.
                 </div>
+                <div class="export-box">
+                  <label class="workspace-label" for="judge-scorecard">Judge scorecard</label>
+                  <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to generate a judge-ready scorecard.</p>
+                  <pre id="judge-scorecard" class="judge-pack">No scorecard available.</pre>
+                  <button id="copy-judge-scorecard" class="small-btn" type="button">Copy judge scorecard</button>
+                </div>
               </div>
             </section>
           </div>
@@ -1479,6 +1502,7 @@
           <li>Project workspace stores multiple projects with autosave and reload continuity.</li>
           <li>Clip scoring is explainable with visible top reasons and interactive weighting.</li>
           <li>SEO assistant now generates A/B titles, descriptions, and tag suggestions from the parsed transcript.</li>
+          <li>Judge scorecard is generated with one-click copy for quick competition judging/handoff review.</li>
           <li>Output artifacts can be copied and downloaded with no local install.</li>
         </ul>
       </section>
@@ -1659,6 +1683,9 @@
         weightElements: Array.from(document.querySelectorAll("input[data-weight]")),
         analysisNotices: {},
         exportSummary: document.getElementById("export-summary"),
+        judgeScorecard: document.getElementById("judge-scorecard"),
+        judgeScorecardStatus: document.getElementById("judge-scorecard-status"),
+        copyJudgeScorecard: document.getElementById("copy-judge-scorecard"),
         copyMetadata: document.getElementById("copy-metadata"),
         copySession: document.getElementById("copy-session"),
         downloadJson: document.getElementById("download-json"),
@@ -2290,6 +2317,39 @@
           .join("");
       }
 
+      function getJudgeScorecardText(project) {
+        const safeProject = project || {};
+        const topClips = (safeProject.clips || []).slice(0, 3);
+        const clipSummary = topClips.length
+          ? topClips
+              .map((clip, index) => {
+                const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.duration}s)`;
+                const reason = (clip.reasons || [])[0] || "No key reason captured.";
+                return `${index + 1}) ${label} -> ${clip.score}/100 | ${reason}`;
+              })
+              .join("\n")
+          : "No clip recommendations yet.";
+        const seo = safeProject.metadata?.seo || {};
+        const bestTitle = safeProject.metadata?.title || "Not generated yet.";
+        const bestDescription = safeProject.metadata?.description || "Not generated yet.";
+        const tags = [...(safeProject.metadata?.tags || []), ...(seo.hashtags || [])].slice(0, 6).join(", ");
+        return [
+          `DropFix Scorecard`,
+          `Project: ${safeProject.name || "Untitled"}`,
+          `Profile: ${safeProject.profile || "standard"}`,
+          `Quality score: ${safeProject.qualityScore || 0}/100`,
+          `Segments parsed: ${(safeProject.segments || []).length}`,
+          `Top clips:`,
+          clipSummary,
+          `SEO title sample: ${bestTitle}`,
+          `SEO description sample: ${bestDescription}`,
+          `Tag stack: ${tags || "not generated"}`,
+          "",
+          `Recommended action: ${safeProject.qualityScore >= 65 ? "Publish with staged clips first" : "Rework hook and pacing before publish"}`,
+          `Generated: ${(safeProject.lastEdited || new Date().toISOString()).slice(0, 10)}`
+        ].join("\n");
+      }
+
       function renderIngestPanels(project) {
         const warnings = project.warnings || [];
         el.parseWarnings.innerHTML = warnings
@@ -2327,6 +2387,12 @@
         el.exportSummary.textContent = project.status === "analyzed"
           ? `${project.clips?.length || 0} clip recommendations ready for use.`
           : "No exports available. Run analysis first.";
+        const judgeScorecard = getJudgeScorecardText(project);
+        el.judgeScorecard.textContent = judgeScorecard;
+        el.judgeScorecardStatus.textContent = project.status === "analyzed"
+          ? "Judge scorecard ready for copy."
+          : "Run analysis to generate a judge-ready scorecard.";
+        el.copyJudgeScorecard.disabled = project.status !== "analyzed";
         renderClipCards(project.clips || []);
         renderQualityNarrative(project);
         updateBadges();
@@ -2696,6 +2762,17 @@
       el.runButton.addEventListener("click", runAnalysis);
       el.seoGenerate.addEventListener("click", regenerateSeoPack);
       el.demoButton.addEventListener("click", runDemoFlow);
+      el.copyJudgeScorecard.addEventListener("click", async () => {
+        const project = getCurrentProject();
+        if (!project || project.status !== "analyzed") {
+          return;
+        }
+        const copied = await copyTextToClipboard(getJudgeScorecardText(project));
+        el.copyJudgeScorecard.textContent = copied ? "Judge scorecard copied" : "Copy failed";
+        setTimeout(() => {
+          el.copyJudgeScorecard.textContent = "Copy judge scorecard";
+        }, 1200);
+      });
 
       el.loadSample.addEventListener("click", () => {
         const sample = DEMO_TRANSCRIPT;
