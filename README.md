@@ -127,4 +127,10 @@ For full API details, open the backend API docs and the backend README.
 
 This repository is intentionally designed to be judged in a local environment first, then optionally exposed with a frontend later.
 
+## Public fallback links
+
+- GitHub Pages (primary public fallback): `https://ezrawestover1-hub.github.io/youtube-automation-hackathon/`
+- Sites URL (if you still want this route): `https://dropfix-youtube-automation.ezra-westover1.chatgpt.site/`  
+  - If this path is still restricted, trigger one Sites publish from the connected project after these files exist: `index.html`, `index.js`, and `package.json`.
+
 
