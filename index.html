@@ -493,6 +493,12 @@
         padding-left: 1.15rem;
       }
 
+      .meta-list {
+        margin: 0.45rem 0 0;
+        padding-left: 1.15rem;
+        line-height: 1.45;
+      }
+
       .tag-cloud {
         display: flex;
         flex-wrap: wrap;
@@ -782,19 +788,67 @@
               </div>
             </section>
 
-            <section class="tab-panel" id="suggestions">
-              <label class="workspace-label">Clip shortlist with transparent reasons</label>
-              <div id="clip-cards" class="clip-list">
-                <p class="muted">Run analysis to generate clips.</p>
+      <section class="tab-panel" id="suggestions">
+        <label class="workspace-label">Clip shortlist with transparent reasons</label>
+        <div id="clip-cards" class="clip-list">
+          <p class="muted">Run analysis to generate clips.</p>
+        </div>
+        <label class="workspace-label" style="margin-top: 0.8rem;">Metadata suggestions</label>
+        <div class="export-box">
+          <div class="tag-cloud" id="metadata-cloud">
+            <span>Generate first</span>
+          </div>
+          <p class="helper" id="metadata-note" style="margin: 0.45rem 0 0">Suggestions depend on analyzed transcript and profile.</p>
+        </div>
+        <label class="workspace-label" style="margin-top: 0.8rem;">Metadata + SEO assistant</label>
+        <div class="export-box">
+          <div class="inline-row" style="align-items: flex-end;">
+            <div style="min-width: 150px; flex: 1;">
+              <label class="workspace-label" for="seo-tone" style="margin-bottom: 0.2rem;">Tone preset</label>
+              <select id="seo-tone">
+                <option value="balanced">Balanced (default)</option>
+                <option value="bold">Bold / curiosity</option>
+                <option value="educational">Educational and trustworthy</option>
+                <option value="commercial">Commercial + conversion</option>
+              </select>
+            </div>
+            <div style="min-width: 165px; flex: 1;">
+              <label class="workspace-label" for="seo-length" style="margin-bottom: 0.2rem;">Description length</label>
+              <select id="seo-length">
+                <option value="short">Short</option>
+                <option value="balanced">Balanced (default)</option>
+                <option value="long">Long + detailed</option>
+              </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <input type="checkbox" id="seo-hashtags" checked />
+              <label for="seo-hashtags" style="margin: 0; font-size: 0.88rem; color: var(--green-deep);">
+                Include hashtag block
+              </label>
+            </div>
+            <button id="generate-seo" class="small-btn" type="button">Generate SEO pack</button>
+          </div>
+
+          <div class="summary-grid">
+            <div class="metric">
+              <strong>A/B title options</strong>
+              <ul id="seo-title-list" class="meta-list"></ul>
+            </div>
+            <div class="metric">
+              <strong>Description variants</strong>
+              <ul id="seo-description-list" class="meta-list"></ul>
+            </div>
+            <div class="metric">
+              <strong>SEO tags</strong>
+              <div class="tag-cloud" id="seo-tag-cloud">
+                <span>Generate after analysis</span>
               </div>
-              <label class="workspace-label" style="margin-top: 0.8rem;">Metadata suggestions</label>
-              <div class="export-box">
-                <div class="tag-cloud" id="metadata-cloud">
-                  <span>Generate first</span>
-                </div>
-                <p class="helper" id="metadata-note" style="margin: 0.45rem 0 0">Suggestions depend on analyzed transcript and profile.</p>
-              </div>
-            </section>
+            </div>
+          </div>
+
+          <p class="helper" id="seo-rationale" style="margin: 0.35rem 0 0">Generate metadata only after analysis for transcript-aware output.</p>
+        </div>
+      </section>
 
             <section class="tab-panel" id="export">
               <h3 class="panel-title">Ready-to-use outputs</h3>
@@ -825,6 +879,7 @@
           <li>Transcript and subtitle ingestion works in-browser with clear parse feedback.</li>
           <li>Project workspace stores multiple projects with autosave and reload continuity.</li>
           <li>Clip scoring is explainable with visible top reasons and interactive weighting.</li>
+          <li>SEO assistant now generates A/B titles, descriptions, and tag suggestions from the parsed transcript.</li>
           <li>Output artifacts can be copied and downloaded with no local install.</li>
         </ul>
       </section>
@@ -888,6 +943,63 @@
         }
       };
 
+      const SEO_TEMPLATES = {
+        balanced: {
+          title: [
+            "How to {keyword} faster without losing retention",
+            "Why this {keyword} system beats trial and error",
+            "The {keyword} strategy creators reuse for better watch time"
+          ],
+          description: [
+            "In this breakdown, you get a practical framework for {keyword} that improves first-impression strength, clarity, and viewer retention.",
+            "Learn exactly how this {keyword} setup is structured, including timing, pacing, and one clear CTA that keeps people watching.",
+            "Use this {keyword} walkthrough to identify where viewers drop and what to change next for stronger repackaging."
+          ]
+        },
+        bold: {
+          title: [
+            "Nobody explains {keyword} like this",
+            "You are probably doing this {keyword} wrong",
+            "Fix these 3 {keyword} mistakes now"
+          ],
+          description: [
+            "This video exposes the exact {keyword} leaks that drop retention and shows what to cut, keep, or repurpose.",
+            "If your viewer count is stalling, this quick {keyword} reset gives you a better opening, stronger middle, and cleaner close.",
+            "A practical {keyword} playbook with no fluff: hook, proof, and one decisive CTA."
+          ]
+        },
+        educational: {
+          title: [
+            "A practical {keyword} framework for creators",
+            "How to teach {keyword} in 5 clear steps",
+            "Understanding why {keyword} quality drops over time"
+          ],
+          description: [
+            "This breakdown clarifies how {keyword} structure impacts viewer understanding and completion behavior.",
+            "You will see the exact sequence of hooks, context, and proof points that improved retention in this topic.",
+            "Use this framework as a reusable checklist when scripting your next long-form or short-form piece."
+          ]
+        },
+        commercial: {
+          title: [
+            "Get higher watch time with this {keyword} formula",
+            "{keyword} that drives real action for creators",
+            "Want better results? Use this {keyword} workflow"
+          ],
+          description: [
+            "This {keyword} workflow is built to help teams move faster while improving quality signals and click-through confidence.",
+            "A creator-ready breakdown with retention tactics, tighter phrasing, and a stronger close to increase follow-through.",
+            "Apply this {keyword} approach in edits and posts, then test against your audience with one measurable clip variant."
+          ]
+        }
+      };
+
+      const DESCRIPTION_LIMITS = {
+        short: 100,
+        balanced: 175,
+        long: 280
+      };
+
       const state = {
         activeTab: "inputs",
         projects: [],
@@ -924,6 +1036,14 @@
         clipCards: document.getElementById("clip-cards"),
         metadataCloud: document.getElementById("metadata-cloud"),
         metadataNote: document.getElementById("metadata-note"),
+        seoTone: document.getElementById("seo-tone"),
+        seoLength: document.getElementById("seo-length"),
+        seoHashtags: document.getElementById("seo-hashtags"),
+        seoGenerate: document.getElementById("generate-seo"),
+        seoTitleList: document.getElementById("seo-title-list"),
+        seoDescriptionList: document.getElementById("seo-description-list"),
+        seoTagCloud: document.getElementById("seo-tag-cloud"),
+        seoRationale: document.getElementById("seo-rationale"),
         qualityBar: document.getElementById("quality-meter"),
         qualitySummary: document.getElementById("quality-summary"),
         qualityExplanations: document.getElementById("quality-explanations"),
@@ -1301,6 +1421,91 @@
         };
       }
 
+      function sanitizeSeoText(input) {
+        return (input || "").replace(/\s+/g, " ").trim().replace(/\s{2,}/g, " ");
+      }
+
+      function limitWords(text, target) {
+        const words = text.split(/\s+/).filter(Boolean);
+        return words.length <= target
+          ? text
+          : `${words.slice(0, target).join(" ")}...`;
+      }
+
+      function makeSeoSuggestions(project) {
+        const segments = project.segments || [];
+        const joined = segments.map((s) => s.text).join(" ");
+        const keywordList = extractKeywords(joined).map(([word]) => word);
+        const seed = keywordList[0] || (el.profile.value === "shorts" ? "youtube shorts" : "youtube creator");
+        const coreKeyword = seed.replace(/[^a-z0-9\s]/gi, "").trim() || "youtube creator";
+        const keywordSlug = coreKeyword.split(/\s+/)[0];
+        const templateKey = el.seoTone.value || "balanced";
+        const template = SEO_TEMPLATES[templateKey] || SEO_TEMPLATES.balanced;
+        const lengthTarget = DESCRIPTION_LIMITS[el.seoLength.value] || DESCRIPTION_LIMITS.balanced;
+        const includeHashtags = el.seoHashtags.checked;
+
+        const profileSuffix = el.profile.value === "education"
+          ? "for YouTube education"
+          : el.profile.value === "shorts"
+            ? "for short-form creator growth"
+            : "for YouTube creators";
+
+        const titleTemplates = template.title;
+        const descriptionTemplates = template.description;
+        const titles = [
+          titleTemplates[0],
+          titleTemplates[1]
+        ]
+          .map((t) => sanitizeSeoText(t.replace("{keyword}", coreKeyword).replace("{audience}", profileSuffix)))
+          .filter(Boolean)
+          .map((value) => `${value} | ${profileSuffix}`);
+
+        const descriptionBase = [
+          descriptionTemplates[0],
+          descriptionTemplates[1]
+        ].map((d) => {
+          const result = sanitizeSeoText(d.replace("{keyword}", coreKeyword).replace("{audience}", profileSuffix));
+          return limitWords(result, lengthTarget);
+        });
+
+        const tags = Array.from(new Set([
+          keywordSlug,
+          coreKeyword,
+          ...keywordList.slice(0, 8),
+          ...[
+            "creator workflow",
+            "video optimization",
+            el.profile.value === "shorts" ? "youtube shorts" : "tutorial",
+            el.profile.value === "education" ? "learning" : "creator tips",
+            "retention"
+          ]
+        ]))
+          .filter(Boolean)
+          .map((value) => sanitizeSeoText(value).replace(/\s+/g, " ").toLowerCase())
+          .filter((value) => value.length > 1)
+          .slice(0, 14);
+
+        const hashtags = includeHashtags
+          ? tags.slice(0, 6).map((tag) => `#${tag.replace(/\s+/g, "")}`)
+          : [];
+
+        return {
+          tone: templateKey,
+          length: el.seoLength.value,
+          includeHashtags,
+          titles: Array.from(new Set([...titles, `${coreKeyword}: complete workflow breakdown`])).slice(0, 2),
+          descriptionVariants: Array.from(new Set([...descriptionBase, `Try this ${coreKeyword} workflow with one clean hook and consistent pacing.`])).slice(0, 2),
+          tags,
+          hashtags,
+          rationale: [
+            `SEO pack optimized for profile: ${el.profile.value}`,
+            `Primary topic keyword: "${coreKeyword}"`,
+            `Estimated title length: ${titles[0]?.length || 0} chars`
+          ],
+          publishReady: project.qualityScore >= 55 && segments.length >= 2
+        };
+      }
+
       function updateBadges() {
         const project = getCurrentProject();
         const totalSegments = (project.segments || []).length;
@@ -1357,7 +1562,7 @@
           profileReasoning: "",
           lastEdited: now,
           clips: [],
-          metadata: {},
+          metadata: { seo: {} },
           status: "new"
         };
         state.projects.unshift(project);
@@ -1377,6 +1582,15 @@
         el.profile.value = project.profile || "standard";
         el.sourceType.value = project.sourceType || "text";
         el.transcript.value = project.transcript || "";
+        if (project.metadata?.seo?.tone && el.seoTone) {
+          el.seoTone.value = project.metadata.seo.tone;
+        }
+        if (project.metadata?.seo?.length && el.seoLength) {
+          el.seoLength.value = project.metadata.seo.length;
+        }
+        if (el.seoHashtags && typeof project.metadata?.seo?.includeHashtags !== "undefined") {
+          el.seoHashtags.checked = project.metadata.seo.includeHashtags;
+        }
         const weights = project.weights || getProfileDefaults(project.profile || "standard");
         setWeightsFromState(weights);
         el.statusState.textContent = project.status || "Loaded";
@@ -1418,6 +1632,23 @@
         el.metadataNote.textContent = project.metadata && project.metadata.description
           ? project.metadata.description
           : "Suggestions depend on analyzed transcript and profile.";
+        const seoTags = project.metadata?.seo?.tags || [];
+        const seoHashtags = project.metadata?.seo?.hashtags || [];
+        const seoDisplayTags = seoHashtags.length
+          ? [...seoTags.slice(0, 6), ...seoHashtags]
+          : seoTags;
+        el.seoTagCloud.innerHTML = seoDisplayTags.length
+          ? seoDisplayTags.map((tag) => `<span>${tag}</span>`).join("")
+          : "<span>Run analysis then click Generate SEO pack.</span>";
+        el.seoTitleList.innerHTML = (project.metadata?.seo?.titles && project.metadata.seo.titles.length)
+          ? project.metadata.seo.titles.map((title) => `<li>${title}</li>`).join("")
+          : "<li>Generate after analysis</li>";
+        el.seoDescriptionList.innerHTML = (project.metadata?.seo?.descriptionVariants && project.metadata.seo.descriptionVariants.length)
+          ? project.metadata.seo.descriptionVariants.map((desc) => `<li>${desc}</li>`).join("")
+          : "<li>Generate after analysis</li>";
+        el.seoRationale.textContent = project.metadata?.seo?.rationale
+          ? project.metadata.seo.rationale.join(" · ")
+          : "Generate SEO pack to see tone-specific title/description variants.";
         el.exportSummary.textContent = project.status === "analyzed"
           ? `${project.clips?.length || 0} clip recommendations ready for use.`
           : "No exports available. Run analysis first.";
@@ -1578,6 +1809,7 @@
         project.weights = weights;
         project.status = "analyzed";
         project.metadata = makeMetadataSuggestions(project);
+        project.metadata.seo = makeSeoSuggestions(project);
         project.qualityExplanations = qualityRationale(result.ordered, result.quality);
         project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
         project.lastEdited = new Date().toISOString();
@@ -1644,7 +1876,7 @@
         project.warnings = [];
         project.status = "new";
         project.clips = [];
-        project.metadata = {};
+        project.metadata = { seo: {} };
         project.qualityScore = 0;
         project.qualityLabel = "No run yet.";
         project.qualityExplanations = [];
@@ -1668,6 +1900,24 @@
           hydrateProject(state.currentId);
           renderProjectList();
         }
+      }
+
+      function regenerateSeoPack() {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        if (project.status !== "analyzed") {
+          setIngestError("Run analysis first before generating SEO options.");
+          return;
+        }
+        project.metadata = project.metadata || {};
+        project.metadata.seo = makeSeoSuggestions(project);
+        project.metadata.seoGeneratedAt = new Date().toISOString();
+        persistProject();
+        renderIngestPanels(project);
+        el.seoRationale.textContent = "SEO pack regenerated for current tone and description length.";
+        switchTab("suggestions");
       }
 
       async function copyTextToClipboard(text) {
@@ -1723,6 +1973,8 @@
       });
 
       el.runButton.addEventListener("click", runAnalysis);
+      el.seoGenerate.addEventListener("click", regenerateSeoPack);
+
       el.loadSample.addEventListener("click", () => {
         const sample = "Title: Why retention drops and how to fix it.\n\nAt 0:07, start with the viewer's pain point so they stay through the intro. Show what changed and why this method works. By second 20, deliver proof with a tiny reveal. Keep one clear takeaway every 45 seconds and repeat the promise before final CTA.";
         const project = ensureProject();
@@ -1838,7 +2090,12 @@
         if (!project) {
           return;
         }
-        const summary = `Project: ${project.name}\nProfile: ${project.profile}\nQuality score: ${project.qualityScore}\nSegments: ${project.segments.length}\nSuggested title: ${project.metadata?.title || "N/A"}\nDescription: ${project.metadata?.description || "N/A"}\nTags: ${(project.metadata?.tags || []).join(", ")}\n`;
+        const seoLines = [
+          `SEO tone: ${project.metadata?.seo?.tone || "N/A"}`,
+          `SEO titles: ${(project.metadata?.seo?.titles || []).join(" | ")}`,
+          `SEO descriptions: ${(project.metadata?.seo?.descriptionVariants || []).join(" | ")}`
+        ];
+        const summary = `Project: ${project.name}\nProfile: ${project.profile}\nQuality score: ${project.qualityScore}\nSegments: ${project.segments.length}\nSuggested title: ${project.metadata?.title || "N/A"}\nDescription: ${project.metadata?.description || "N/A"}\nTags: ${(project.metadata?.tags || []).join(", ")}\n${seoLines.join("\n")}\n`;
         downloadFile(`${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix-summary.txt`, summary, "text/plain");
       });
 
