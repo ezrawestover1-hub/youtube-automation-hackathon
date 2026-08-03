@@ -564,6 +564,30 @@
         line-height: 1.25;
       }
 
+      .state-badge.status-strong {
+        background: rgba(111, 220, 145, 0.12);
+        color: #d5ffdf;
+        border-color: rgba(111, 220, 145, 0.45);
+      }
+
+      .state-badge.status-good {
+        background: rgba(101, 184, 255, 0.12);
+        color: #d6ecff;
+        border-color: rgba(101, 184, 255, 0.45);
+      }
+
+      .state-badge.status-watch {
+        background: rgba(248, 191, 87, 0.12);
+        color: #ffe7ba;
+        border-color: rgba(248, 191, 87, 0.45);
+      }
+
+      .state-badge.status-risks {
+        background: rgba(255, 148, 148, 0.12);
+        color: #ffdddd;
+        border-color: rgba(255, 148, 148, 0.45);
+      }
+
       .context-strip {
         margin-top: 0.4rem;
         border: 1px dashed rgba(123, 139, 168, 0.2);
@@ -1211,6 +1235,7 @@
               <li><strong>Sprint 3</strong> implemented: tabbed workspace + local persistence + rerun controls.</li>
               <li><strong>Sprint 4</strong> implemented: explainable, adjustable scoring factors + rationale.</li>
               <li><strong>Sprint 5</strong> implemented: judge-mode verdict and CSV handoff export.</li>
+              <li><strong>Sprint 6</strong> implemented: verdict-tone visual ranking + one-click judge packet export.</li>
             </ul>
           </aside>
         </div>
@@ -1479,6 +1504,7 @@
                   <button id="copy-session" class="small-btn" type="button">Copy full session</button>
                   <button id="download-json" class="small-btn" type="button">Download JSON</button>
                   <button id="download-summary" class="small-btn" type="button">Download summary</button>
+                  <button id="download-judge-packet" class="small-btn" type="button">Download judge packet</button>
                 </div>
                 <div class="analysis-notice" id="export-hint">
                   Export is generated locally from current project state for client handoff.
@@ -1519,6 +1545,7 @@
           <li>SEO assistant now generates A/B titles, descriptions, and tag suggestions from the parsed transcript.</li>
           <li>Judge scorecard is generated with one-click copy for quick competition judging/handoff review.</li>
           <li>Competition mode supports one-line verdicts and CSV row export for head-to-head judging.</li>
+          <li>Judge packet export bundles verdict, scorecard, top clips, and both judge/creator comparisons into one submission file.</li>
           <li>Output artifacts can be copied and downloaded with no local install.</li>
         </ul>
       </section>
@@ -1710,6 +1737,7 @@
         downloadJson: document.getElementById("download-json"),
         downloadSummary: document.getElementById("download-summary"),
         downloadJudgeCsv: document.getElementById("download-judge-csv"),
+        downloadJudgePacket: document.getElementById("download-judge-packet"),
       };
 
       function clamp(value, min, max) {
@@ -2429,9 +2457,9 @@
         return `"${cell}"`;
       }
 
-      function makeJudgeCsvRow(project) {
+      function makeJudgeCsvRow(project, modeOverride) {
         const safeProject = project || {};
-        const mode = getCompetitionMode();
+        const mode = modeOverride || getCompetitionMode();
         const verdict = getCompetitionVerdict(safeProject, mode);
         const topClip = (safeProject.clips || [])[0];
         const rows = [
@@ -2457,6 +2485,63 @@
           (safeProject.lastEdited || new Date().toISOString()).slice(0, 10)
         ];
         return `${rows.map(escapeCsvCell).join(",")}\n${row.map(escapeCsvCell).join(",")}`;
+      }
+
+      function getVerdictToneClass(mode, quality) {
+        if (mode === "creator") {
+          if (quality >= 75 || quality >= 60) {
+            return "status-good";
+          }
+          return "status-risks";
+        }
+        if (quality >= 80) {
+          return "status-strong";
+        }
+        if (quality >= 65) {
+          return "status-good";
+        }
+        if (quality >= 50) {
+          return "status-watch";
+        }
+        return "status-risks";
+      }
+
+      function makeJudgePacket(project) {
+        const safeProject = project || {};
+        const verdictJudge = getCompetitionVerdict(safeProject, "judge");
+        const verdictCreator = getCompetitionVerdict(safeProject, "creator");
+        const topClips = (safeProject.clips || []).slice(0, 3).map((clip, index) => ({
+          rank: index + 1,
+          start: formatDuration(clip.start),
+          end: formatDuration(clip.end),
+          score: clip.score,
+          reason: (clip.reasons && clip.reasons[0]) || "n/a"
+        }));
+        return {
+          title: "DropFix judge packet",
+          generatedAt: safeProject.lastEdited || new Date().toISOString(),
+          projectName: safeProject.name || "Untitled",
+          profile: safeProject.profile || "standard",
+          qualityScore: clampPercent(safeProject.qualityScore || 0),
+          segments: (safeProject.segments || []).length,
+          verdicts: {
+            judge: verdictJudge,
+            creator: verdictCreator
+          },
+          topClips,
+          metadata: {
+            title: safeProject.metadata?.title || "",
+            description: safeProject.metadata?.description || "",
+            tags: safeProject.metadata?.tags || [],
+            callToAction: safeProject.metadata?.callToAction || ""
+          },
+          seo: safeProject.metadata?.seo || {},
+          compareRows: {
+            judge: makeJudgeCsvRow(safeProject, "judge"),
+            creator: makeJudgeCsvRow(safeProject, "creator")
+          },
+          scorecardText: getJudgeScorecardText(safeProject)
+        };
       }
 
       function renderIngestPanels(project) {
@@ -2497,6 +2582,11 @@
           ? `${project.clips?.length || 0} clip recommendations ready for use.`
           : "No exports available. Run analysis first.";
         const verdict = getCompetitionVerdict(project, getCompetitionMode());
+        const quality = clampPercent(project.qualityScore || 0);
+        const verdictTone = project.status === "analyzed"
+          ? getVerdictToneClass(getCompetitionMode(), quality)
+          : "status-watch";
+        el.verdictPill.className = `state-badge ${verdictTone}`;
         el.verdictPill.textContent = project.status === "analyzed" ? verdict.label : "Run analysis";
         el.verdictNote.textContent = project.status === "analyzed"
           ? `Verdict: ${verdict.rationale}`
@@ -2508,6 +2598,7 @@
           : "Run analysis to generate a judge-ready scorecard.";
         el.copyJudgeScorecard.disabled = project.status !== "analyzed";
         el.downloadJudgeCsv.disabled = project.status !== "analyzed";
+        el.downloadJudgePacket.disabled = project.status !== "analyzed";
         renderClipCards(project.clips || []);
         renderQualityNarrative(project);
         updateBadges();
@@ -2902,6 +2993,15 @@
         const csv = makeJudgeCsvRow(project);
         const filename = `${(project.name || "project").replace(/\\s+/g, "-").toLowerCase()}-dropfix-judge.csv`;
         downloadFile(filename, csv, "text/csv");
+      });
+      el.downloadJudgePacket.addEventListener("click", () => {
+        const project = getCurrentProject();
+        if (!project || project.status !== "analyzed") {
+          return;
+        }
+        const packet = makeJudgePacket(project);
+        const filename = `${(project.name || "project").replace(/\\s+/g, "-").toLowerCase()}-dropfix-judge-packet.json`;
+        downloadFile(filename, JSON.stringify(packet, null, 2), "application/json");
       });
 
       el.loadSample.addEventListener("click", () => {
