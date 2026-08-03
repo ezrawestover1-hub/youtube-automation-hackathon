@@ -1,14 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DropFix | YouTube Workflow Automation</title>
-    <meta
-      name="description"
-      content="DropFix helps YouTube creators generate clip-ready recommendations and metadata from transcript files with no setup."
-    />
-    <style>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>DropFix | YouTube Workflow Automation</title>
+      <meta
+        name="description"
+        content="DropFix helps YouTube creators generate clip-ready recommendations and metadata from transcript files with no setup."
+      />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+      <style>
       :root {
         --cream-main: #f6efe4;
         --cream-soft: #fff9f1;
@@ -19,6 +25,17 @@
         --line: rgba(46, 90, 70, 0.2);
         --radius: 16px;
         --shadow: 0 18px 45px rgba(31, 92, 69, 0.15);
+        --shadow-soft: 0 10px 30px rgba(31, 92, 69, 0.1);
+        --surface: rgba(255, 252, 244, 0.88);
+        --control-bg: #ffffff;
+        --control-border: rgba(46, 90, 70, 0.32);
+        --control-focus: #56b77a;
+        --ease-snappy: cubic-bezier(0.22, 0.61, 0.36, 1);
+        --muted-surface: #f4faf2;
+        --focus-ring: rgba(86, 183, 121, 0.35);
+        --panel-sheen: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(248, 255, 244, 0.83));
+        --panel-shadow: 0 22px 48px rgba(31, 92, 69, 0.14);
+        --panel-shadow-soft: 0 10px 24px rgba(31, 92, 69, 0.09);
       }
 
       * {
@@ -32,18 +49,44 @@
       body {
         margin: 0;
         color: var(--text-primary);
-        font-family: "Trebuchet MS", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
+        font-family: "Manrope", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
+        position: relative;
         background:
           radial-gradient(circle at 14% 12%, rgba(243, 228, 209, 0.9), transparent 30%),
           radial-gradient(circle at 86% 8%, rgba(142, 201, 165, 0.34), transparent 38%),
           linear-gradient(150deg, var(--cream-main), var(--cream-soft));
         min-height: 100vh;
+        letter-spacing: 0.01em;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.45), transparent 22%),
+          radial-gradient(circle at 80% 78%, rgba(92, 201, 122, 0.16), transparent 34%),
+          linear-gradient(165deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0) 66%, rgba(255, 255, 255, 0.2));
+        opacity: 0.7;
+        z-index: -1;
+      }
+
+      .top-bar {
+        border: 1px solid rgba(46, 90, 70, 0.14);
+        border-radius: 16px;
+        padding: 0.4rem 0.75rem;
+        background: var(--surface);
+        box-shadow: 0 8px 26px rgba(31, 92, 69, 0.08);
       }
 
       .wrap {
         width: min(1220px, 95vw);
         margin: 0 auto;
         padding: 1.75rem 0 3rem;
+        position: relative;
+        z-index: 1;
       }
 
       .top-bar {
@@ -58,7 +101,7 @@
         display: inline-flex;
         align-items: center;
         gap: 0.55rem;
-        background: #ffffffde;
+        background: linear-gradient(180deg, #ffffff, #ebf7ec);
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 0.58rem 0.9rem;
@@ -70,7 +113,7 @@
       .tag {
         color: var(--green-deep);
         border: 1px solid var(--line);
-        background: var(--cream-soft);
+        background: linear-gradient(180deg, #fffdf9, var(--cream-soft));
         border-radius: 999px;
         padding: 0.34rem 0.8rem;
         font-size: 0.8rem;
@@ -87,10 +130,36 @@
 
       .hero {
         border-radius: var(--radius);
+        position: relative;
+        overflow: hidden;
         padding: clamp(1.45rem, 2.2vw, 2.6rem);
-        background: linear-gradient(145deg, #245d47, #2f7457 52%, #4c8b70 100%);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: linear-gradient(135deg, #235b46 1%, #30785a 56%, #4c8b70 100%);
         color: #f6fff7;
-        box-shadow: var(--shadow);
+        box-shadow: var(--panel-shadow);
+        isolation: isolate;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: -30% -20% auto auto;
+        width: 380px;
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.02));
+        z-index: -1;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -15% -40%;
+        width: 400px;
+        height: 260px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+        transform: rotate(-12deg);
+        z-index: -1;
       }
 
       .hero h1 {
@@ -124,6 +193,8 @@
         border: 1px solid rgba(255, 255, 255, 0.24);
         border-radius: var(--radius);
         padding: 0.8rem 0.9rem;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 10px 24px rgba(10, 28, 22, 0.1);
       }
 
       .pillboard ul {
@@ -155,8 +226,17 @@
         padding: 0.73rem 1rem;
         font-weight: 700;
         text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+        white-space: nowrap;
         cursor: pointer;
-        transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+        transition:
+          transform 160ms ease,
+          box-shadow 160ms ease,
+          opacity 160ms ease,
+          filter 160ms ease;
       }
 
       .btn:hover {
@@ -166,12 +246,14 @@
       }
 
       .btn.primary {
-        background: #d7f0d2;
-        color: #163f33;
+        background: linear-gradient(180deg, #5dc58a, #2f905a);
+        color: #effff1;
+        box-shadow: 0 8px 20px rgba(41, 132, 82, 0.25);
+        border: 1px solid #3e8662;
       }
 
       .btn.secondary {
-        background: transparent;
+        background: rgba(255, 255, 255, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.5);
         color: #f7fffa;
       }
@@ -184,18 +266,34 @@
       }
 
       .card {
-        background: var(--card-bg, rgba(255, 250, 243, 0.74));
-        border: 1px solid var(--line);
+        --card-accent: linear-gradient(135deg, rgba(88, 181, 125, 0.16), rgba(255, 255, 255, 0.65));
+        background:
+          var(--card-accent),
+          var(--card-bg, var(--panel-sheen));
+        border: 1px solid rgba(31, 92, 69, 0.12);
         border-radius: var(--radius);
-        box-shadow: var(--shadow);
+        box-shadow: var(--panel-shadow-soft);
         backdrop-filter: blur(6px);
         padding: 0.95rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        pointer-events: none;
       }
 
       .panel-title {
         margin: 0 0 0.55rem;
         color: var(--green-deep);
-        font-size: 1.05rem;
+        font-size: 1.07rem;
+        letter-spacing: 0.01em;
+        font-weight: 800;
       }
 
       .workspace-actions {
@@ -208,10 +306,38 @@
         border: 1px solid var(--line);
         background: #f8fdf7;
         color: var(--green-deep);
-        border-radius: 10px;
-        padding: 0.43rem 0.75rem;
+        border-radius: 11px;
+        padding: 0.5rem 0.9rem;
         font-weight: 700;
+        font-size: 0.88rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.28rem;
+        justify-content: center;
         cursor: pointer;
+        transition-timing-function: var(--ease-snappy);
+        transition:
+          transform 160ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease;
+        box-shadow: 0 4px 14px rgba(31, 92, 69, 0.08);
+      }
+
+      .small-btn:hover {
+        transform: translateY(-1px);
+        background: #ecfbef;
+        border-color: #8dcfa6;
+      }
+
+      .small-btn[data-preset] {
+        background: #fbfffc;
+      }
+
+      .small-btn:active,
+      .tab-btn:active,
+      .flow-step:active,
+      .btn:active {
+        transform: translateY(1px) scale(0.98);
       }
 
       .projects {
@@ -222,10 +348,20 @@
 
       .project-item {
         background: #fffef8;
-        border: 1px solid var(--line);
+        border: 1px solid rgba(31, 92, 69, 0.14);
         border-radius: 10px;
         padding: 0.55rem;
         cursor: pointer;
+        transition:
+          transform 140ms var(--ease-snappy),
+          border-color 140ms var(--ease-snappy);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .project-item:hover {
+        transform: translateY(-1px);
+        border-color: rgba(43, 110, 77, 0.4);
       }
 
       .project-item.active {
@@ -257,20 +393,92 @@
         display: flex;
         gap: 0.45rem;
         flex-wrap: wrap;
+        align-items: center;
       }
 
       .tab-btn {
         border: 1px solid var(--line);
-        background: #fff;
+        background: linear-gradient(180deg, #ffffff, #f3fff5);
         border-radius: 999px;
         padding: 0.48rem 0.86rem;
         color: var(--green-deep);
         font-weight: 700;
+        transition:
+          color 140ms ease,
+          background-color 140ms ease,
+          transform 140ms ease,
+          border-color 140ms ease;
         cursor: pointer;
       }
 
       .tab-btn.active {
-        background: #d5efe0;
+        background: linear-gradient(170deg, #3f9a64, #2f7554 70%);
+        border-color: #4c9270;
+        color: #f5fff7;
+        box-shadow: 0 8px 22px rgba(31, 92, 69, 0.22);
+      }
+
+      .tab-btn.active:hover {
+        transform: none;
+      }
+
+      .tab-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .workflow-strip {
+        margin-top: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+      }
+
+      .flow-step {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.45rem 0.75rem;
+        background: #ffffffd9;
+        color: #2b5d47;
+        cursor: pointer;
+        font-size: 0.84rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        transition:
+          border-color 140ms ease,
+          color 140ms ease,
+          background-color 140ms ease;
+        animation: flowChipIn 180ms var(--ease-snappy);
+      }
+
+      .flow-step:hover {
+        transform: translateY(-1px);
+      }
+
+      .flow-step.is-active {
+        color: #f5fff5;
+        background: linear-gradient(180deg, #4ea56f, #2d7554);
+        border-color: #2b6e4d;
+      }
+
+      .flow-step.is-complete {
+        background: linear-gradient(180deg, #d8f1de, #c5e8cc);
+        border-color: #6fba88;
+      }
+
+      .flow-step:disabled {
+        opacity: 0.46;
+        cursor: not-allowed;
+        filter: grayscale(0.2);
+      }
+
+      .flow-step[aria-current="step"] {
+        box-shadow: 0 8px 18px rgba(31, 92, 69, 0.2);
+      }
+
+      .tab-btn:disabled {
+        opacity: 0.46;
+        cursor: not-allowed;
+        filter: grayscale(0.2);
       }
 
       .state-badges {
@@ -289,6 +497,58 @@
         border: 1px solid #a8d2b5;
       }
 
+      .context-strip {
+        margin-top: 0.4rem;
+        border: 1px dashed rgba(46, 90, 70, 0.2);
+        border-radius: 12px;
+        padding: 0.5rem 0.65rem;
+        background: var(--muted-surface);
+        color: var(--text-primary);
+        animation: panelReveal 220ms ease;
+      }
+
+      .workflow-progress {
+        margin-top: 0.5rem;
+        display: grid;
+        gap: 0.32rem;
+      }
+
+      .workflow-progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: #edf4ee;
+        overflow: hidden;
+      }
+
+      .workflow-progress-fill {
+        display: block;
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #58b47a, #2d8554);
+        transition: width 200ms var(--ease-snappy);
+      }
+
+      .workflow-progress-label {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #2e5546;
+      }
+
+      @keyframes flowChipIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px) scale(0.97);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
       .panels {
         position: relative;
       }
@@ -299,6 +559,19 @@
 
       .tab-panel.active {
         display: block;
+        animation: panelReveal 180ms ease;
+      }
+
+      @keyframes panelReveal {
+        from {
+          opacity: 0.75;
+          transform: translateY(2px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .two-col {
@@ -321,6 +594,21 @@
         margin: 0.6rem 0;
       }
 
+      .field-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-top: 0.15rem;
+        font-size: 0.88rem;
+        color: var(--green-deep);
+        font-weight: 600;
+      }
+
+      .file-upload {
+        margin: 0;
+        cursor: pointer;
+      }
+
       .input-grid {
         display: grid;
         gap: 0.65rem;
@@ -333,6 +621,11 @@
         background: #fffef7;
         color: var(--text-muted);
         min-height: 120px;
+        transition:
+          border-color 160ms ease,
+          background-color 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease;
         display: grid;
         place-items: center;
         text-align: center;
@@ -347,25 +640,156 @@
         display: none;
       }
 
+      input,
+      select,
       textarea {
         width: 100%;
-        min-height: 270px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 0.72rem;
+        border: 1px solid var(--control-border);
+        border-radius: 12px;
+        background: linear-gradient(180deg, #ffffff, #f8fffa);
         color: var(--text-primary);
+        transition:
+          border-color 160ms ease,
+          box-shadow 160ms ease,
+          transform 160ms ease;
+        line-height: 1.45;
+      }
+
+      textarea {
+        min-height: 300px;
+        resize: vertical;
+        line-height: 1.5;
+        padding: 0.72rem;
         font-family: inherit;
+        font-size: 0.95rem;
+        color: #153226;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      input:hover,
+      select:hover,
+      textarea:hover {
+        border-color: rgba(46, 90, 70, 0.48);
+        box-shadow: 0 8px 18px rgba(31, 92, 69, 0.09);
+        transform: translateY(-0.5px);
+      }
+
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid transparent;
+        border-color: var(--control-focus);
+        box-shadow:
+          0 0 0 4px var(--focus-ring),
+          0 10px 24px rgba(31, 92, 69, 0.16);
+        transform: translateY(-1px);
+      }
+
+      :where(button, [role="button"], input, select, textarea):focus-visible {
+        outline: 3px solid #80d08f;
+        outline-offset: 2px;
+      }
+
+      .dropzone:hover,
+      .dropzone:focus-visible {
+        border-color: #5fbc7d;
+        box-shadow: 0 10px 20px rgba(31, 92, 69, 0.16);
+        transform: translateY(-1px);
       }
 
       select,
       input[type="text"],
       input[type="range"] {
         border: 1px solid var(--line);
-        border-radius: 9px;
+        border-radius: 12px;
         padding: 0.58rem 0.7rem;
-        color: var(--text-primary);
-        background: #fff;
+        line-height: 1.35;
         width: 100%;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 28px;
+        margin: 0;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #d8e7dc;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        margin-top: -8px;
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        border: 2px solid #2f7457;
+        background: #f4fff4;
+        cursor: pointer;
+        box-shadow: 0 6px 14px rgba(31, 92, 69, 0.2);
+      }
+
+      input[type="range"]::-moz-range-track {
+        height: 8px;
+        border-radius: 999px;
+        background: #d8e7dc;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        border: 2px solid #2f7457;
+        background: #f4fff4;
+        cursor: pointer;
+        box-shadow: 0 6px 14px rgba(31, 92, 69, 0.2);
+      }
+
+      input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--control-border);
+        border-radius: 6px;
+        background: #fff;
+        display: inline-grid;
+        place-items: center;
+        margin: 0;
+        transition:
+          border-color 140ms ease,
+          background-color 140ms ease,
+          box-shadow 140ms ease,
+          transform 140ms ease;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      input[type="checkbox"]:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(31, 92, 69, 0.14);
+      }
+
+      input[type="checkbox"]:checked {
+        border-color: #2f905a;
+        background: linear-gradient(180deg, #4ea56f, #2d7554);
+      }
+
+      input[type="checkbox"]:checked::before {
+        content: "";
+        width: 9px;
+        height: 5px;
+        border-left: 2px solid #f7fff9;
+        border-bottom: 2px solid #f7fff9;
+        transform: rotate(-45deg) translate(2px, 4px);
+      }
+
+      input[type="checkbox"]:active {
+        transform: scale(0.98);
       }
 
       .helper {
@@ -466,6 +890,16 @@
         border-radius: 12px;
         padding: 0.68rem;
         background: #fff;
+        transition:
+          transform 140ms var(--ease-snappy),
+          border-color 140ms var(--ease-snappy),
+          box-shadow 140ms var(--ease-snappy);
+      }
+
+      .clip-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(43, 110, 77, 0.32);
+        box-shadow: 0 8px 18px rgba(31, 92, 69, 0.1);
       }
 
       .clip-top {
@@ -512,6 +946,14 @@
         color: var(--green-deep);
         padding: 0.22rem 0.55rem;
         font-size: 0.85rem;
+        transition:
+          background-color 140ms var(--ease-snappy),
+          transform 140ms var(--ease-snappy);
+      }
+
+      .tag-cloud span:hover {
+        transform: translateY(-1px);
+        background: #e1f6e6;
       }
 
       .inline-row {
@@ -523,7 +965,7 @@
       .export-box {
         border: 1px dashed var(--line);
         border-radius: 12px;
-        background: #fffdf3;
+        background: #fffbef;
         padding: 0.8rem;
       }
 
@@ -539,6 +981,9 @@
         border-left: 5px solid var(--green-deep);
         border-radius: var(--radius);
         padding: 0.9rem 1rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--panel-shadow-soft);
       }
 
       .proof ul {
@@ -549,6 +994,27 @@
 
       .proof li + li {
         margin-top: 0.35rem;
+      }
+
+      .proof::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        pointer-events: none;
+      }
+
+      .proof::before {
+        content: "";
+        position: absolute;
+        inset: auto -20% -28px auto;
+        height: 140px;
+        width: 140px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(89, 179, 129, 0.15), transparent 68%);
+        transform: translateY(20%);
+        pointer-events: none;
       }
 
       footer {
@@ -567,6 +1033,16 @@
 
       .foot-links a {
         color: var(--green-deep);
+      }
+
+      .nav-chip {
+        text-decoration: none;
+        transition: transform 130ms ease, background-color 130ms ease;
+      }
+
+      .nav-chip:hover {
+        transform: translateY(-1px);
+        background: #f1ffed;
       }
 
       @media (max-width: 980px) {
@@ -588,6 +1064,28 @@
         .links {
           justify-content: flex-start;
         }
+
+        .top-bar,
+        .hero,
+        .card {
+          border-radius: 14px;
+        }
+
+        .btn,
+        .small-btn,
+        .tab-btn,
+        .flow-step {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .cta-row,
+        .input-actions,
+        .workspace-actions,
+        .workspace-tabs,
+        .workflow-strip {
+          width: 100%;
+        }
       }
     </style>
   </head>
@@ -599,9 +1097,9 @@
           <span class="tag">YouTube Hackathon</span>
         </div>
         <nav class="links" aria-label="Primary navigation">
-          <a class="tag" href="#workspace">Workspace</a>
-          <a class="tag" href="#proof">Proof</a>
-          <a class="tag" href="#ready">Ready-to-use</a>
+          <a class="tag nav-chip" href="#workspace">Workspace</a>
+          <a class="tag nav-chip" href="#proof">Proof</a>
+          <a class="tag nav-chip" href="#ready">Ready-to-use</a>
         </nav>
       </header>
 
@@ -653,7 +1151,21 @@
               <button class="tab-btn" type="button" data-tab="suggestions">Suggestions</button>
               <button class="tab-btn" type="button" data-tab="export">Export</button>
             </div>
+            <div class="workflow-strip" id="workflow-strip" aria-label="Workspace steps">
+              <button class="flow-step is-active" type="button" data-step="inputs">01 Inputs</button>
+              <button class="flow-step" type="button" data-step="analysis">02 Analysis</button>
+              <button class="flow-step" type="button" data-step="suggestions">03 Suggestions</button>
+              <button class="flow-step" type="button" data-step="export">04 Export</button>
+            </div>
+            <p class="context-strip" id="workflow-hint" role="status" aria-live="polite"></p>
+            <div class="workflow-progress" id="workflow-progress">
+              <div class="workflow-progress-track">
+                <span id="workflow-progress-fill" class="workflow-progress-fill"></span>
+              </div>
+              <p class="workflow-progress-label" id="workflow-progress-label">0/4 complete</p>
+            </div>
             <div class="state-badges">
+              <span class="state-badge" id="workflow-state">Workflow: 0/4</span>
               <span class="state-badge" id="step-state">Step: Inputs</span>
               <span class="state-badge" id="segments-state">Segments: 0</span>
               <span class="state-badge" id="file-state">No source loaded</span>
@@ -687,13 +1199,13 @@
                   <div class="input-actions">
                     <button id="run-analysis" class="small-btn" type="button">Run analysis</button>
                     <button id="load-sample" class="small-btn" type="button">Load sample</button>
-                    <label class="small-btn" style="margin:0; cursor:pointer;">
+                    <label class="small-btn file-upload" style="margin:0; cursor:pointer;">
                       <input id="file-input" type="file" accept=".txt,.srt,.vtt,.csv" style="display:none" />
                       Upload file
                     </label>
                     <button id="clear-input" class="small-btn" type="button">Clear</button>
                   </div>
-                  <label>
+                  <label class="field-toggle">
                     <input id="auto-clean" type="checkbox" checked />
                     Auto-clean transcript (remove filler words)
                   </label>
@@ -1018,6 +1530,11 @@
         stepState: document.getElementById("step-state"),
         segmentsState: document.getElementById("segments-state"),
         fileState: document.getElementById("file-state"),
+        workflowState: document.getElementById("workflow-state"),
+        workflowHint: document.getElementById("workflow-hint"),
+        progressFill: document.getElementById("workflow-progress-fill"),
+        progressLabel: document.getElementById("workflow-progress-label"),
+        flowSteps: Array.from(document.querySelectorAll(".flow-step")),
         profile: document.getElementById("profile"),
         profileQuick: document.getElementById("profile-quick"),
         sourceType: document.getElementById("source-type"),
@@ -1506,10 +2023,52 @@
         };
       }
 
+      function getWorkflowStepState(project) {
+        const safeProject = project || {};
+        const totalSegments = (safeProject.segments || []).length;
+        const hasParsed = totalSegments > 0;
+        const hasAnalysis = safeProject.status === "analyzed" && Array.isArray(safeProject.clips) && safeProject.clips.length > 0;
+        const hasSeo =
+          hasAnalysis &&
+          safeProject.metadata &&
+          safeProject.metadata.seo &&
+          ((safeProject.metadata.seo.titles || []).length > 0 ||
+            (safeProject.metadata.seo.descriptionVariants || []).length > 0);
+        const hasExport =
+          hasSeo &&
+          Boolean(safeProject.metadata?.title || safeProject.metadata?.description);
+        return {
+          completion: {
+            inputs: safeProject.status !== "needs-fix" && (hasParsed || safeProject.status === "analyzed"),
+            analysis: hasAnalysis,
+            suggestions: hasSeo,
+            export: hasExport
+          },
+          totalSegments,
+          fileType: safeProject.sourceType || "none"
+        };
+      }
+
+      function isStepUnlocked(stepKey, completion) {
+        if (stepKey === "inputs") {
+          return true;
+        }
+        if (stepKey === "analysis") {
+          return completion.inputs;
+        }
+        if (stepKey === "suggestions") {
+          return completion.analysis;
+        }
+        if (stepKey === "export") {
+          return completion.suggestions;
+        }
+        return true;
+      }
+
       function updateBadges() {
         const project = getCurrentProject();
-        const totalSegments = (project.segments || []).length;
-        const fileType = project.sourceType || "none";
+        const stateInfo = getWorkflowStepState(project);
+        const { completion: stepCompletion, totalSegments, fileType } = stateInfo;
         const status = state.analyzing ? "Analyzing" : "Ready";
         const stepLabels = {
           inputs: "Inputs",
@@ -1517,12 +2076,37 @@
           suggestions: "Suggestions",
           export: "Export"
         };
+        const workflowHints = {
+          inputs: "Upload text or drag-and-drop a subtitle transcript, then run Analyze to score every segment.",
+          analysis: "Tune your scoring profile and rerun if needed to prioritize best clips.",
+          suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
+          export: "Copy or download the summary package and move straight into your YouTube publishing flow."
+        };
         el.statusState.textContent = status;
         el.autosaveState.textContent = "Autosave: on";
         el.stepState.textContent = `Step: ${stepLabels[state.activeTab] || "Inputs"}`;
         el.segmentsState.textContent = `Segments: ${totalSegments}`;
         el.fileState.textContent = `Source: ${fileType}`;
         el.profileQuick.textContent = `${el.profile.options[el.profile.selectedIndex].text}`;
+        el.workflowHint.textContent = workflowHints[state.activeTab] || workflowHints.inputs;
+        const completed = Object.values(stepCompletion).filter(Boolean).length;
+        const totalSteps = Object.keys(stepCompletion).length;
+        const progressPercent = Math.round((completed / totalSteps) * 100);
+        el.progressFill.style.width = `${progressPercent}%`;
+        el.progressLabel.textContent = `${completed}/${totalSteps} steps complete`;
+        el.workflowState.textContent = completed === totalSteps ? "Workflow complete" : `${stepLabels[state.activeTab] || "Inputs"} is the active stage`;
+        el.flowSteps.forEach((stepButton) => {
+          const key = stepButton.dataset.step;
+          const enabled = isStepUnlocked(key, stepCompletion);
+          stepButton.disabled = !enabled;
+          stepButton.classList.toggle("is-complete", stepCompletion[key]);
+          stepButton.setAttribute("aria-current", stepButton.dataset.step === state.activeTab ? "step" : "false");
+        });
+        document.querySelectorAll(".tab-btn").forEach((tabButton) => {
+          const key = tabButton.dataset.tab;
+          const enabled = isStepUnlocked(key, stepCompletion);
+          tabButton.disabled = !enabled;
+        });
       }
 
       function getCurrentProject() {
@@ -1609,7 +2193,7 @@
             const edited = new Date(project.lastEdited).toLocaleDateString();
             return `<button class="project-item ${isActive}" data-project="${project.id}" type="button">
               <p class="project-name">${project.name}</p>
-              <p class="project-meta">${project.status} · edited ${edited}</p>
+              <p class="project-meta">${project.status} | edited ${edited}</p>
             </button>`;
           })
           .join("");
@@ -1647,7 +2231,7 @@
           ? project.metadata.seo.descriptionVariants.map((desc) => `<li>${desc}</li>`).join("")
           : "<li>Generate after analysis</li>";
         el.seoRationale.textContent = project.metadata?.seo?.rationale
-          ? project.metadata.seo.rationale.join(" · ")
+          ? project.metadata.seo.rationale.join(" | ")
           : "Generate SEO pack to see tone-specific title/description variants.";
         el.exportSummary.textContent = project.status === "analyzed"
           ? `${project.clips?.length || 0} clip recommendations ready for use.`
@@ -1765,7 +2349,7 @@
             ? fileName.replace(/\\.[^.]+$/, "")
             : project.name;
           el.parseStatus.textContent = `Parsed ${segments.length} segment(s) from ${sourceMode.toUpperCase()}.`;
-          el.parseMetrics.innerHTML = `Segments: ${segments.length} · Duration: ${formatDuration(segments.at(-1).end)} · Avg words: ${(
+          el.parseMetrics.innerHTML = `Segments: ${segments.length} | Duration: ${formatDuration(segments.at(-1).end)} | Avg words: ${(
             segments.reduce((sum, s) => sum + s.wordCount, 0) / segments.length
           ).toFixed(1)}`;
           el.ingestStatus.textContent = `Input recognized as ${sourceMode.toUpperCase()}.`;
@@ -1830,9 +2414,19 @@
       }
 
       function switchTab(tab) {
+        const project = getCurrentProject();
+        const { completion: stepCompletion } = getWorkflowStepState(project);
+        if (!isStepUnlocked(tab, stepCompletion)) {
+          return;
+        }
         state.activeTab = tab;
         document.querySelectorAll(".tab-btn").forEach((button) => {
           button.classList.toggle("active", button.dataset.tab === tab);
+        });
+        el.flowSteps.forEach((step) => {
+          const active = step.dataset.step === tab;
+          step.classList.toggle("is-active", active);
+          step.setAttribute("aria-current", active ? "step" : "false");
         });
         document.querySelectorAll(".tab-panel").forEach((panel) => {
           panel.classList.toggle("active", panel.id === tab);
@@ -1947,7 +2541,21 @@
       }
 
       document.querySelectorAll(".tab-btn").forEach((button) => {
-        button.addEventListener("click", () => switchTab(button.dataset.tab));
+        button.addEventListener("click", () => {
+          if (button.disabled) {
+            return;
+          }
+          switchTab(button.dataset.tab);
+        });
+      });
+
+      el.flowSteps.forEach((step) => {
+        step.addEventListener("click", () => {
+          if (step.disabled) {
+            return;
+          }
+          switchTab(step.dataset.step);
+        });
       });
 
       el.newProject?.addEventListener("click", () => {
@@ -2116,6 +2724,7 @@
       });
 
       initFromWorkspace();
+      switchTab(state.activeTab);
     </script>
   </body>
 </html>
