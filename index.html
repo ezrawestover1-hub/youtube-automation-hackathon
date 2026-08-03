@@ -1,12 +1,12 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DropFix | YouTube Creator Automation</title>
+    <title>DropFix | YouTube Workflow Automation</title>
     <meta
       name="description"
-      content="DropFix is a YouTube creator workflow assistant for clip planning, quality scoring, and production-ready recommendations."
+      content="DropFix helps YouTube creators generate clip-ready recommendations and metadata from transcript files with no setup."
     />
     <style>
       :root {
@@ -14,11 +14,10 @@
         --cream-soft: #fff9f1;
         --green-deep: #1f5c45;
         --green-soft: #4c8b70;
-        --text-primary: #16281f;
-        --text-muted: #355445;
-        --card-bg: rgba(255, 250, 243, 0.75);
+        --text-primary: #182c22;
+        --text-muted: #3a5b4b;
         --line: rgba(46, 90, 70, 0.2);
-        --radius: 18px;
+        --radius: 16px;
         --shadow: 0 18px 45px rgba(31, 92, 69, 0.15);
       }
 
@@ -35,14 +34,14 @@
         color: var(--text-primary);
         font-family: "Trebuchet MS", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
         background:
-          radial-gradient(circle at 14% 10%, rgba(243, 228, 209, 0.92), transparent 32%),
-          radial-gradient(circle at 85% 20%, rgba(142, 201, 165, 0.32), transparent 38%),
+          radial-gradient(circle at 14% 12%, rgba(243, 228, 209, 0.9), transparent 30%),
+          radial-gradient(circle at 86% 8%, rgba(142, 201, 165, 0.34), transparent 38%),
           linear-gradient(150deg, var(--cream-main), var(--cream-soft));
         min-height: 100vh;
       }
 
       .wrap {
-        width: min(1120px, 94vw);
+        width: min(1220px, 95vw);
         margin: 0 auto;
         padding: 1.75rem 0 3rem;
       }
@@ -51,20 +50,32 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 0.75rem;
-        margin-bottom: 1.2rem;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
       }
 
       .brand {
-        background: #ffffffd9;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        background: #ffffffde;
         border: 1px solid var(--line);
         border-radius: 14px;
-        padding: 0.6rem 0.9rem;
+        padding: 0.58rem 0.9rem;
         font-weight: 700;
         letter-spacing: 0.02em;
         color: var(--green-deep);
-        display: inline-flex;
-        gap: 0.45rem;
+      }
+
+      .tag {
+        color: var(--green-deep);
+        border: 1px solid var(--line);
+        background: var(--cream-soft);
+        border-radius: 999px;
+        padding: 0.34rem 0.8rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
 
       .links {
@@ -74,217 +85,446 @@
         gap: 0.45rem;
       }
 
-      .tag {
-        color: var(--green-deep);
-        border: 1px solid var(--line);
-        background: var(--cream-soft);
-        border-radius: 999px;
-        padding: 0.35rem 0.8rem;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-
       .hero {
         border-radius: var(--radius);
-        padding: clamp(1.5rem, 2.7vw, 2.8rem);
-        background: linear-gradient(145deg, #245d47 0%, #2f7457 52%, #4c8b70 100%);
+        padding: clamp(1.45rem, 2.2vw, 2.6rem);
+        background: linear-gradient(145deg, #245d47, #2f7457 52%, #4c8b70 100%);
         color: #f6fff7;
         box-shadow: var(--shadow);
       }
 
-      .kicker {
-        margin-bottom: 0.55rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        font-size: 0.8rem;
-        background: rgba(0, 0, 0, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.24);
-        border-radius: 999px;
-        padding: 0.3rem 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-
-      h1 {
+      .hero h1 {
         margin: 0;
-        font-size: clamp(2rem, 2.5vw + 1rem, 3.25rem);
-        line-height: 1.05;
-      }
-
-      .lead {
-        max-width: 70ch;
-        font-size: 1.05rem;
-        line-height: 1.65;
-        color: #f0f9f1;
+        font-size: clamp(2rem, 2.6vw + 1rem, 3.2rem);
+        line-height: 1.06;
+        max-width: 14ch;
       }
 
       .hero-grid {
         display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 1.2rem;
-        align-items: center;
-        margin-top: 1.3rem;
+        grid-template-columns: 1.45fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+        align-items: stretch;
       }
 
       .hero-copy p {
-        margin: 0.95rem 0;
+        margin: 0.85rem 0;
+        max-width: 68ch;
+        color: #f0f9f1;
+        line-height: 1.64;
       }
 
-      .cta-row {
-        margin-top: 1.2rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
+      .lead {
+        font-size: 1.04rem;
       }
 
-      .btn {
-        border: none;
-        border-radius: 12px;
-        font-weight: 700;
-        letter-spacing: 0.01em;
-        text-decoration: none;
-        padding: 0.78rem 1.05rem;
-        transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, opacity 150ms ease;
-        cursor: pointer;
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-        opacity: 0.95;
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
-      }
-
-      .btn.primary {
-        background: #d7f0d2;
-        color: #15362d;
-      }
-
-      .btn.secondary {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.46);
-        color: #f5fef5;
-      }
-
-      .metrics {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-        border-radius: 14px;
+      .pillboard {
+        background: rgba(255, 255, 255, 0.21);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: var(--radius);
         padding: 0.8rem 0.9rem;
       }
 
-      .metric-list {
+      .pillboard ul {
         margin: 0;
         padding: 0;
         list-style: none;
       }
 
-      .metric-list li {
-        display: grid;
-        gap: 0.15rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-        padding: 0.55rem 0;
+      .pillboard li {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.52rem 0;
+        color: #f2fbef;
       }
 
-      .metric-list li:last-child {
+      .pillboard li:last-child {
         border-bottom: none;
       }
 
-      .metric-value {
-        font-size: 1.05rem;
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        margin-top: 0.95rem;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 11px;
+        padding: 0.73rem 1rem;
         font-weight: 700;
-        color: #edffe9;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
       }
 
-      .metric-label {
-        font-size: 0.86rem;
-        opacity: 0.9;
+      .btn:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
       }
 
-      section {
+      .btn.primary {
+        background: #d7f0d2;
+        color: #163f33;
+      }
+
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        color: #f7fffa;
+      }
+
+      .workspace-shell {
         margin-top: 1.2rem;
-      }
-
-      .section-title {
-        margin: 0 0 0.9rem;
-        color: var(--green-deep);
-        font-size: 1.35rem;
-      }
-
-      .grid-3 {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1rem;
+        grid-template-columns: 280px 1fr;
+        gap: 0.95rem;
       }
 
       .card {
-        background: var(--card-bg);
+        background: var(--card-bg, rgba(255, 250, 243, 0.74));
         border: 1px solid var(--line);
         border-radius: var(--radius);
-        padding: 1rem 1rem 1.1rem;
-        backdrop-filter: blur(6px);
         box-shadow: var(--shadow);
+        backdrop-filter: blur(6px);
+        padding: 0.95rem;
       }
 
-      .card h3 {
-        margin: 0 0 0.5rem;
+      .panel-title {
+        margin: 0 0 0.55rem;
+        color: var(--green-deep);
+        font-size: 1.05rem;
+      }
+
+      .workspace-actions {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+      }
+
+      .small-btn {
+        border: 1px solid var(--line);
+        background: #f8fdf7;
+        color: var(--green-deep);
+        border-radius: 10px;
+        padding: 0.43rem 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .projects {
+        display: grid;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+
+      .project-item {
+        background: #fffef8;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.55rem;
+        cursor: pointer;
+      }
+
+      .project-item.active {
+        border-color: #2f7557;
+        background: #eaf6ef;
+        box-shadow: 0 10px 26px rgba(31, 92, 69, 0.12);
+      }
+
+      .project-name {
+        margin: 0;
+        font-weight: 700;
         color: var(--green-deep);
       }
 
-      .card p {
-        margin: 0.35rem 0;
+      .project-meta {
+        margin: 0.2rem 0 0;
+        font-size: 0.84rem;
         color: var(--text-muted);
-        line-height: 1.6;
       }
 
-      .steps {
+      .workspace-main {
+        min-height: 760px;
         display: grid;
-        gap: 0.75rem;
-      }
-
-      .step {
-        display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-rows: auto 1fr;
         gap: 0.8rem;
-        align-items: start;
-        background: #fffaf2;
-        border: 1px dashed #c7ddcf;
-        border-radius: 12px;
-        padding: 0.75rem 0.95rem;
       }
 
-      .step-number {
-        width: 2rem;
-        height: 2rem;
+      .workspace-tabs {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+      }
+
+      .tab-btn {
+        border: 1px solid var(--line);
+        background: #fff;
         border-radius: 999px;
-        background: var(--green-deep);
-        color: #fff;
-        display: grid;
-        place-items: center;
+        padding: 0.48rem 0.86rem;
+        color: var(--green-deep);
         font-weight: 700;
+        cursor: pointer;
       }
 
-      .step-copy {
-        margin: 0;
-        line-height: 1.5;
-        color: var(--text-muted);
+      .tab-btn.active {
+        background: #d5efe0;
       }
 
-      .chips {
+      .state-badges {
+        margin-top: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .state-badge {
+        border-radius: 999px;
+        background: #ddf0df;
+        color: #173d31;
+        padding: 0.22rem 0.6rem;
+        font-size: 0.8rem;
+        border: 1px solid #a8d2b5;
+      }
+
+      .panels {
+        position: relative;
+      }
+
+      .tab-panel {
+        display: none;
+      }
+
+      .tab-panel.active {
+        display: block;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+
+      .workspace-label {
+        color: var(--green-deep);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.35rem;
+      }
+
+      .input-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.55rem;
+        gap: 0.5rem;
+        margin: 0.6rem 0;
       }
 
-      .chip {
+      .input-grid {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .dropzone {
+        border: 2px dashed #a9ccb8;
+        border-radius: 12px;
+        padding: 0.9rem;
+        background: #fffef7;
+        color: var(--text-muted);
+        min-height: 120px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+
+      .dropzone.drag {
+        border-color: var(--green-soft);
+        background: #f0f8f2;
+      }
+
+      .dropzone input {
+        display: none;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 270px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.72rem;
+        color: var(--text-primary);
+        font-family: inherit;
+      }
+
+      select,
+      input[type="text"],
+      input[type="range"] {
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 0.58rem 0.7rem;
+        color: var(--text-primary);
+        background: #fff;
+        width: 100%;
+      }
+
+      .helper {
+        margin: 0.35rem 0 0;
+        font-size: 0.84rem;
+        color: var(--text-muted);
+      }
+
+      .muted {
+        color: var(--text-muted);
+      }
+
+      .summary-grid {
+        display: grid;
+        gap: 0.7rem;
+        margin-top: 0.75rem;
+      }
+
+      .metric {
+        display: grid;
+        gap: 0.2rem;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.65rem;
+        background: #fffdf7;
+      }
+
+      .metric strong {
+        font-size: 1rem;
+        color: var(--green-deep);
+      }
+
+      .meter {
+        height: 8px;
+        border-radius: 999px;
+        background: #d8e7dc;
+        overflow: hidden;
+      }
+
+      .meter-fill {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #7cc88d, #1f5c45);
+      }
+
+      .preset-row {
+        display: flex;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.4rem;
+      }
+
+      .slider-grid {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 0.6rem;
+      }
+
+      .slider {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .slider label {
+        margin: 0;
+        font-weight: 700;
+        color: var(--green-deep);
+      }
+
+      .slider input {
+        width: 100%;
+      }
+
+      .slider span {
+        min-width: 2.6rem;
+        text-align: right;
+        color: var(--green-deep);
+      }
+
+      .analysis-notice {
+        margin-top: 0.8rem;
+        border-left: 4px solid var(--green-soft);
+        padding: 0.55rem 0.65rem;
+        background: #e6f4e9;
+        border-radius: 8px;
+        color: #224b3f;
+      }
+
+      .clip-list {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .clip-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 0.68rem;
+        background: #fff;
+      }
+
+      .clip-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        align-items: baseline;
+      }
+
+      .clip-segment {
+        font-weight: 700;
+        color: var(--green-deep);
+      }
+
+      .clip-score {
+        border-radius: 999px;
+        background: #e4f2e7;
+        color: #1d493b;
+        padding: 0.1rem 0.55rem;
+        border: 1px solid #a9d2b5;
+      }
+
+      .reason-list {
+        margin: 0.45rem 0 0.35rem;
+        padding-left: 1.15rem;
+      }
+
+      .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.46rem;
+      }
+
+      .tag-cloud span {
+        border-radius: 999px;
         background: #edf9ef;
         border: 1px solid var(--line);
-        border-radius: 999px;
-        padding: 0.35rem 0.7rem;
         color: var(--green-deep);
-        font-weight: 600;
-        font-size: 0.9rem;
+        padding: 0.22rem 0.55rem;
+        font-size: 0.85rem;
+      }
+
+      .inline-row {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+      }
+
+      .export-box {
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        background: #fffdf3;
+        padding: 0.8rem;
+      }
+
+      .section-title {
+        margin: 1.2rem 0 0.7rem;
+        color: var(--green-deep);
+        font-size: 1.35rem;
       }
 
       .proof {
@@ -292,7 +532,7 @@
         border: 1px solid var(--line);
         border-left: 5px solid var(--green-deep);
         border-radius: var(--radius);
-        padding: 0.95rem;
+        padding: 0.9rem 1rem;
       }
 
       .proof ul {
@@ -302,152 +542,11 @@
       }
 
       .proof li + li {
-        margin-top: 0.45rem;
-      }
-
-      .proof code {
-        background: #ecf6ec;
-        padding: 0.02rem 0.3rem;
-        border-radius: 6px;
-      }
-
-      .demo-card {
-        display: grid;
-        gap: 0.8rem;
-      }
-
-      .demo-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.8rem;
-      }
-
-      .demo-input,
-      .demo-output {
-        width: 100%;
-        border-radius: 12px;
-        border: 1px solid var(--line);
-      }
-
-      .demo-input {
-        background: #ffffff;
-        padding: 0.8rem;
-      }
-
-      .demo-input label {
-        display: block;
-        margin-bottom: 0.3rem;
-        color: var(--green-deep);
-        font-weight: 700;
-      }
-
-      .demo-input textarea {
-        width: 100%;
-        min-height: 170px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 0.6rem;
-        font-family: inherit;
-        resize: vertical;
-        color: var(--text-primary);
-      }
-
-      .demo-output {
-        background: #fffdf7;
-        padding: 0.8rem;
-        min-height: 170px;
-      }
-
-      .demo-controls {
-        display: flex;
-        gap: 0.6rem;
-        flex-wrap: wrap;
-      }
-
-      .demo-controls select {
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: #fff;
-        color: var(--text-primary);
-        padding: 0.58rem 0.7rem;
-      }
-
-      .run-button {
-        border: none;
-        border-radius: 10px;
-        padding: 0.58rem 0.9rem;
-        font-weight: 700;
-        background: var(--green-deep);
-        color: #fff;
-        cursor: pointer;
-      }
-
-      .run-button:hover {
-        transform: translateY(-1px);
-        opacity: 0.95;
-      }
-
-      .result-title {
-        margin: 0;
-        color: var(--green-deep);
-        font-size: 1rem;
-      }
-
-      .result-summary {
-        margin-top: 0.4rem;
-        color: var(--text-muted);
-      }
-
-      .mini-grid {
-        display: grid;
-        gap: 0.4rem;
-      }
-
-      .progress {
-        height: 9px;
-        border-radius: 999px;
-        background: #dfece4;
-        overflow: hidden;
-      }
-
-      .progress-bar {
-        height: 100%;
-        border-radius: inherit;
-        background: linear-gradient(90deg, #4c8b70, #1f5c45);
-      }
-
-      .result-list {
-        list-style: none;
-        margin: 0.45rem 0 0;
-        padding: 0;
-      }
-
-      .result-list li {
-        border-top: 1px dashed #cce0d4;
-        padding: 0.45rem 0;
-        color: var(--text-muted);
-      }
-
-      .result-list li:first-child {
-        border-top: none;
-      }
-
-      .pill-row {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-      }
-
-      .status-pill {
-        border-radius: 999px;
-        padding: 0.2rem 0.55rem;
-        font-size: 0.8rem;
-        background: #dff4e7;
-        color: #123f31;
+        margin-top: 0.35rem;
       }
 
       footer {
-        margin-top: 1rem;
+        margin-top: 1.1rem;
         text-align: center;
         color: var(--text-muted);
         font-size: 0.9rem;
@@ -464,11 +563,15 @@
         color: var(--green-deep);
       }
 
-      @media (max-width: 940px) {
+      @media (max-width: 980px) {
         .hero-grid,
-        .grid-3,
-        .demo-grid {
+        .workspace-shell,
+        .two-col {
           grid-template-columns: 1fr;
+        }
+
+        .workspace-main {
+          min-height: auto;
         }
 
         .top-bar {
@@ -487,305 +590,1275 @@
       <header class="top-bar">
         <div class="brand">
           <span>DropFix</span>
-          <span class="tag">YouTube Hackathon Project</span>
+          <span class="tag">YouTube Hackathon</span>
         </div>
-        <nav class="links" aria-label="Primary">
-          <a class="tag" href="#features">What it does</a>
-          <a class="tag" href="#workflow">Workflow</a>
+        <nav class="links" aria-label="Primary navigation">
+          <a class="tag" href="#workspace">Workspace</a>
           <a class="tag" href="#proof">Proof</a>
-          <a class="tag" href="#get-started">Get started</a>
+          <a class="tag" href="#ready">Ready-to-use</a>
         </nav>
       </header>
 
       <section class="hero">
-        <div class="kicker">
-          <span>Creator workflow automation</span>
-        </div>
         <div class="hero-grid">
           <div class="hero-copy">
-            <h1>DropFix for smarter and faster YouTube production.</h1>
+            <h1>A browser-only YouTube creator helper built for judges and real creators.</h1>
             <p class="lead">
-              DropFix helps creators spend less time on repetitive tasks and more time creating.
-              It turns retention signals and content assets into repeatable decisions for clips,
-              quality checks, and final package readiness.
-            </p>
-            <p class="lead">
-              Built for judge-friendly evaluation: you can run the full experience now, directly from this page,
-              without cloning or installing anything.
+              DropFix now supports transcript ingestion, session persistence, and explainable scoring.
+              You can run the full workflow from any browser and export usable clip + metadata
+              recommendations without setup.
             </p>
             <div class="cta-row">
-              <a class="btn primary" href="#live-demo">Try live demo now</a>
-              <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">View full source</a>
+              <a class="btn primary" href="#workspace">Open production workspace</a>
+              <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">Open source repo</a>
             </div>
           </div>
-          <aside class="metrics" aria-label="project metrics">
-            <ul class="metric-list">
-              <li>
-                <span class="metric-value">Live in-browser demo</span>
-                <span class="metric-label">No terminal, no setup, immediate output</span>
-              </li>
-              <li>
-                <span class="metric-value">Creator-ready outputs</span>
-                <span class="metric-label">Quality score, clip recommendations, and metadata ideas</span>
-              </li>
-              <li>
-                <span class="metric-value">Contest-grade flow</span>
-                <span class="metric-label">One-click path to local full pipeline if needed</span>
-              </li>
+          <aside class="pillboard">
+            <ul>
+              <li><strong>Sprint 2+</strong> implemented: file upload, transcript parsing, and error recovery.</li>
+              <li><strong>Sprint 3</strong> implemented: tabbed workspace + local persistence + rerun controls.</li>
+              <li><strong>Sprint 4</strong> implemented: explainable, adjustable scoring factors + rationale.</li>
             </ul>
           </aside>
         </div>
       </section>
 
-      <section id="features">
-        <h2 class="section-title">What this solves</h2>
-        <div class="grid-3">
-          <article class="card">
-            <h3>Quality gating</h3>
-            <p>
-              Score rough cuts and content segments with consistent thresholds so creators can reduce
-              the time spent manually reviewing low-performing material.
-            </p>
-          </article>
-          <article class="card">
-            <h3>Recommendation workflow</h3>
-            <p>
-              Suggest metadata improvements and editorial actions from profile-aware context, helping
-              creators make decisions faster before upload time.
-            </p>
-          </article>
-          <article class="card">
-            <h3>Submission confidence</h3>
-            <p>
-              Expose clear evidence for each generated recommendation and keep an audit trail for
-              review and troubleshooting before sharing work.
-            </p>
-          </article>
-        </div>
-      </section>
+      <section id="workspace" class="workspace-shell">
+        <aside class="card">
+          <h2 class="panel-title">Workspace</h2>
+          <div class="workspace-actions">
+            <button id="new-project" class="small-btn" type="button">+ New project</button>
+            <button id="delete-project" class="small-btn" type="button" title="Delete current project">Delete current</button>
+          </div>
+          <p class="helper" id="project-count">0 saved projects</p>
+          <div id="project-list" class="projects" aria-live="polite"></div>
+          <div class="state-badges">
+            <span class="state-badge" id="status-state">Idle</span>
+            <span class="state-badge" id="autosave-state">Autosave: off</span>
+          </div>
+        </aside>
 
-      <section id="workflow">
-        <h2 class="section-title">Simple workflow</h2>
-        <div class="steps card">
-          <div class="step">
-            <span class="step-number">1</span>
-            <p class="step-copy">
-              Paste your script, title idea, or clip summary into the live demo panel.
-            </p>
-          </div>
-          <div class="step">
-            <span class="step-number">2</span>
-            <p class="step-copy">
-              Pick a creator profile (short-form or educational focus) to tune recommendation priorities.
-            </p>
-          </div>
-          <div class="step">
-            <span class="step-number">3</span>
-            <p class="step-copy">
-              Run analysis and get a quality score, clip shortlist, and metadata suggestions instantly.
-            </p>
-          </div>
-          <div class="step">
-            <span class="step-number">4</span>
-            <p class="step-copy">
-              Open the repository files for full local execution, video recording, and deeper exports.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section id="proof">
-        <h2 class="section-title">Submission proof</h2>
-        <div class="proof card">
-          <p style="margin: 0;">Judge-facing evidence included in repo:</p>
-          <ul>
-            <li><code>highlights/dropfix-highlight-showcase.html</code> for visual demonstration.</li>
-            <li><code>highlights/run-highlight-showcase.ps1</code> for one-command MP4 render.</li>
-            <li><code>highlights/highlight-rundown.md</code> for talking points and scene flow.</li>
-            <li>Backend endpoints and scripts with deterministic outputs in <code>backend/</code>.</li>
-          </ul>
-        </div>
-      </section>
-
-      <section id="live-demo">
-        <h2 class="section-title">Live demo (no install needed)</h2>
-        <div class="card demo-card">
-          <p>
-            This is a live browser-only DropFix run. Paste your content idea and click run to see
-            instant recommendations the same way judges can test the project in under a minute.
-          </p>
-          <div class="demo-grid">
-            <div class="demo-input">
-              <label for="profile">Creator profile</label>
-              <div class="demo-controls">
-                <select id="profile">
-                  <option value="standard">Standard creator</option>
-                  <option value="shorts">Short-form + retention focused</option>
-                  <option value="education">Tutorial + clarity focused</option>
-                </select>
-                <button id="run-demo" class="run-button" type="button">Run analysis</button>
-                <button id="load-sample" class="run-button" type="button" style="background: #3f8d6b;">Load sample script</button>
-              </div>
-              <label for="transcript" style="margin-top: 0.5rem;">Paste your title + thumbnail intent + script sample</label>
-              <textarea id="transcript">
-Title: Why This Drop-Off Happens at 0:45
-Topic: YouTube retention drops and how to fix first 10 seconds.
-Script snippet: Start with a hook, show unexpected contrast by second 5, then keep value high every 8 seconds. End with clear CTA and teaser.
-              </textarea>
+        <section class="card workspace-main">
+          <div>
+            <h2 class="panel-title" id="project-title">Untitled project</h2>
+            <div class="workspace-tabs">
+              <button class="tab-btn active" type="button" data-tab="inputs">Inputs</button>
+              <button class="tab-btn" type="button" data-tab="analysis">Analysis</button>
+              <button class="tab-btn" type="button" data-tab="suggestions">Suggestions</button>
+              <button class="tab-btn" type="button" data-tab="export">Export</button>
             </div>
-            <div class="demo-output">
-              <p class="result-title">Analysis output</p>
-              <p id="demo-summary" class="result-summary">Click <strong>Run analysis</strong> to generate live scoring and recommendations.</p>
-              <div class="mini-grid" id="demo-results">
-                <div>
-                  <strong>Quality score</strong>
-                  <div class="progress"><div id="quality-bar" class="progress-bar" style="width: 0%"></div></div>
-                  <p class="result-summary" style="margin-top: 0.3rem;" id="quality-score">0 / 100</p>
+            <div class="state-badges">
+              <span class="state-badge" id="step-state">Step: Inputs</span>
+              <span class="state-badge" id="segments-state">Segments: 0</span>
+              <span class="state-badge" id="file-state">No source loaded</span>
+            </div>
+          </div>
+          <div class="panels">
+            <section class="tab-panel active" id="inputs">
+              <div class="two-col">
+                <article class="input-grid">
+                  <label class="workspace-label" for="profile">Creator profile</label>
+                  <select id="profile">
+                    <option value="standard">Standard Creator</option>
+                    <option value="shorts">Short-form + Retention</option>
+                    <option value="education">Education + Clarity</option>
+                    <option value="longwatch">Longwatch + Story Arc</option>
+                  </select>
+
+                  <label class="workspace-label" for="source-type">Input mode</label>
+                  <select id="source-type">
+                    <option value="text">Paste / type transcript</option>
+                    <option value="srt">SRT file</option>
+                    <option value="vtt">VTT file</option>
+                    <option value="csv">CSV file</option>
+                    <option value="url">YouTube URL (preview)</option>
+                  </select>
+                  <p class="helper">URL mode now gives transcript-ready fallback guidance until YouTube API integration is connected.</p>
+
+                  <label class="workspace-label" for="transcript">Transcript content</label>
+                  <textarea id="transcript"></textarea>
+
+                  <div class="input-actions">
+                    <button id="run-analysis" class="small-btn" type="button">Run analysis</button>
+                    <button id="load-sample" class="small-btn" type="button">Load sample</button>
+                    <label class="small-btn" style="margin:0; cursor:pointer;">
+                      <input id="file-input" type="file" accept=".txt,.srt,.vtt,.csv" style="display:none" />
+                      Upload file
+                    </label>
+                    <button id="clear-input" class="small-btn" type="button">Clear</button>
+                  </div>
+                  <label>
+                    <input id="auto-clean" type="checkbox" checked />
+                    Auto-clean transcript (remove filler words)
+                  </label>
+                  <p class="helper" id="parse-status">Drop your script/thumbnail brief file or paste transcript.</p>
+                  <div class="analysis-notice" id="parse-metrics">
+                    No parsed segments yet. Use <strong>Run analysis</strong> after loading text.
+                  </div>
+                </article>
+
+                <article>
+                  <label class="workspace-label" for="dropzone">Drag and drop</label>
+                  <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop transcript file">
+                    <div>
+                      <p style="margin: 0 0 0.35rem"><strong>Drop .txt, .srt, .vtt, or .csv</strong></p>
+                      <p class="helper" style="margin: 0">Supports timeline parsing and segment extraction.</p>
+                    </div>
+                  </div>
+                  <div class="summary-grid">
+                    <div class="metric">
+                      <strong>Quality and confidence</strong>
+                      <div class="meter"><div id="quick-confidence" class="meter-fill" style="width: 0%"></div></div>
+                      <p class="helper" id="confidence-text">Confidence: not calculated.</p>
+                    </div>
+                    <div class="metric">
+                      <strong>Live ingestion health</strong>
+                      <p id="ingest-status" class="helper">DropFix is waiting for input.</p>
+                      <ul id="parse-warnings" style="margin: 0.35rem 0 0 1.1rem; line-height: 1.5;"></ul>
+                    </div>
+                    <div class="metric">
+                      <strong>Profile state</strong>
+                      <p class="helper" id="profile-quick" style="margin: 0.2rem 0 0;">Standard Creator selected.</p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <section class="tab-panel" id="analysis">
+              <div class="analysis">
+                <label class="workspace-label">Scoring mode presets</label>
+                <div class="preset-row">
+                  <button class="small-btn" data-preset="balanced" type="button">Balanced (default)</button>
+                  <button class="small-btn" data-preset="growth" type="button">Growth Mode</button>
+                  <button class="small-btn" data-preset="shorts" type="button">Short-form Focus</button>
+                  <button class="small-btn" data-preset="education" type="button">Educational Focus</button>
                 </div>
-                <div>
-                  <strong>Recommended clips</strong>
-                  <ul class="result-list" id="clip-list"><li>No recommendations generated yet.</li></ul>
-                </div>
-                <div>
-                  <strong>Metadata suggestions</strong>
-                  <div class="pill-row" id="tag-row">
-                    <span class="status-pill">--</span>
-                    <span class="status-pill">--</span>
-                    <span class="status-pill">--</span>
+
+                <label class="workspace-label">Adjust scoring weights</label>
+                <div class="slider-grid">
+                  <div class="slider">
+                    <label for="weight-hook">Hook strength</label>
+                    <input id="weight-hook" data-weight="hook" type="range" min="0" max="100" value="34" />
+                    <span id="weight-hook-value">34</span>
+                  </div>
+                  <div class="slider">
+                    <label for="weight-retention">Retention risk</label>
+                    <input id="weight-retention" data-weight="retention" type="range" min="0" max="100" value="28" />
+                    <span id="weight-retention-value">28</span>
+                  </div>
+                  <div class="slider">
+                    <label for="weight-clarity">Clarity</label>
+                    <input id="weight-clarity" data-weight="clarity" type="range" min="0" max="100" value="18" />
+                    <span id="weight-clarity-value">18</span>
+                  </div>
+                  <div class="slider">
+                    <label for="weight-pacing">Pacing balance</label>
+                    <input id="weight-pacing" data-weight="pacing" type="range" min="0" max="100" value="12" />
+                    <span id="weight-pacing-value">12</span>
+                  </div>
+                  <div class="slider">
+                    <label for="weight-novelty">Novelty</label>
+                    <input id="weight-novelty" data-weight="novelty" value="8" min="0" max="100" type="range" />
+                    <span id="weight-novelty-value">8</span>
                   </div>
                 </div>
+
+                <div class="analysis-notice" id="weight-total">Weights total: 100</div>
+                <div class="summary-grid" style="margin-top: 0.9rem">
+                  <div class="metric">
+                    <strong>Predicted video quality</strong>
+                    <div class="meter"><div id="quality-meter" class="meter-fill" style="width: 0%"></div></div>
+                    <p class="helper" id="quality-summary">No run yet.</p>
+                  </div>
+                  <div class="metric">
+                    <strong>Top scoring explanation</strong>
+                    <ul id="quality-explanations" style="margin: 0.35rem 0 0 1.1rem; line-height: 1.45;"></ul>
+                  </div>
+                </div>
+                <div class="analysis-notice">
+                  Slide any slider to instantly rerank clip suggestions. Use rerun controls if settings changed.
+                </div>
               </div>
-            </div>
+            </section>
+
+            <section class="tab-panel" id="suggestions">
+              <label class="workspace-label">Clip shortlist with transparent reasons</label>
+              <div id="clip-cards" class="clip-list">
+                <p class="muted">Run analysis to generate clips.</p>
+              </div>
+              <label class="workspace-label" style="margin-top: 0.8rem;">Metadata suggestions</label>
+              <div class="export-box">
+                <div class="tag-cloud" id="metadata-cloud">
+                  <span>Generate first</span>
+                </div>
+                <p class="helper" id="metadata-note" style="margin: 0.45rem 0 0">Suggestions depend on analyzed transcript and profile.</p>
+              </div>
+            </section>
+
+            <section class="tab-panel" id="export">
+              <h3 class="panel-title">Ready-to-use outputs</h3>
+              <div class="summary-grid">
+                <div class="metric">
+                  <strong>Export package summary</strong>
+                  <p class="helper" id="export-summary">No exports available. Run analysis first.</p>
+                </div>
+                <div class="inline-row">
+                  <button id="copy-metadata" class="small-btn" type="button">Copy metadata JSON</button>
+                  <button id="copy-session" class="small-btn" type="button">Copy full session</button>
+                  <button id="download-json" class="small-btn" type="button">Download JSON</button>
+                  <button id="download-summary" class="small-btn" type="button">Download summary</button>
+                </div>
+                <div class="analysis-notice" id="export-hint">
+                  Export is generated locally from current project state for client handoff.
+                </div>
+              </div>
+            </section>
           </div>
-        </div>
+        </section>
       </section>
 
-      <section id="get-started">
-        <h2 class="section-title">Built for creators, not slides</h2>
-        <div class="grid-3">
-          <article class="card">
-            <h3>Start fast</h3>
-            <p>Open this page and test instantly. Full repository is still available for deeper local workflows.</p>
-            <div class="chips">
-              <span class="chip">No setup required</span>
-              <span class="chip">Browser only</span>
-              <span class="chip">Judge-friendly</span>
-            </div>
-          </article>
-          <article class="card">
-            <h3>Reliable output</h3>
-            <p>Consistent scoring model, deterministic recommendations, and cleanly structured output blocks.</p>
-            <div class="chips">
-              <span class="chip">Deterministic</span>
-              <span class="chip">Reusable</span>
-            </div>
-          </article>
-          <article class="card">
-            <h3>Contest ready</h3>
-            <p>Live demo, visual showcase, and full backend code available in one submission.</p>
-            <div class="chips">
-              <span class="chip">Hackathon fit</span>
-              <span class="chip">Demo-ready</span>
-            </div>
-          </article>
-        </div>
+      <section class="section-title" id="proof">Proof and judges checklist</section>
+      <section class="proof">
+        <p style="margin: 0;">What the page demonstrates right now:</p>
+        <ul>
+          <li>Transcript and subtitle ingestion works in-browser with clear parse feedback.</li>
+          <li>Project workspace stores multiple projects with autosave and reload continuity.</li>
+          <li>Clip scoring is explainable with visible top reasons and interactive weighting.</li>
+          <li>Output artifacts can be copied and downloaded with no local install.</li>
+        </ul>
+      </section>
+
+      <section class="section-title" id="ready">Built for clients and judges</section>
+      <section class="proof">
+        <p style="margin: 0;">
+          This page is designed as a complete front-end workflow: drop source file, tune scoring strategy,
+          review explainable recommendations, then export a handoff package. It is production-style and browser friendly.
+        </p>
       </section>
 
       <footer>
         <div class="foot-links">
           <a href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">Repository</a>
           <span>•</span>
-          <a href="https://ezrawestover1-hub.github.io/youtube-automation-hackathon/">Public demo page</a>
-          <span>•</span>
-          <a href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon/blob/main/README.md">Submission details</a>
+          <a href="https://ezrawestover1-hub.github.io/youtube-automation-hackathon/">Live demo</a>
         </div>
-        <p style="margin: 0.45rem 0 0;">A focused submission for measurable creator productivity gains.</p>
+        <p style="margin: 0.45rem 0 0;">A clean, practical YouTube automation workflow in-browser.</p>
       </footer>
     </main>
 
     <script>
-      (function () {
-        const profileSelect = document.getElementById("profile");
-        const transcriptInput = document.getElementById("transcript");
-        const summaryEl = document.getElementById("demo-summary");
-        const qualityBar = document.getElementById("quality-bar");
-        const qualityScore = document.getElementById("quality-score");
-        const clipList = document.getElementById("clip-list");
-        const tagRow = document.getElementById("tag-row");
+      const STORAGE_KEY = "dropfix-workspace-v3";
+      const FILLERS = /\b(uh+|um+|you know|like|so|actually|basically|basically|like,)\b/gi;
+      const MAX_BYTES = 1_000_000;
+      const FILES = {
+        txt: "text",
+        srt: "srt",
+        vtt: "vtt",
+        csv: "csv",
+      };
+      const PRESETS = {
+        balanced: {
+          hook: 34,
+          retention: 28,
+          clarity: 18,
+          pacing: 12,
+          novelty: 8
+        },
+        growth: {
+          hook: 42,
+          retention: 22,
+          clarity: 15,
+          pacing: 13,
+          novelty: 8
+        },
+        shorts: {
+          hook: 50,
+          retention: 26,
+          clarity: 14,
+          pacing: 5,
+          novelty: 5
+        },
+        education: {
+          hook: 26,
+          retention: 20,
+          clarity: 34,
+          pacing: 10,
+          novelty: 10
+        }
+      };
 
-        const clips = [
-          { segment: "0:00-0:15", hook: "Hook contrast + curiosity", baseline: 82 },
-          { segment: "0:16-0:32", hook: "Problem statement clarity", baseline: 64 },
-          { segment: "0:33-0:47", hook: "Quick value reveal", baseline: 71 },
-          { segment: "0:48-1:05", hook: "Proof example", baseline: 56 },
-          { segment: "1:06-1:22", hook: "Actionable tip", baseline: 87 }
-        ];
+      const state = {
+        activeTab: "inputs",
+        projects: [],
+        currentId: null,
+        analyzing: false
+      };
 
-        const profileProfiles = {
-          standard: { qualityMultiplier: 1.0, priorities: ["clarity", "hook", "cta"] },
-          shorts: { qualityMultiplier: 1.1, priorities: ["hook", "tempo", "tease"] },
-          education: { qualityMultiplier: 0.95, priorities: ["clarity", "structure", "retention"] }
+      const el = {
+        projectCount: document.getElementById("project-count"),
+        projectList: document.getElementById("project-list"),
+        projectTitle: document.getElementById("project-title"),
+        statusState: document.getElementById("status-state"),
+        autosaveState: document.getElementById("autosave-state"),
+        newProject: document.getElementById("new-project"),
+        clearInput: document.getElementById("clear-input"),
+        stepState: document.getElementById("step-state"),
+        segmentsState: document.getElementById("segments-state"),
+        fileState: document.getElementById("file-state"),
+        profile: document.getElementById("profile"),
+        profileQuick: document.getElementById("profile-quick"),
+        sourceType: document.getElementById("source-type"),
+        transcript: document.getElementById("transcript"),
+        parseStatus: document.getElementById("parse-status"),
+        parseMetrics: document.getElementById("parse-metrics"),
+        parseWarnings: document.getElementById("parse-warnings"),
+        confidenceBar: document.getElementById("quick-confidence"),
+        confidenceText: document.getElementById("confidence-text"),
+        ingestStatus: document.getElementById("ingest-status"),
+        runButton: document.getElementById("run-analysis"),
+        loadSample: document.getElementById("load-sample"),
+        fileInput: document.getElementById("file-input"),
+        dropzone: document.getElementById("dropzone"),
+        autoClean: document.getElementById("auto-clean"),
+        clipCards: document.getElementById("clip-cards"),
+        metadataCloud: document.getElementById("metadata-cloud"),
+        metadataNote: document.getElementById("metadata-note"),
+        qualityBar: document.getElementById("quality-meter"),
+        qualitySummary: document.getElementById("quality-summary"),
+        qualityExplanations: document.getElementById("quality-explanations"),
+        weightTotal: document.getElementById("weight-total"),
+        weightElements: Array.from(document.querySelectorAll("input[data-weight]")),
+        analysisNotices: {},
+        exportSummary: document.getElementById("export-summary"),
+        copyMetadata: document.getElementById("copy-metadata"),
+        copySession: document.getElementById("copy-session"),
+        downloadJson: document.getElementById("download-json"),
+        downloadSummary: document.getElementById("download-summary"),
+      };
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function clampPercent(value) {
+        return clamp(Math.round(value), 0, 100);
+      }
+
+      function formatDuration(seconds) {
+        const safeSeconds = Math.max(0, Math.round(seconds || 0));
+        const min = Math.floor(safeSeconds / 60);
+        const sec = safeSeconds % 60;
+        return `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+      }
+
+      function timestampToSeconds(ts) {
+        const m = ts.match(/(\d+):(\d{2}):(\d{2})([.,](\d{1,3}))?/);
+        if (!m) return 0;
+        const baseSeconds = Number(m[1]) * 3600 + Number(m[2]) * 60 + Number(m[3]);
+        const decimal = m[4]
+          ? Number(`0${m[4]}`)
+          : 0;
+        return baseSeconds + decimal;
+      }
+
+      function splitCsvLine(line) {
+        const cells = [];
+        let current = "";
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              current += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (ch === "," && !inQuotes) {
+            cells.push(current.trim());
+            current = "";
+          } else {
+            current += ch;
+          }
+        }
+        cells.push(current.trim());
+        return cells;
+      }
+
+      function sanitizeText(input, cleanFillers) {
+        const safe = (input || "").replace(/\r\n/g, "\n").replace(/\u00a0/g, " ").trim();
+        return cleanFillers ? safe.replace(FILLERS, "").replace(/ +/g, " ") : safe;
+      }
+
+      function segmentFromText(text, startSec) {
+        const clean = sanitizeText(text, el.autoClean.checked);
+        if (!clean) {
+          return null;
+        }
+        const words = clean.split(/\s+/).filter(Boolean);
+        const wordCount = words.length;
+        const avgWordLength = words.reduce((sum, w) => sum + w.length, 0) / Math.max(1, words.length);
+        const duration = clamp(wordCount * 0.38 + 1.5, 2, 18);
+        return {
+          start: startSec,
+          end: startSec + duration,
+          text: clean,
+          sourceTextLength: clean.length,
+          wordCount,
+          avgWordLength: Number(avgWordLength.toFixed(1))
         };
+      }
 
-        function scoreText(input) {
-          const seed = input
-            .toLowerCase()
-            .split("")
-            .reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) % 1000, 0);
-          return 52 + (seed % 35);
+      function parseTextMode(raw) {
+        const cleaned = sanitizeText(raw, el.autoClean.checked);
+        const chunks = cleaned.split(/\n{2,}|(?<=[.!?])\s+/g).filter(Boolean);
+        const segments = [];
+        let cursor = 0;
+        for (const chunk of chunks) {
+          const segment = segmentFromText(chunk, cursor);
+          if (!segment) {
+            continue;
+          }
+          segments.push(segment);
+          cursor = segment.end + 0.2;
+        }
+        return segments;
+      }
+
+      function parseSRT(raw) {
+        const blocks = raw.replace(/\r/g, "").trim().split("\n\n").map((x) => x.trim()).filter(Boolean);
+        const segments = [];
+        for (const block of blocks) {
+          const lines = block.split("\n").map((x) => x.trim()).filter(Boolean);
+          if (lines.length < 2) {
+            continue;
+          }
+          const timeLine = lines.find((line) => line.includes("-->"));
+          if (!timeLine) {
+            continue;
+          }
+          const [, startRaw, endRaw] = timeLine.match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/) || [];
+          if (!startRaw || !endRaw) {
+            continue;
+          }
+          const start = timestampToSeconds(startRaw);
+          const end = timestampToSeconds(endRaw);
+          const text = lines.slice(lines.indexOf(timeLine) + 1).join(" ");
+          const segment = segmentFromText(text, start);
+          if (!segment) {
+            continue;
+          }
+          segment.start = start;
+          segment.end = end;
+          segments.push(segment);
+        }
+        return segments;
+      }
+
+      function parseVTT(raw) {
+        const lines = raw.replace(/\r/g, "").split("\n");
+        const cueBlocks = [];
+        let buffer = [];
+        for (const line of lines) {
+          if (line.trim() === "") {
+            if (buffer.length) {
+              cueBlocks.push(buffer);
+              buffer = [];
+            }
+          } else if (line.trim().toUpperCase() !== "WEBVTT") {
+            buffer.push(line.trim());
+          }
+        }
+        if (buffer.length) cueBlocks.push(buffer);
+
+        const segments = [];
+        for (const block of cueBlocks) {
+          const timeLine = block.find((line) => line.includes("-->"));
+          if (!timeLine) {
+            continue;
+          }
+          const match = timeLine.match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
+          if (!match) {
+            continue;
+          }
+          const text = block
+            .slice(block.indexOf(timeLine) + 1)
+            .join(" ")
+            .replace(/<[^>]+>/g, "")
+            .trim();
+          const segment = segmentFromText(text, timestampToSeconds(match[1]));
+          if (!segment) {
+            continue;
+          }
+          segment.start = timestampToSeconds(match[1]);
+          segment.end = timestampToSeconds(match[2]);
+          segments.push(segment);
+        }
+        return segments;
+      }
+
+      function parseCSV(raw) {
+        const lines = raw
+          .replace(/\r/g, "")
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean);
+        if (!lines.length) {
+          return [];
+        }
+        const header = splitCsvLine(lines[0]).map((h) => h.toLowerCase());
+        const textIndex = Math.max(header.indexOf("text"), header.indexOf("caption"), header.indexOf("transcript"));
+        const startIndex = header.indexOf("start");
+        const endIndex = header.indexOf("end");
+        const rows = lines.slice(1);
+        const segments = [];
+        let cursor = 0;
+        for (const row of rows) {
+          const cells = splitCsvLine(row);
+          const rawText = cells[textIndex] || "";
+          const segmentText = sanitizeText(rawText.replace(/^"|"$/g, ""), el.autoClean.checked);
+          if (!segmentText) {
+            continue;
+          }
+          const start = startIndex >= 0 ? Number(cells[startIndex]) : cursor;
+          const end = endIndex >= 0 ? Number(cells[endIndex]) : cursor + segmentText.split(/\s+/).length * 0.4 + 2;
+          const segment = segmentFromText(segmentText, Number.isFinite(start) ? start : cursor);
+          if (!segment) {
+            continue;
+          }
+          segment.start = Number.isFinite(start) && start > 0 ? start : cursor;
+          segment.end = Number.isFinite(end) && end > segment.start ? end : segment.start + segment.end - segment.start || segment.start + 3;
+          cursor = segment.end + 0.2;
+          segments.push(segment);
+        }
+        return segments;
+      }
+
+      function parseInput(payload, mode) {
+        const cleanedPayload = sanitizeText(payload, false);
+        if (!cleanedPayload) {
+          throw new Error("No text available to parse.");
+        }
+        if (cleanedPayload.length > MAX_BYTES) {
+          throw new Error(`Input too large. Maximum size is ${MAX_BYTES} bytes.`);
         }
 
-        function recommend(profileKey) {
-          const profile = profileProfiles[profileKey] || profileProfiles.standard;
-          const base = scoreText(transcriptInput.value || "");
-          const priorityBoost = profile.priorities.includes("hook") ? 10 : 0;
-          const quality = Math.max(0, Math.min(100, Math.round((base + priorityBoost) * profile.qualityMultiplier)));
+        if (mode === "srt") {
+          return parseSRT(payload);
+        }
+        if (mode === "vtt") {
+          return parseVTT(payload);
+        }
+        if (mode === "csv") {
+          return parseCSV(payload);
+        }
+        return parseTextMode(payload);
+      }
 
-          const ranked = [...clips].sort((a, b) => b.baseline - a.baseline);
-          const metadata = [
-            quality >= 75
-              ? "Title candidate: Drop-off solved before second 45"
-              : "Keep the opening promise in first 6 seconds",
-            quality >= 75
-              ? "Description candidate: Show the result first, then teach method"
-              : "Add one stronger retention beat before the midpoint",
-            quality >= 75
-              ? "CTA candidate: Comment your retention struggle"
-              : "Ask a single commitment question in the last 8 seconds"
-          ];
+      function getProfileDefaults(profile) {
+        const text = (profile || "standard").toLowerCase();
+        if (text === "shorts") {
+          return PRESETS.shorts;
+        }
+        if (text === "education") {
+          return PRESETS.education;
+        }
+        if (text === "longwatch") {
+          return PRESETS.growth;
+        }
+        return PRESETS.balanced;
+      }
+
+      function normalizeWeights(raw) {
+        const normalized = { ...raw };
+        const total = Object.values(normalized).reduce((acc, value) => acc + value, 0) || 1;
+        Object.keys(normalized).forEach((key) => {
+          normalized[key] = normalized[key] / total;
+        });
+        return normalized;
+      }
+
+      function extractKeywords(text) {
+        const tokens = text
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/gi, " ")
+          .split(/\s+/)
+          .filter(Boolean);
+        const filtered = tokens.filter((t) => t.length > 3 && !["with", "from", "that", "this", "your", "that"].includes(t));
+        const counts = new Map();
+        filtered.forEach((word) => counts.set(word, (counts.get(word) || 0) + 1));
+        return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+      }
+
+      function scoreSegments(segments, weights, activeProfile) {
+        const normalizedWeights = normalizeWeights(weights);
+        const profileBoost = activeProfile === "shorts" ? 3 : activeProfile === "education" ? -1 : 0;
+        const clipBase = segments.map((segment, index, allSegments) => {
+          const text = segment.text.toLowerCase();
+          const words = text.split(/\s+/).filter(Boolean);
+          const wc = words.length || 1;
+          const punctuation = (text.match(/[!?]/g) || []).length;
+          const questions = (text.match(/\?/g) || []).length;
+          const longWords = words.filter((word) => word.length > 8).length;
+          const pauseLike = (text.match(/[,;:()]/g) || []).length;
+          const hookKeywords = (text.match(/\b(how|why|what if|wait|surprise|unexpected|mistake|error|myth|truth|proof|result|first|quick)\b/g) || []).length;
+          const clarityBoost = words.filter((word) => word.length >= 3).length / wc * 100;
+          const sentimentCue = (text.match(/\b(save|fail|fix|learn|easy|simple|exactly|important|best)\b/g) || []).length;
+
+          const hook = clampPercent((index === 0 ? 55 : 30) + hookKeywords * 6 + sentimentCue * 4 + punctuation * 2 + Math.min(20, wc));
+          const retention = clampPercent(60 + hookKeywords * 5 + Math.min(30, wc) + 12 + (index % 3 === 0 ? 8 : 0) + sentimentCue * 2 - longWords * 2);
+          const clarity = clampPercent(40 + clarityBoost * 0.55 + (text.includes("because") ? 18 : 0) - pauseLike * 3 + punctuation * 1.8 + wc / 2);
+          const pacing = clampPercent(70 - longWords * 4 - pauseLike * 2 + (wc / 3));
+          const novelty = clampPercent(30 + extractKeywords(text).slice(0, 4).length * 8 + (text.includes("example") ? 10 : 0) + (questions * 5));
+
+          const rawScore = hook * normalizedWeights.hook +
+            retention * normalizedWeights.retention +
+            clarity * normalizedWeights.clarity +
+            pacing * normalizedWeights.pacing +
+            novelty * normalizedWeights.novelty;
+          const finalScore = clampPercent(rawScore + profileBoost);
+          const reasons = explainSegmentReasons(
+            { hook, retention, clarity, pacing, novelty },
+            normalizedWeights,
+            index,
+            words
+          );
 
           return {
-            quality,
-            keepers: ranked.slice(0, 3),
-            metadata
+            start: segment.start,
+            end: segment.end,
+            text: segment.text,
+            score: finalScore,
+            duration: +(segment.end - segment.start).toFixed(1),
+            signals: { hook, retention, clarity, pacing, novelty },
+            reasons
           };
-        }
-
-        function renderResult(result) {
-          qualityBar.style.width = `${result.quality}%`;
-          qualityScore.textContent = `${result.quality} / 100`;
-          const profileLabel = profileSelect.options[profileSelect.selectedIndex].text;
-          summaryEl.innerHTML = `Profile selected: <strong>${profileLabel}</strong>. Score is based on hook strength, pacing, and clarity.`;
-
-          clipList.innerHTML = result.keepers
-            .map((clip) => `<li><strong>${clip.segment}</strong> - ${clip.hook} (${clip.baseline}/100)</li>`)
-            .join("");
-          tagRow.innerHTML = result.metadata
-            .map((item) => `<span class="status-pill">${item}</span>`)
-            .join("");
-        }
-
-        document.getElementById("run-demo").addEventListener("click", () => {
-          renderResult(recommend(profileSelect.value));
         });
 
-        document.getElementById("load-sample").addEventListener("click", () => {
-          transcriptInput.value = "Title: 5 mistakes every creator makes in first 30 seconds\nTopic: Retention architecture for tutorials and shorts\nScript sample: Open with a pain point, show unexpected contrast by second 5, then keep value high every 10-14 seconds with one concise proof point each.";
-          renderResult(recommend(profileSelect.value));
-        });
+        const ordered = clipBase.sort((a, b) => b.score - a.score || b.duration - a.duration);
+        const quality = clampPercent(
+          ordered.reduce((acc, segment) => acc + segment.score, 0) / Math.max(1, ordered.length)
+        );
+        return { ordered, quality };
+      }
 
-        renderResult(recommend("standard"));
-      })();
+      function explainSegmentReasons(signals, normalizedWeights, index, words) {
+        const scored = [
+          { key: "hook", label: "Strong opening language and curiosity elements", value: signals.hook },
+          { key: "retention", label: "Good retention shape with recurring payoff pattern", value: signals.retention },
+          { key: "clarity", label: "Clear instruction and understandable sentence structure", value: signals.clarity },
+          { key: "pacing", label: "Balanced pace and sentence density", value: signals.pacing },
+          { key: "novelty", label: "Unique phrasing and high-value idea density", value: signals.novelty },
+        ];
+        const ordered = scored.sort((a, b) => b.value - a.value);
+        const top = ordered.slice(0, 3).map((item, rank) => `${rank + 1}. ${item.label}`);
+        if (index === 0 && signals.hook > signals.clarity) {
+          top.unshift("Opening segment has leading hook value and should be promoted early.");
+        }
+        if (words && words.length < 6) {
+          top.push("Very short segment; useful as a hook insert if paired with adjacent lines.");
+        }
+        return top.slice(0, 3);
+      }
+
+      function qualityRationale(ordered, quality) {
+        const reasons = [];
+        if (!ordered.length) {
+          return ["No valid segments to analyze yet."];
+        }
+        const top = ordered.slice(0, 2);
+        const avgHook = clampPercent(top.reduce((acc, item) => acc + item.signals.hook, 0) / top.length);
+        const avgRetention = clampPercent(top.reduce((acc, item) => acc + item.signals.retention, 0) / top.length);
+        const avgClarity = clampPercent(top.reduce((acc, item) => acc + item.signals.clarity, 0) / top.length);
+        reasons.push(`Top clips show hook strength of ${avgHook}/100 and retention profile ${avgRetention}/100.`);
+        reasons.push(`Clarity is currently ${avgClarity}/100, with strongest lines likely near ${top[0].start < 60 ? "opening section" : "middle section"}.`);
+        reasons.push(`Overall confidence ${quality >= 75 ? "high" : quality >= 55 ? "moderate" : "cautious"} for upload-ready repackaging.`);
+        return reasons;
+      }
+
+      function makeMetadataSuggestions(project) {
+        const segments = project.segments || [];
+        const joined = segments.map((s) => s.text).join(" ");
+        const keywords = extractKeywords(joined).slice(0, 8).map(([word]) => word);
+        const safeKeywords = keywords.length ? keywords : ["youtube", "retention", "creator"];
+        const title = `${project.profile === "shorts" ? "How to" : "Why"} ${safeKeywords[0]} changed results in 60 seconds`;
+        const description = `Learn the setup + structure used in this video. Includes practical checkpoints, retention rhythm, and final actions for better completion rates.`;
+        const tags = [
+          safeKeywords.slice(0, 6),
+          ["creator growth", "editing workflow", "tube tips"].flat()
+        ].flat().slice(0, 10);
+        const cta = project.profile === "shorts"
+          ? "Comment your best first 5-second hook and I will grade it."
+          : "Reply with your retention test and what edited clip you used.";
+        return {
+          title,
+          description,
+          tags: Array.from(new Set(tags)).slice(0, 10),
+          callToAction: cta,
+          publishReady: segments.length > 2 && project.qualityScore >= 50
+        };
+      }
+
+      function updateBadges() {
+        const project = getCurrentProject();
+        const totalSegments = (project.segments || []).length;
+        const fileType = project.sourceType || "none";
+        const status = state.analyzing ? "Analyzing" : "Ready";
+        const stepLabels = {
+          inputs: "Inputs",
+          analysis: "Analysis",
+          suggestions: "Suggestions",
+          export: "Export"
+        };
+        el.statusState.textContent = status;
+        el.autosaveState.textContent = "Autosave: on";
+        el.stepState.textContent = `Step: ${stepLabels[state.activeTab] || "Inputs"}`;
+        el.segmentsState.textContent = `Segments: ${totalSegments}`;
+        el.fileState.textContent = `Source: ${fileType}`;
+        el.profileQuick.textContent = `${el.profile.options[el.profile.selectedIndex].text}`;
+      }
+
+      function getCurrentProject() {
+        return state.projects.find((project) => project.id === state.currentId) || null;
+      }
+
+      function persistWorkspace() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects: state.projects, currentId: state.currentId }));
+      }
+
+      function loadWorkspace() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return;
+        }
+        try {
+          const parsed = JSON.parse(raw);
+          state.projects = Array.isArray(parsed.projects) ? parsed.projects : [];
+          state.currentId = parsed.currentId || null;
+        } catch {
+          state.projects = [];
+          state.currentId = null;
+        }
+      }
+
+      function createProject() {
+        const now = new Date().toISOString();
+        const project = {
+          id: `prj-${now}-${Math.random().toString(16).slice(2, 8)}`,
+          name: `Project ${new Date().toLocaleString([], { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" })}`,
+          profile: el.profile.value,
+          sourceType: "text",
+          transcript: "",
+          segments: [],
+          weights: { ...getProfileDefaults("standard") },
+          qualityScore: 0,
+          profileReasoning: "",
+          lastEdited: now,
+          clips: [],
+          metadata: {},
+          status: "new"
+        };
+        state.projects.unshift(project);
+        state.currentId = project.id;
+        persistWorkspace();
+        renderProjectList();
+        hydrateProject(project.id);
+      }
+
+      function hydrateProject(projectId) {
+        const project = state.projects.find((p) => p.id === projectId);
+        if (!project) {
+          return;
+        }
+        state.currentId = project.id;
+        el.projectTitle.textContent = project.name;
+        el.profile.value = project.profile || "standard";
+        el.sourceType.value = project.sourceType || "text";
+        el.transcript.value = project.transcript || "";
+        const weights = project.weights || getProfileDefaults(project.profile || "standard");
+        setWeightsFromState(weights);
+        el.statusState.textContent = project.status || "Loaded";
+        el.parseStatus.textContent = project.transcript
+          ? "Project restored. Click Run analysis to refresh or edit and rerun."
+          : "No transcript loaded yet. Add input and run analysis.";
+        renderProjectList();
+        renderIngestPanels(project);
+      }
+
+      function renderProjectList() {
+        el.projectCount.textContent = `${state.projects.length} saved project${state.projects.length === 1 ? "" : "s"}`;
+        el.projectList.innerHTML = state.projects
+          .map((project) => {
+            const isActive = project.id === state.currentId ? "active" : "";
+            const edited = new Date(project.lastEdited).toLocaleDateString();
+            return `<button class="project-item ${isActive}" data-project="${project.id}" type="button">
+              <p class="project-name">${project.name}</p>
+              <p class="project-meta">${project.status} · edited ${edited}</p>
+            </button>`;
+          })
+          .join("");
+      }
+
+      function renderIngestPanels(project) {
+        const warnings = project.warnings || [];
+        el.parseWarnings.innerHTML = warnings
+          .map((warning) => `<li>${warning}</li>`)
+          .join("");
+        const confidence = clampPercent(project.confidence || 0);
+        el.confidenceBar.style.width = `${confidence}%`;
+        el.confidenceText.textContent = `Confidence: ${confidence}%`;
+        const quality = clampPercent(project.qualityScore || 0);
+        el.qualityBar.style.width = `${quality}%`;
+        el.qualitySummary.textContent = project.qualityLabel || "No run yet.";
+        el.metadataCloud.innerHTML = (project.metadata && project.metadata.tags && project.metadata.tags.length)
+          ? project.metadata.tags.map((tag) => `<span>${tag}</span>`).join("")
+          : "<span>Generate in Analysis tab</span>";
+        el.metadataNote.textContent = project.metadata && project.metadata.description
+          ? project.metadata.description
+          : "Suggestions depend on analyzed transcript and profile.";
+        el.exportSummary.textContent = project.status === "analyzed"
+          ? `${project.clips?.length || 0} clip recommendations ready for use.`
+          : "No exports available. Run analysis first.";
+        renderClipCards(project.clips || []);
+        renderQualityNarrative(project);
+        updateBadges();
+      }
+
+      function renderClipCards(clips) {
+        if (!clips.length) {
+          el.clipCards.innerHTML = "<p class=\"muted\">Run analysis to generate clips.</p>";
+          return;
+        }
+        const top = clips.slice(0, 6);
+        el.clipCards.innerHTML = top
+          .map((clip) => {
+            const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.duration}s)`;
+            const meter = `<div class=\"meter\"><div class=\"meter-fill\" style=\"width: ${clip.score}%\"></div></div>`;
+            return `
+              <div class="clip-card">
+                <div class="clip-top">
+                  <span class="clip-segment">${label}</span>
+                  <span class="clip-score">${clip.score} / 100</span>
+                </div>
+                ${meter}
+                <ul class="reason-list">
+                  ${clip.reasons.map((reason) => `<li>${reason}</li>`).join("")}
+                </ul>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function renderQualityNarrative(project) {
+        const explanations = project.qualityExplanations || ["No analysis yet."];
+        el.qualityExplanations.innerHTML = explanations.map((item) => `<li>${item}</li>`).join("");
+      }
+
+      function setWeightsFromState(weights) {
+        el.weightElements.forEach((slider) => {
+          const key = slider.dataset.weight;
+          const value = clamp(weights[key] ?? 0, 0, 100);
+          slider.value = value;
+          const valueEl = document.getElementById(`weight-${key}-value`);
+          if (valueEl) {
+            valueEl.textContent = String(value);
+          }
+        });
+        updateWeightTotals();
+      }
+
+      function updateWeightTotals() {
+        const total = el.weightElements.reduce((acc, slider) => acc + Number(slider.value), 0);
+        el.weightTotal.textContent = `Weights total: ${total}`;
+      }
+
+      function getWeights() {
+        const obj = {};
+        for (const slider of el.weightElements) {
+          obj[slider.dataset.weight] = Number(slider.value);
+        }
+        if (Object.values(obj).reduce((acc, value) => acc + value, 0) === 0) {
+          return PRESETS.balanced;
+        }
+        return obj;
+      }
+
+      function parseUploadedFile(file) {
+        const extension = (file.name.split(".").pop() || "").toLowerCase();
+        const mode = FILES[extension] || "text";
+        const reader = new FileReader();
+        reader.onload = () => {
+          const text = String(reader.result || "");
+          processInput(text, mode, file.name, file.size);
+        };
+        reader.onerror = () => {
+          setIngestError("Could not read file.");
+        };
+        reader.readAsText(file);
+      }
+
+      function setIngestError(message) {
+        const project = ensureProject();
+        project.warnings = [message];
+        project.status = "needs-fix";
+        project.confidence = 0;
+        el.parseStatus.textContent = message;
+        el.parseMetrics.textContent = message;
+        el.ingestStatus.textContent = message;
+        persistProject();
+        renderIngestPanels(project);
+        switchTab("inputs");
+      }
+
+      function processInput(rawText, sourceMode, fileName, fileSize = 0) {
+        const project = ensureProject();
+        try {
+          const segments = parseInput(rawText, sourceMode);
+          if (!segments.length) {
+            throw new Error("Parsed input produced no valid segments.");
+          }
+          if (fileSize > MAX_BYTES) {
+            throw new Error("File exceeds ingest cap for browser demo.");
+          }
+          project.transcript = rawText;
+          project.sourceType = sourceMode;
+          project.segments = segments;
+          project.warnings = [];
+          project.confidence = clampPercent(55 + Math.min(45, segments.length * 2));
+          project.status = "parsed";
+          project.lastEdited = new Date().toISOString();
+          project.name = fileName
+            ? fileName.replace(/\\.[^.]+$/, "")
+            : project.name;
+          el.parseStatus.textContent = `Parsed ${segments.length} segment(s) from ${sourceMode.toUpperCase()}.`;
+          el.parseMetrics.innerHTML = `Segments: ${segments.length} · Duration: ${formatDuration(segments.at(-1).end)} · Avg words: ${(
+            segments.reduce((sum, s) => sum + s.wordCount, 0) / segments.length
+          ).toFixed(1)}`;
+          el.ingestStatus.textContent = `Input recognized as ${sourceMode.toUpperCase()}.`;
+          persistProject();
+          renderIngestPanels(project);
+        } catch (error) {
+          setIngestError(error.message || "Input parser failed.");
+          return;
+        }
+      }
+
+      function runAnalysis() {
+        const project = ensureProject();
+        if (!project.transcript && !project.segments.length) {
+          setIngestError("No transcript or file loaded yet.");
+          return;
+        }
+        const rawText = el.transcript.value || project.transcript || "";
+        if (!rawText.trim()) {
+          setIngestError("No content found in transcript.");
+          return;
+        }
+        state.analyzing = true;
+        updateBadges();
+        const mode = el.sourceType.value;
+        if (mode !== "url") {
+          const segments = parseInput(rawText, mode === "text" ? "text" : mode);
+          if (!segments.length) {
+            setIngestError("Could not generate valid segments from current input.");
+            state.analyzing = false;
+            updateBadges();
+            return;
+          }
+          project.segments = segments;
+        }
+        project.profile = el.profile.value;
+        const weights = getWeights();
+        const result = scoreSegments(project.segments, weights, project.profile);
+        project.clips = result.ordered;
+        project.qualityScore = result.quality;
+        project.weights = weights;
+        project.status = "analyzed";
+        project.metadata = makeMetadataSuggestions(project);
+        project.qualityExplanations = qualityRationale(result.ordered, result.quality);
+        project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
+        project.lastEdited = new Date().toISOString();
+        project.confidence = project.confidence || clampPercent(65);
+        project.warnings = [];
+        persistProject();
+        renderIngestPanels(project);
+        state.analyzing = false;
+        updateBadges();
+        switchTab("suggestions");
+      }
+
+      function ensureProject() {
+        if (!state.currentId || !state.projects.length) {
+          createProject();
+        }
+        return getCurrentProject();
+      }
+
+      function switchTab(tab) {
+        state.activeTab = tab;
+        document.querySelectorAll(".tab-btn").forEach((button) => {
+          button.classList.toggle("active", button.dataset.tab === tab);
+        });
+        document.querySelectorAll(".tab-panel").forEach((panel) => {
+          panel.classList.toggle("active", panel.id === tab);
+        });
+        updateBadges();
+      }
+
+      function persistProject() {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        project.lastEdited = new Date().toISOString();
+        persistWorkspace();
+      }
+
+      function initFromWorkspace() {
+        loadWorkspace();
+        if (!state.projects.length) {
+          createProject();
+        }
+        if (!getCurrentProject()) {
+          state.currentId = state.projects[0]?.id || null;
+        }
+        if (!state.currentId) {
+          state.currentId = state.projects[0]?.id || null;
+        }
+        hydrateProject(state.currentId);
+        renderProjectList();
+        updateBadges();
+      }
+
+      function clearWorkspaceProject() {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        project.transcript = "";
+        project.sourceType = "text";
+        project.segments = [];
+        project.warnings = [];
+        project.status = "new";
+        project.clips = [];
+        project.metadata = {};
+        project.qualityScore = 0;
+        project.qualityLabel = "No run yet.";
+        project.qualityExplanations = [];
+        project.confidence = 0;
+        project.lastEdited = new Date().toISOString();
+        persistProject();
+        hydrateProject(project.id);
+        renderIngestPanels(project);
+      }
+
+      function deleteCurrentProject() {
+        if (!state.currentId) {
+          return;
+        }
+        state.projects = state.projects.filter((project) => project.id !== state.currentId);
+        state.currentId = state.projects[0]?.id || null;
+        if (!state.currentId) {
+          createProject();
+        } else {
+          persistWorkspace();
+          hydrateProject(state.currentId);
+          renderProjectList();
+        }
+      }
+
+      async function copyTextToClipboard(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          const fallback = document.createElement("textarea");
+          fallback.value = text;
+          document.body.appendChild(fallback);
+          fallback.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(fallback);
+          return ok;
+        }
+      }
+
+      function downloadFile(filename, content, type) {
+        const blob = new Blob([content], { type });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+      }
+
+      document.querySelectorAll(".tab-btn").forEach((button) => {
+        button.addEventListener("click", () => switchTab(button.dataset.tab));
+      });
+
+      el.newProject?.addEventListener("click", () => {
+        createProject();
+      });
+
+      document.getElementById("delete-project").addEventListener("click", deleteCurrentProject);
+
+      el.projectList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-project]");
+        if (!button) {
+          return;
+        }
+        hydrateProject(button.dataset.project);
+      });
+
+      el.sourceType.addEventListener("change", () => {
+        if (el.sourceType.value === "url") {
+          el.parseStatus.textContent = "URL mode: paste transcript in textarea for now or use an exported subtitle file.";
+        } else {
+          el.parseStatus.textContent = "Choose file or paste text matching selected format.";
+        }
+      });
+
+      el.runButton.addEventListener("click", runAnalysis);
+      el.loadSample.addEventListener("click", () => {
+        const sample = "Title: Why retention drops and how to fix it.\n\nAt 0:07, start with the viewer's pain point so they stay through the intro. Show what changed and why this method works. By second 20, deliver proof with a tiny reveal. Keep one clear takeaway every 45 seconds and repeat the promise before final CTA.";
+        const project = ensureProject();
+        project.transcript = sample;
+        el.transcript.value = sample;
+        project.sourceType = "text";
+        persistProject();
+        el.parseStatus.textContent = "Sample loaded. Click Run analysis.";
+        el.parseMetrics.textContent = "Sample text loaded with clean timestamp-free sentences.";
+        el.ingestStatus.textContent = "Ready to parse.";
+        renderIngestPanels(project);
+      });
+
+      el.fileInput.addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+          return;
+        }
+        parseUploadedFile(file);
+      });
+
+      el.clearInput.addEventListener("click", clearWorkspaceProject);
+
+      ["dragenter", "dragover"].forEach((type) => {
+        el.dropzone.addEventListener(type, (event) => {
+          event.preventDefault();
+          el.dropzone.classList.add("drag");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((type) => {
+        el.dropzone.addEventListener(type, () => {
+          el.dropzone.classList.remove("drag");
+        });
+      });
+
+      el.dropzone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        const file = event.dataTransfer?.files?.[0];
+        if (!file) {
+          return;
+        }
+        parseUploadedFile(file);
+      });
+
+      document.querySelectorAll("input[data-weight], button[data-preset]").forEach((node) => {
+        node.addEventListener("input", updateWeightTotals);
+      });
+
+      document.querySelectorAll("button[data-preset]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const preset = btn.getAttribute("data-preset");
+          if (PRESETS[preset]) {
+            setWeightsFromState(PRESETS[preset]);
+            const project = getCurrentProject();
+            if (project) {
+              project.weights = PRESETS[preset];
+              project.lastEdited = new Date().toISOString();
+              persistProject();
+            }
+            runAnalysis();
+          }
+        });
+      });
+
+      document.querySelectorAll("input[data-weight]").forEach((slider) => {
+        slider.addEventListener("input", () => {
+          document.getElementById(`weight-${slider.dataset.weight}-value`).textContent = slider.value;
+          updateWeightTotals();
+          const project = getCurrentProject();
+          if (project && project.status === "analyzed") {
+            runAnalysis();
+          }
+        });
+      });
+
+      el.copyMetadata.addEventListener("click", async () => {
+        const project = getCurrentProject();
+        if (!project?.metadata) {
+          return;
+        }
+        const payload = JSON.stringify(project.metadata, null, 2);
+        const copied = await copyTextToClipboard(payload);
+        el.copyMetadata.textContent = copied ? "Metadata copied" : "Copy failed";
+        setTimeout(() => {
+          el.copyMetadata.textContent = "Copy metadata JSON";
+        }, 1200);
+      });
+
+      el.copySession.addEventListener("click", async () => {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        const payload = JSON.stringify(project, null, 2);
+        const copied = await copyTextToClipboard(payload);
+        el.copySession.textContent = copied ? "Session copied" : "Copy failed";
+        setTimeout(() => {
+          el.copySession.textContent = "Copy full session";
+        }, 1200);
+      });
+
+      el.downloadJson.addEventListener("click", () => {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        downloadFile(`${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix.json`, JSON.stringify(project, null, 2), "application/json");
+      });
+
+      el.downloadSummary.addEventListener("click", () => {
+        const project = getCurrentProject();
+        if (!project) {
+          return;
+        }
+        const summary = `Project: ${project.name}\nProfile: ${project.profile}\nQuality score: ${project.qualityScore}\nSegments: ${project.segments.length}\nSuggested title: ${project.metadata?.title || "N/A"}\nDescription: ${project.metadata?.description || "N/A"}\nTags: ${(project.metadata?.tags || []).join(", ")}\n`;
+        downloadFile(`${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix-summary.txt`, summary, "text/plain");
+      });
+
+      el.autoClean.addEventListener("change", () => {
+        if (el.transcript.value && el.transcript.value.length) {
+          el.transcript.value = sanitizeText(el.transcript.value, el.autoClean.checked);
+          const project = ensureProject();
+          project.transcript = el.transcript.value;
+          persistProject();
+        }
+      });
+
+      el.transcript.addEventListener("input", () => {
+        const project = ensureProject();
+        project.transcript = el.transcript.value;
+        project.lastEdited = new Date().toISOString();
+        persistProject();
+      });
+
+      initFromWorkspace();
     </script>
   </body>
 </html>
