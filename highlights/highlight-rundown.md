@@ -26,6 +26,16 @@ Use this with `highlights/run-highlight-showcase.ps1` and record your screen (OB
 - "Quality score and gate status help teams trust what to ship."
 - "Everything is local-first, so judges can verify it from clone → run → export."
 
+## Zero-effort auto-render mode
+
+- From repo root run:
+  - `npm.cmd install --prefix highlights puppeteer-core ffmpeg-static`
+  - `.\highlights\run-highlight-showcase.ps1`
+- Output file:
+  - `outputs\\dropfix-highlight-showcase.mp4`
+
+Run this once and send the generated MP4 directly.
+
 ## Recorded demo command (optional live callouts)
 
 - `cd backend`
@@ -35,4 +45,3 @@ Use this with `highlights/run-highlight-showcase.ps1` and record your screen (OB
 - `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
 
 You can keep it visual by just showing the local-open HTML deck while referencing the checklist.
-
