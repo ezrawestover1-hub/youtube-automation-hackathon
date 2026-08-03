@@ -3,256 +3,518 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DropFix | YouTube Automation</title>
+    <title>DropFix | YouTube Creator Automation</title>
     <meta
       name="description"
-      content="DropFix helps creators automate clip planning, metadata checks, and upload-ready recommendations."
+      content="DropFix is a YouTube creator workflow assistant for clip planning, quality scoring, and production-ready recommendations."
     />
     <style>
       :root {
-        --cream: #f5ebdf;
-        --cream-soft: #fcf6ee;
-        --sage: #2f6652;
-        --sage-soft: #4c8d72;
-        --ink: #20332a;
-        --panel: rgba(252, 245, 234, 0.75);
-        --shadow: 0 18px 45px rgba(43, 91, 71, 0.16);
+        --cream-main: #f6efe4;
+        --cream-soft: #fff9f1;
+        --cream-muted: #f4e8d5;
+        --green-deep: #1f5c45;
+        --green: #2f7457;
+        --green-soft: #4c8b70;
+        --green-accent: #8ec9a5;
+        --text-primary: #16281f;
+        --text-muted: #355445;
+        --card-bg: rgba(255, 250, 243, 0.75);
+        --line: rgba(46, 90, 70, 0.2);
         --radius: 18px;
+        --shadow: 0 18px 45px rgba(31, 92, 69, 0.15);
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 0;
-        font-family: "Trebuchet MS", "Segoe UI", "Avenir", sans-serif;
-        color: var(--ink);
+        color: var(--text-primary);
+        font-family: "Trebuchet MS", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
         background:
-          radial-gradient(circle at 12% 8%, rgba(244, 225, 198, 0.9), transparent 30%),
-          radial-gradient(circle at 88% 15%, rgba(76, 141, 114, 0.22), transparent 36%),
-          linear-gradient(160deg, var(--cream-soft), var(--cream));
+          radial-gradient(circle at 14% 10%, rgba(243, 228, 209, 0.92), transparent 32%),
+          radial-gradient(circle at 85% 20%, rgba(142, 201, 165, 0.32), transparent 38%),
+          linear-gradient(150deg, var(--cream-main), var(--cream-soft));
         min-height: 100vh;
-        padding: 2rem 1rem 4rem;
       }
 
-      .container {
-        max-width: 1040px;
+      .wrap {
+        width: min(1120px, 94vw);
         margin: 0 auto;
+        padding: 1.75rem 0 3rem;
       }
 
-      header {
-        background: linear-gradient(150deg, var(--sage), #3d7a62);
-        color: #f9f9f4;
-        padding: 2.25rem 2rem;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        display: grid;
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         gap: 0.75rem;
+        margin-bottom: 1.2rem;
       }
 
-      .badge {
-        width: fit-content;
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.35);
+      .brand {
+        background: #ffffffd9;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0.6rem 0.9rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--green-deep);
+        display: inline-flex;
+        gap: 0.45rem;
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.45rem;
+      }
+
+      .tag {
+        color: var(--green-deep);
+        border: 1px solid var(--line);
+        background: var(--cream-soft);
         border-radius: 999px;
         padding: 0.35rem 0.8rem;
-        letter-spacing: 0.03em;
-        font-size: 0.84rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .hero {
+        border-radius: var(--radius);
+        padding: clamp(1.5rem, 2.7vw, 2.8rem);
+        background: linear-gradient(145deg, #245d47 0%, #2f7457 52%, #4c8b70 100%);
+        color: #f6fff7;
+        box-shadow: var(--shadow);
+      }
+
+      .kicker {
+        margin-bottom: 0.55rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-size: 0.8rem;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+        border-radius: 999px;
+        padding: 0.3rem 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
       }
 
       h1 {
-        margin: 0.1rem 0;
-        font-size: clamp(1.9rem, 2vw + 1rem, 3rem);
+        margin: 0;
+        font-size: clamp(2rem, 2.5vw + 1rem, 3.25rem);
+        line-height: 1.05;
       }
 
-      h2 {
-        margin: 0 0 0.4rem;
-        font-size: clamp(1.15rem, 1.15vw + 1rem, 1.6rem);
+      .lead {
+        max-width: 70ch;
+        font-size: 1.05rem;
+        line-height: 1.65;
+        color: #f0f9f1;
       }
 
-      p {
-        margin: 0.2rem 0;
-        line-height: 1.6;
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 1.2rem;
+        align-items: center;
+        margin-top: 1.3rem;
       }
 
-      .cta {
+      .hero-copy p {
+        margin: 0.95rem 0;
+      }
+
+      .cta-row {
+        margin-top: 1.2rem;
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
-        margin-top: 1.2rem;
       }
 
       .btn {
-        border: 0;
-        border-radius: 14px;
-        padding: 0.75rem 1.05rem;
-        font-size: 0.95rem;
-        cursor: pointer;
-        text-decoration: none;
+        border: none;
+        border-radius: 12px;
         font-weight: 700;
-        transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+        letter-spacing: 0.01em;
+        text-decoration: none;
+        padding: 0.78rem 1.05rem;
+        transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, opacity 150ms ease;
+        cursor: pointer;
       }
 
       .btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(44, 82, 64, 0.22);
         opacity: 0.95;
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
       }
 
       .btn.primary {
-        background: #d9f0d7;
-        color: #16342b;
+        background: #d7f0d2;
+        color: #15362d;
       }
 
-      .btn.ghost {
-        background: rgba(255, 255, 255, 0.17);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.33);
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.46);
+        color: #f5fef5;
       }
 
-      .grid {
+      .metrics {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 14px;
+        padding: 0.8rem 0.9rem;
+      }
+
+      .metric-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .metric-list li {
+        display: grid;
+        gap: 0.15rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        padding: 0.55rem 0;
+      }
+
+      .metric-list li:last-child {
+        border-bottom: none;
+      }
+
+      .metric-value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #edffe9;
+      }
+
+      .metric-label {
+        font-size: 0.86rem;
+        opacity: 0.9;
+      }
+
+      section {
         margin-top: 1.2rem;
+      }
+
+      .section-title {
+        margin: 0 0 0.9rem;
+        color: var(--green-deep);
+        font-size: 1.35rem;
+      }
+
+      .grid-3 {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1rem;
       }
 
-      .panel {
-        background: var(--panel);
-        backdrop-filter: blur(7px);
-        border: 1px solid rgba(46, 96, 75, 0.18);
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--line);
         border-radius: var(--radius);
-        padding: 1.2rem 1.1rem;
+        padding: 1rem 1rem 1.1rem;
+        backdrop-filter: blur(6px);
         box-shadow: var(--shadow);
       }
 
-      ul {
-        padding-left: 1.05rem;
+      .card h3 {
+        margin: 0 0 0.5rem;
+        color: var(--green-deep);
       }
 
-      li + li {
-        margin-top: 0.55rem;
+      .card p {
+        margin: 0.35rem 0;
+        color: var(--text-muted);
+        line-height: 1.6;
       }
 
-      .small {
-        font-size: 0.95rem;
-        opacity: 0.9;
+      .steps {
+        display: grid;
+        gap: 0.75rem;
       }
 
-      .foot {
-        margin-top: 1.1rem;
-        color: #2c4b3e;
-        background: #fff5e8;
-        border: 1px dashed #4c8d72;
+      .step {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        align-items: start;
+        background: #fffaf2;
+        border: 1px dashed #c7ddcf;
         border-radius: 12px;
-        padding: 0.7rem 0.9rem;
+        padding: 0.75rem 0.95rem;
       }
 
-      .status {
-        margin-top: 0.8rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.45rem;
-        background: rgba(74, 140, 117, 0.13);
-        border: 1px solid rgba(46, 96, 75, 0.35);
+      .step-number {
+        width: 2rem;
+        height: 2rem;
         border-radius: 999px;
-        padding: 0.35rem 0.8rem;
+        background: var(--green-deep);
+        color: #fff;
+        display: grid;
+        place-items: center;
         font-weight: 700;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
+      .step-copy {
+        margin: 0;
+        line-height: 1.5;
+        color: var(--text-muted);
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+      }
+
+      .chip {
+        background: #edf9ef;
+        border: 1px solid var(--line);
         border-radius: 999px;
-        background: #2f6652;
-        animation: blink 1.4s infinite;
+        padding: 0.35rem 0.7rem;
+        color: var(--green-deep);
+        font-weight: 600;
+        font-size: 0.9rem;
       }
 
-      @keyframes blink {
-        0%, 100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.35;
-        }
+      .proof {
+        background: #fdf8f0;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--green-deep);
+        border-radius: var(--radius);
+        padding: 0.95rem;
       }
 
-      @media (max-width: 960px) {
-        .grid {
+      .proof ul {
+        margin: 0.35rem 0 0;
+        color: var(--text-muted);
+        line-height: 1.65;
+      }
+
+      .proof li + li {
+        margin-top: 0.45rem;
+      }
+
+      .proof code {
+        background: #ecf6ec;
+        padding: 0.02rem 0.3rem;
+        border-radius: 6px;
+      }
+
+      footer {
+        margin-top: 1rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .foot-links {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+      }
+
+      .foot-links a {
+        color: var(--green-deep);
+      }
+
+      @media (max-width: 940px) {
+        .hero-grid,
+        .grid-3 {
           grid-template-columns: 1fr;
+        }
+
+        .top-bar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .links {
+          justify-content: flex-start;
         }
       }
     </style>
   </head>
   <body>
-    <main class="container">
-      <header>
-        <span class="badge">Devpost YouTube Automation Hackathon</span>
-        <h1>DropFix</h1>
-        <p>
-          A local-first creator pipeline assistant that removes repetitive clip and metadata
-          work.
-        </p>
-        <p>
-          Build fast, review confidently, and export meaningful recommendations from retention
-          signals before editing or uploading.
-        </p>
-        <div class="cta">
-          <a class="btn primary" href="#quick-start">Open local quick start</a>
-          <a
-            class="btn ghost"
-            href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon"
-          >
-            Open GitHub repo
-          </a>
+    <main class="wrap">
+      <header class="top-bar">
+        <div class="brand">
+          <span>DropFix</span>
+          <span class="tag">YouTube Hackathon Project</span>
         </div>
-        <div class="status">
-          <span class="dot" aria-hidden="true"></span>
-          Live demo UI + local backend-first workflow
-        </div>
+        <nav class="links" aria-label="Primary">
+          <a class="tag" href="#features">What it does</a>
+          <a class="tag" href="#workflow">Workflow</a>
+          <a class="tag" href="#proof">Proof</a>
+          <a class="tag" href="#get-started">Get started</a>
+        </nav>
       </header>
 
-      <section class="grid" id="quick-start">
-        <article class="panel">
-          <h2>Creator pain point solved</h2>
-          <ul class="small">
-            <li>Drop and track retention quality signals</li>
-            <li>Auto-score rough cuts before final edit</li>
-            <li>Get title/description recommendations from context</li>
-            <li>Keep outputs reproducible and inspectable in local files</li>
-          </ul>
-        </article>
-
-        <article class="panel">
-          <h2>Showcase flow</h2>
-          <ul class="small">
-            <li>Open <code>highlights/dropfix-highlight-showcase.html</code></li>
-            <li>Run <code>highlights/run-highlight-showcase.ps1</code></li>
-            <li>Record with one command and export MP4</li>
-            <li>Show judges results-ready visuals and timing</li>
-          </ul>
-        </article>
-
-        <article class="panel">
-          <h2>Run locally in 5 commands</h2>
-          <ul class="small">
-            <li>Clone repo</li>
-            <li>Set up Python virtual env</li>
-            <li>Copy <code>.env.example</code> (if needed)</li>
-            <li>Start <code>uvicorn app.main:app --reload</code></li>
-            <li>Open <code>http://127.0.0.1:8000/docs</code></li>
-          </ul>
-        </article>
+      <section class="hero">
+        <div class="kicker">
+          <span>Creator workflow automation</span>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>DropFix for smarter and faster YouTube production.</h1>
+            <p class="lead">
+              DropFix helps creators spend less time on repetitive tasks and more time creating.
+              It turns retention signals and content assets into repeatable decisions for clips,
+              quality checks, and final package readiness.
+            </p>
+            <p class="lead">
+              Built to be judged in a real studio style: reproducible inputs, clear outputs, and
+              a compact workflow that works in local environments.
+            </p>
+            <div class="cta-row">
+              <a class="btn primary" href="#get-started">Run local setup</a>
+              <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">View source</a>
+            </div>
+          </div>
+          <aside class="metrics" aria-label="project metrics">
+            <ul class="metric-list">
+              <li>
+                <span class="metric-value">Local-first architecture</span>
+                <span class="metric-label">Works without a required external domain</span>
+              </li>
+              <li>
+                <span class="metric-value">Creator-ready outputs</span>
+                <span class="metric-label">Saved in inspectable local files under outputs/</span>
+              </li>
+              <li>
+                <span class="metric-value">Hackathon-ready timeline</span>
+                <span class="metric-label">Auto-record and export a polished showcase in one command</span>
+              </li>
+            </ul>
+          </aside>
+        </div>
       </section>
 
-      <section class="foot">
-        <p class="small">
-          Current state: repository-first submission ready; this page is intentionally lightweight and
-          judge-friendly, with a clean cream + green creator-ready visual style.
-        </p>
+      <section id="features">
+        <h2 class="section-title">What this solves</h2>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Quality gating</h3>
+            <p>
+              Score rough cuts and content segments with consistent thresholds so creators can reduce
+              the time spent manually reviewing low-performing material.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Recommendation workflow</h3>
+            <p>
+              Suggest metadata improvements and editorial actions from profile-aware context, helping
+              creators make decisions faster before upload time.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Submission confidence</h3>
+            <p>
+              Expose clear evidence for each generated recommendation and keep an audit trail for
+              review and troubleshooting before sharing work.
+            </p>
+          </article>
+        </div>
       </section>
+
+      <section id="workflow">
+        <h2 class="section-title">Simple workflow</h2>
+        <div class="steps card">
+          <div class="step">
+            <span class="step-number">1</span>
+            <p class="step-copy">
+              Open local backend and verify service with one run command.
+            </p>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <p class="step-copy">
+              Import or process clips and metadata for scoring.
+            </p>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <p class="step-copy">
+              Review recommendations, adjust profile settings, and export quality output.
+            </p>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <p class="step-copy">
+              Generate the one-minute showcase deck with polished timing and visuals.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="proof">
+        <h2 class="section-title">Submission proof</h2>
+        <div class="proof card">
+          <p style="margin: 0;">Judge-facing evidence included in repo:</p>
+          <ul>
+            <li><code>highlights/dropfix-highlight-showcase.html</code> for visual demonstration.</li>
+            <li><code>highlights/run-highlight-showcase.ps1</code> for one-command MP4 render.</li>
+            <li><code>highlights/highlight-rundown.md</code> for talking points and scene flow.</li>
+            <li>Backend endpoints and scripts with deterministic outputs in <code>backend/</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="get-started">
+        <h2 class="section-title">Built for creators, not slides</h2>
+        <div class="grid-3">
+          <article class="card">
+            <h3>Start fast</h3>
+            <p>Clone, install, and launch in under five commands.</p>
+            <div class="chips">
+              <span class="chip">Python API</span>
+              <span class="chip">Local-first</span>
+              <span class="chip">No domain needed</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Reliable output</h3>
+            <p>Structured JSON artifacts and repeatable generation commands.</p>
+            <div class="chips">
+              <span class="chip">Deterministic</span>
+              <span class="chip">Debuggable</span>
+            </div>
+          </article>
+          <article class="card">
+            <h3>Contest ready</h3>
+            <p>Clear, polished UI path plus executable workflow script.</p>
+            <div class="chips">
+              <span class="chip">Hackathon fit</span>
+              <span class="chip">Demo-ready</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <footer>
+        <div class="foot-links">
+          <a href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">Repository</a>
+          <span>•</span>
+          <a href="https://ezrawestover1-hub.github.io/youtube-automation-hackathon/">Public demo page</a>
+          <span>•</span>
+          <a href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon/blob/main/README.md">Submission details</a>
+        </div>
+        <p style="margin: 0.45rem 0 0;">A focused submission for measurable creator productivity gains.</p>
+      </footer>
     </main>
   </body>
 </html>
