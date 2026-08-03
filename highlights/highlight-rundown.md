@@ -1,22 +1,22 @@
-# DropFix Highlight Reel — 90 Second Show-off Script
+# DropFix Highlight Reel — User-Ready Demo Script
 
-Use this with `highlights/run-highlight-showcase.ps1` and record your screen (OBS, Clipchamp, or native recorder).
+Use this with `highlights/run-highlight-showcase.ps1` in auto-record mode.
 
 ## Scene order
 
-1. **Intro (0:00–0:10)**
+1. **Intro (0:00—0:08)**
    - "DropFix automates creator review from retention data + transcript evidence to ranked recommendations."
-2. **Setup & intake (0:10–0:20)**
+2. **Setup & intake (0:08—0:16)**
    - Mention local-first workflow and single-command local run.
-3. **Detection (0:20–0:33)**
+3. **Detection (0:16—0:30)**
    - Show retention event extraction and explain these are reproducible signals.
-4. **Evidence (0:33–0:45)**
+4. **Evidence (0:30—0:42)**
    - Show evidence endpoint and transcript overlap.
-5. **Recommendations (0:45–1:00)**
+5. **Recommendations (0:42—0:54)**
    - Show top finding and why it is directly editable.
-6. **Quality score (1:00–1:14)**
+6. **Quality score (0:54—1:06)**
    - Show quality score and gate status as trust signal.
-7. **Export (1:14–1:30)**
+7. **Export (1:06—1:30)**
    - Show markdown export and handoff-ready results.
 
 ## On-screen lines (what to speak)
@@ -29,8 +29,7 @@ Use this with `highlights/run-highlight-showcase.ps1` and record your screen (OB
 ## Zero-effort auto-render mode
 
 - From repo root run:
-  - `npm.cmd install --prefix highlights puppeteer-core ffmpeg-static`
-  - `.\highlights\run-highlight-showcase.ps1`
+  - `.\highlights\run-highlight-showcase.ps1 -Install -OpenOutput`
 - Output file:
   - `outputs\\dropfix-highlight-showcase.mp4`
 

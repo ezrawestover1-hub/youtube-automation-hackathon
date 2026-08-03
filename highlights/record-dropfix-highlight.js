@@ -3,22 +3,48 @@ const path = require('path');
 const os = require('os');
 const { spawnSync } = require('child_process');
 const puppeteer = require('puppeteer-core');
+const { pathToFileURL } = require('url');
 
-const fps = Number.parseInt(process.env.HIGHLIGHT_FPS || '30', 10);
-const durationSeconds = Number.parseInt(process.env.HIGHLIGHT_SECONDS || '90', 10);
-const width = Number.parseInt(process.env.HIGHLIGHT_WIDTH || '1920', 10);
-const height = Number.parseInt(process.env.HIGHLIGHT_HEIGHT || '1080', 10);
+function parseIntEnv(name, fallback, min, max) {
+  const raw = Number.parseInt(process.env[name], 10);
+  if (Number.isNaN(raw) || raw < min || raw > max) {
+    return fallback;
+  }
+  return raw;
+}
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function getChromePath() {
+  const candidates = [
+    process.env.HIGHLIGHT_CHROME_PATH,
+    process.env.PUPPETEER_EXECUTABLE_PATH,
+    'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+    'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
+  ].filter(Boolean);
+
+  return candidates.find((p) => fs.existsSync(p));
+}
+
 (async () => {
   const repoRoot = path.resolve(__dirname, '..');
   const htmlPath = path.join(repoRoot, 'highlights', 'dropfix-highlight-showcase.html');
-  const url = new URL(`file://${path.resolve(htmlPath).replace(/\\/g, '/')}`);
-  const outputPath = path.join(repoRoot, 'outputs', 'dropfix-highlight-showcase.mp4');
+  const outputPath = path.resolve(
+    process.env.HIGHLIGHT_OUTPUT || path.join(repoRoot, 'outputs', 'dropfix-highlight-showcase.mp4')
+  );
   const frameDir = path.join(os.tmpdir(), `dropfix-highlight-${Date.now()}`);
+
+  const fps = parseIntEnv('HIGHLIGHT_FPS', 30, 1, 60);
+  const durationSeconds = parseIntEnv('HIGHLIGHT_SECONDS', 90, 5, 360);
+  const width = parseIntEnv('HIGHLIGHT_WIDTH', 1366, 320, 7680);
+  const height = parseIntEnv('HIGHLIGHT_HEIGHT', 768, 180, 4320);
+
+  if (!fs.existsSync(htmlPath)) {
+    throw new Error(`Cannot find showcase HTML at ${htmlPath}`);
+  }
 
   if (!fs.existsSync(path.dirname(outputPath))) {
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
@@ -26,40 +52,44 @@ function sleep(ms) {
 
   fs.mkdirSync(frameDir, { recursive: true });
 
-  const chromePath = [
-    'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-  ].find((p) => fs.existsSync(p));
-
+  const chromePath = getChromePath();
   if (!chromePath) {
-    throw new Error('Chrome not found. Install Chrome or update the script executablePath.');
+    throw new Error('Chrome not found. Install Chrome/Brave or set HIGHLIGHT_CHROME_PATH.');
   }
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: chromePath,
-    args: ['--disable-gpu', '--no-sandbox'],
-    defaultViewport: { width, height },
-  });
+  let browser;
+  try {
+    const url = pathToFileURL(htmlPath).toString();
 
-  const page = await browser.newPage();
-  await page.setViewport({ width, height });
-  await page.goto(url.toString(), { waitUntil: 'networkidle0' });
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath: chromePath,
+      args: ['--disable-gpu', '--no-sandbox'],
+      defaultViewport: { width, height },
+    });
 
-  const totalFrames = Math.max(1, fps * durationSeconds);
-  const frameIntervalMs = 1000 / fps;
-  for (let i = 0; i < totalFrames; i++) {
-    await sleep(frameIntervalMs);
-    const framePath = path.join(frameDir, `frame_${String(i).padStart(6, '0')}.png`);
-    await page.screenshot({ path: framePath, type: 'png' });
+    const page = await browser.newPage();
+    await page.setViewport({ width, height });
+    await page.goto(url, { waitUntil: 'networkidle0' });
 
-    if ((i + 1) % 50 === 0) {
-      console.log(`captured ${i + 1}/${totalFrames} frames`);
+    const totalFrames = Math.max(1, fps * durationSeconds);
+    const frameIntervalMs = 1000 / fps;
+    for (let i = 0; i < totalFrames; i++) {
+      await sleep(frameIntervalMs);
+      const framePath = path.join(frameDir, `frame_${String(i).padStart(6, '0')}.png`);
+      await page.screenshot({ path: framePath, type: 'png' });
+
+      if ((i + 1) % 60 === 0) {
+        console.log(`captured ${i + 1}/${totalFrames} frames`);
+      }
+    }
+
+    await page.close();
+  } finally {
+    if (browser) {
+      await browser.close();
     }
   }
-
-  await page.close();
-  await browser.close();
 
   const ffmpegPath = require('ffmpeg-static');
   if (!ffmpegPath || !fs.existsSync(ffmpegPath)) {
@@ -71,12 +101,12 @@ function sleep(ms) {
     '-y',
     '-framerate', String(fps),
     '-i', pattern,
-    '-vcodec', 'libx264',
+    '-c:v', 'libx264',
     '-pix_fmt', 'yuv420p',
     '-r', String(fps),
     '-movflags', '+faststart',
-    '-crf', '24',
-    '-preset', 'veryfast',
+    '-crf', '22',
+    '-preset', 'fast',
     outputPath,
   ];
 
@@ -91,4 +121,5 @@ function sleep(ms) {
 
   fs.rmSync(frameDir, { recursive: true, force: true });
   console.log(`Highlight rendered: ${outputPath}`);
+  console.log(`Frames used: ${Math.max(1, fps * durationSeconds)} at ${fps} fps for ${durationSeconds}s`);
 })();

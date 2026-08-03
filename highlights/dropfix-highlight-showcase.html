@@ -6,14 +6,15 @@
     <title>DropFix Highlight Reel</title>
     <style>
       :root {
-        --bg-1: #0f172a;
-        --bg-2: #111827;
-        --panel: #111827cc;
-        --accent: #38bdf8;
-        --ok: #34d399;
-        --warn: #facc15;
-        --text: #f8fafc;
-        --muted: #cbd5e1;
+        --bg-1: #f3ead7;
+        --bg-2: #fff9ec;
+        --panel: #f4f2e7cc;
+        --accent: #16894a;
+        --accent-soft: #45bf75;
+        --ok: #0f9d58;
+        --warn: #b8860b;
+        --text: #1f2937;
+        --muted: #4b5563;
       }
 
       * {
@@ -25,15 +26,15 @@
         min-height: 100vh;
         display: grid;
         place-items: center;
-        background: radial-gradient(circle at top, #1e3a8a, var(--bg-1));
+        background: radial-gradient(circle at 20% 20%, #ffeec7, var(--bg-1) 55%, #e9dcbe);
         color: var(--text);
-        font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+        font-family: "Nunito", "Segoe UI", Roboto, Arial, sans-serif;
       }
 
       .deck {
         width: min(1100px, 95vw);
         aspect-ratio: 16 / 9;
-        background: linear-gradient(130deg, var(--bg-2), #0f172a);
+        background: linear-gradient(130deg, var(--bg-2), #fff8ea);
         border: 1px solid #334155;
         border-radius: 16px;
         position: relative;
@@ -76,16 +77,16 @@
       }
 
       .terminal {
-        background: #020617;
-        border: 1px solid #334155;
+        background: #09211a;
+        border: 1px solid #2e6b4b;
         border-radius: 10px;
         padding: 16px;
         font-family: "Courier New", Courier, monospace;
-        color: #e2e8f0;
+        color: #d8ffe7;
         line-height: 1.4;
         white-space: pre-wrap;
         min-height: 280px;
-        box-shadow: inset 0 0 22px rgba(15, 23, 42, 0.9);
+        box-shadow: inset 0 0 22px rgba(15, 32, 26, 0.35);
       }
 
       .good {
@@ -114,7 +115,7 @@
         padding: 10px 14px;
         border-radius: 10px;
         background: var(--accent);
-        color: #082f49;
+        color: #ecfff2;
         font-weight: 700;
         cursor: pointer;
       }
@@ -126,7 +127,7 @@
       .progress {
         height: 8px;
         width: 320px;
-        background: #1e293b;
+        background: #d9d2c6;
         border-radius: 999px;
         overflow: hidden;
       }
@@ -134,7 +135,7 @@
       .progress > div {
         height: 100%;
         width: 0;
-        background: linear-gradient(90deg, var(--accent), #60a5fa);
+        background: linear-gradient(90deg, var(--accent), var(--accent-soft));
         transition: width 0.4s linear;
       }
 
@@ -154,7 +155,7 @@
   </head>
   <body>
     <div class="deck" id="deck">
-      <section class="slide active">
+      <section class="slide active" data-duration-seconds="8">
         <span class="tag">DropFix Highlight Reel</span>
         <h1>YouTube Automation Tooling in One Pipeline</h1>
         <p class="muted">Proof of capability: from raw content signals → evidence → recommendations → quality report.</p>
@@ -169,7 +170,7 @@ Ready to show real creator workflow impact.
         </div>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="8">
         <span class="tag">1) Setup &amp; Intake</span>
         <h2>Fast Local-First Execution</h2>
         <p class="muted">Everything runs locally via a reproducible command stack. No extra domain required.</p>
@@ -191,7 +192,7 @@ Ready to show real creator workflow impact.
         </div>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="14">
         <span class="tag">2) Detect</span>
         <h2>Retention signal becomes concrete events</h2>
         <div class="terminal">
@@ -203,7 +204,7 @@ Ready to show real creator workflow impact.
         <p class="muted">Signal extraction is threshold-aware and profile-tunable for creator style.</p>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="12">
         <span class="tag">3) Align + Evidence</span>
         <h2>Every recommendation is tied to proof</h2>
         <div class="terminal">
@@ -215,7 +216,7 @@ Ready to show real creator workflow impact.
         <p class="muted">Judges get auditable linkage, not just black-box suggestions.</p>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="12">
         <span class="tag">4) Recommend + Prioritize</span>
         <h2>Actionable, ranked output</h2>
         <div class="grid">
@@ -238,7 +239,7 @@ Ready to show real creator workflow impact.
         </div>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="14">
         <span class="tag">5) Quality Signal</span>
         <h2>Gated reliability, not raw AI output</h2>
         <div class="terminal">
@@ -251,7 +252,7 @@ Ready to show real creator workflow impact.
         <p class="muted">This is where the submission signal really compounds for judges.</p>
       </section>
 
-      <section class="slide">
+      <section class="slide" data-duration-seconds="22">
         <span class="tag">6) Deliver</span>
         <h2>Exportable result, creator-ready</h2>
         <div class="terminal">
@@ -284,29 +285,39 @@ Ready to show real creator workflow impact.
       const button = document.getElementById('toggle');
       const counter = document.getElementById('counter');
       const bar = document.getElementById('bar');
+      const defaultDurations = Array.from(document.querySelectorAll('.slide')).map(
+        (slide) => Number.parseFloat(slide.dataset.durationSeconds || '6')
+      );
       let index = 0;
       let running = true;
       let progress = 0;
+      let currentDurationMs = defaultDurations[index] * 1000;
+      let elapsedMs = 0;
+      const tickMs = 60;
 
       function show(i) {
         slides.forEach((slide, idx) => {
           slide.classList.toggle('active', idx === i);
         });
         counter.textContent = `Scene ${i + 1} / ${slides.length}`;
+        progress = 0;
+        elapsedMs = 0;
+        bar.style.width = '0%';
+        currentDurationMs = defaultDurations[i] * 1000;
       }
 
       show(index);
-      const cadenceMs = 6000;
-      const tickMs = 50;
 
       function tick() {
         if (!running) return;
-        progress += (tickMs / cadenceMs) * 100;
+        elapsedMs += tickMs;
+        progress = (elapsedMs / currentDurationMs) * 100;
+
         if (progress >= 100) {
-          progress = 0;
           index = (index + 1) % slides.length;
           show(index);
         }
+
         bar.style.width = `${Math.min(progress, 100)}%`;
       }
 

@@ -28,9 +28,9 @@ This is the competition version we want judges to evaluate quickly:
   - [highlights/highlight-rundown.md](highlights/highlight-rundown.md)
 - One-step render (run once):
   ```powershell
-  npm.cmd install --prefix highlights puppeteer-core ffmpeg-static
-  .\highlights\run-highlight-showcase.ps1
+  .\highlights\run-highlight-showcase.ps1 -Install -OpenOutput
   ```
+- The script auto-installs dependencies if missing (or use `-Install` to force refresh).
 - Output:
   - `outputs\dropfix-highlight-showcase.mp4`
 ## Repository layout
@@ -113,6 +113,15 @@ For full API details, open the backend API docs and the backend README.
 - API documentation: `http://127.0.0.1:8000/docs`
 - Health check: `GET /runs/{run_id}/status`
 - Review outputs: `GET /runs/{run_id}/quality`, `GET /runs/{run_id}/export`
+
+## Showcase commands
+
+- Record the auto-rendered demo:
+  - `.\highlights\run-highlight-showcase.ps1 -Install -OpenOutput`
+- Record a different length/dimension:
+  - `.\highlights\run-highlight-showcase.ps1 -Install -OpenOutput -Seconds 90 -Fps 24 -Width 1366 -Height 768`
+- Open deck only (manual recording):
+  - `.\highlights\run-highlight-showcase.ps1 -AutoRecord:$false`
 
 ## Note
 
