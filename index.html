@@ -1166,6 +1166,7 @@
           <span class="tag">YouTube Hackathon</span>
         </div>
         <nav class="links" aria-label="Primary navigation">
+          <a class="tag nav-chip" href="#judge-demo">Judge demo</a>
           <a class="tag nav-chip" href="#workspace">Workspace</a>
           <a class="tag nav-chip" href="#proof">Proof</a>
           <a class="tag nav-chip" href="#ready">Ready-to-use</a>
@@ -1183,6 +1184,7 @@
             </p>
             <div class="cta-row">
               <a class="btn primary" href="#workspace">Open production workspace</a>
+              <a class="btn secondary" href="#judge-demo">View demo flow</a>
               <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">Open source repo</a>
             </div>
           </div>
@@ -1194,6 +1196,22 @@
             </ul>
           </aside>
         </div>
+      </section>
+
+      <section class="section-title" id="judge-demo">Judge Demo (One click)</section>
+      <section class="proof">
+        <p style="margin: 0 0 0.85rem">Use this to show the full claim-to-action loop in under 30 seconds:</p>
+        <div class="inline-row" style="align-items: center; justify-content: flex-start; gap: 0.6rem; margin-bottom: 0.75rem">
+          <button id="run-demo" class="btn primary" type="button">Run live demo workflow</button>
+          <span class="tag" id="demo-state">Idle</span>
+        </div>
+        <ol class="helper" style="margin: 0; padding-left: 1.1rem; line-height: 1.55">
+          <li>Loads a realistic transcript sample into Inputs</li>
+          <li>Parses segments, analyzes quality, and generates rationale</li>
+          <li>Creates ranked clips + metadata + SEO variants</li>
+          <li>Moves into Suggestions and Export tabs with handoff data ready</li>
+        </ol>
+        <p class="helper" style="margin: 0.55rem 0 0">Designed for judges and creators who want to verify workflow value immediately.</p>
       </section>
 
       <section id="workspace" class="workspace-shell">
@@ -1581,6 +1599,8 @@
         long: 280
       };
 
+      const DEMO_TRANSCRIPT = "Title: Why retention drops and how to fix it.\n\nAt 0:07, start with the viewer's pain point so they stay through the intro. Show what changed and why this method works. By second 20, deliver proof with a tiny reveal. Keep one clear takeaway every 45 seconds and repeat the promise before final CTA.";
+
       const state = {
         activeTab: "inputs",
         projects: [],
@@ -1626,6 +1646,8 @@
         seoLength: document.getElementById("seo-length"),
         seoHashtags: document.getElementById("seo-hashtags"),
         seoGenerate: document.getElementById("generate-seo"),
+        demoButton: document.getElementById("run-demo"),
+        demoState: document.getElementById("demo-state"),
         seoTitleList: document.getElementById("seo-title-list"),
         seoDescriptionList: document.getElementById("seo-description-list"),
         seoTagCloud: document.getElementById("seo-tag-cloud"),
@@ -2475,6 +2497,28 @@
         switchTab("suggestions");
       }
 
+      function runDemoFlow() {
+        const project = ensureProject();
+        project.name = "DropFix Judge Demo";
+        project.sourceType = "text";
+        project.profile = "shorts";
+        project.transcript = DEMO_TRANSCRIPT;
+        el.sourceType.value = "text";
+        el.profile.value = "shorts";
+        el.transcript.value = DEMO_TRANSCRIPT;
+        el.parseStatus.textContent = "Demo loaded. Running analysis now.";
+        el.parseMetrics.textContent = "Parsing demo transcript and generating evidence-first output.";
+        el.ingestStatus.textContent = "Demo workflow running.";
+        el.demoState.textContent = "Running";
+        renderIngestPanels(project);
+        persistProject();
+        switchTab("analysis");
+        runAnalysis();
+        switchTab("suggestions");
+        el.demoState.textContent = "Done";
+        el.parseStatus.textContent = "Demo complete. Export/metadata panels are ready.";
+      }
+
       function ensureProject() {
         if (!state.currentId || !state.projects.length) {
           createProject();
@@ -2651,9 +2695,10 @@
 
       el.runButton.addEventListener("click", runAnalysis);
       el.seoGenerate.addEventListener("click", regenerateSeoPack);
+      el.demoButton.addEventListener("click", runDemoFlow);
 
       el.loadSample.addEventListener("click", () => {
-        const sample = "Title: Why retention drops and how to fix it.\n\nAt 0:07, start with the viewer's pain point so they stay through the intro. Show what changed and why this method works. By second 20, deliver proof with a tiny reveal. Keep one clear takeaway every 45 seconds and repeat the promise before final CTA.";
+        const sample = DEMO_TRANSCRIPT;
         const project = ensureProject();
         project.transcript = sample;
         el.transcript.value = sample;
