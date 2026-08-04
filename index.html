@@ -2302,6 +2302,249 @@
         .workspace-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .tab-btn { width: auto; }
       }
+      /* Workspace hierarchy pass: one path, one status, one primary action. */
+      .mobile-nav,
+      .workspace-tabs-legacy,
+      .workspace-telemetry {
+        display: none;
+      }
+
+      .workspace-shell > aside .state-badges {
+        display: none;
+      }
+
+      .workflow-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0;
+        margin: 0.85rem 0 0;
+        padding: 0.28rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 14px;
+        background: #0b0b0b;
+      }
+
+      .flow-step {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.42rem;
+        min-height: 42px;
+        padding: 0.55rem 0.5rem;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: transparent;
+        color: #858585;
+        font-size: 0.78rem;
+        box-shadow: none;
+      }
+
+      .flow-step span {
+        color: #666;
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+      }
+
+      .flow-step:hover {
+        color: #e8e8e8;
+        background: rgba(255,255,255,0.05);
+        transform: none;
+      }
+
+      .flow-step.is-complete {
+        border-color: transparent;
+        background: transparent;
+        color: #c9c9c9;
+      }
+
+      .flow-step.is-complete span {
+        color: #9c9c9c;
+      }
+
+      .flow-step.is-active {
+        border-color: rgba(255,24,48,0.46);
+        background: rgba(255,24,48,0.12);
+        color: #fff;
+        box-shadow: inset 0 -2px 0 var(--studio-red);
+      }
+
+      .flow-step.is-active span {
+        color: #ff8490;
+      }
+
+      .flow-step.is-locked,
+      .flow-step:disabled {
+        opacity: 0.45;
+        background: transparent;
+        border-color: transparent;
+        color: #747474;
+      }
+
+      .flow-step.is-locked::before,
+      .flow-step:disabled::before {
+        display: none;
+      }
+
+      .workspace-next-step {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 0.7rem;
+        padding: 0.72rem 0.85rem;
+        border-left: 2px solid var(--studio-red);
+        border-radius: 0 10px 10px 0;
+        background: rgba(255,255,255,0.035);
+      }
+
+      .next-step-label {
+        flex: 0 0 auto;
+        color: #f1f1ef;
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .workspace-next-step .context-strip {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #b8b8b5;
+        font-size: 0.84rem;
+      }
+
+      .input-guide {
+        display: none;
+      }
+
+      .input-grid {
+        gap: 0.85rem;
+      }
+
+      .input-actions {
+        align-items: center;
+        padding-top: 0.15rem;
+      }
+
+      .input-actions #run-analysis {
+        order: -1;
+        min-width: min(100%, 214px);
+        min-height: 48px;
+        padding-inline: 1.15rem;
+        font-size: 0.9rem;
+      }
+
+      .input-actions .small-btn:not(#run-analysis) {
+        color: #b8b8b8;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .input-actions .small-btn:not(#run-analysis):hover {
+        color: #fff;
+        border-color: rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.055);
+      }
+
+      .helper,
+      .account-meta,
+      .evidence-cell p,
+      .context-strip {
+        color: #aeaeaa;
+      }
+
+      @media (max-width: 980px) {
+        .top-bar {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+          min-height: 58px;
+          padding: 0.5rem 0.6rem 0.5rem 0.85rem;
+        }
+
+        .top-bar .links,
+        .top-bar .top-right {
+          display: none;
+        }
+
+        .mobile-nav {
+          display: block;
+          position: relative;
+        }
+
+        .mobile-nav summary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 38px;
+          padding: 0 0.75rem;
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 9px;
+          background: #191919;
+          color: #eee;
+          cursor: pointer;
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          list-style: none;
+        }
+
+        .mobile-nav summary::-webkit-details-marker {
+          display: none;
+        }
+
+        .mobile-nav-panel {
+          position: absolute;
+          top: calc(100% + 0.45rem);
+          right: 0;
+          z-index: 30;
+          display: grid;
+          min-width: 172px;
+          padding: 0.35rem;
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 12px;
+          background: rgba(18,18,18,0.98);
+          box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+        }
+
+        .mobile-nav-panel a {
+          padding: 0.7rem 0.75rem;
+          border-radius: 8px;
+          color: #d6d6d2;
+          font-size: 0.86rem;
+          font-weight: 700;
+          text-decoration: none;
+        }
+
+        .mobile-nav-panel a:hover {
+          color: #fff;
+          background: rgba(255,255,255,0.07);
+        }
+
+        .workflow-strip {
+          grid-template-columns: repeat(4, minmax(72px, 1fr));
+          overflow-x: auto;
+        }
+
+        .flow-step {
+          width: auto !important;
+          min-width: 72px;
+          font-size: 0.71rem;
+        }
+
+        .workspace-next-step {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 0.22rem;
+        }
+
+        .input-actions #run-analysis {
+          width: 100%;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2318,6 +2561,16 @@
           <a class="tag nav-chip" href="#ready" data-page-link="ready">Ready-to-use</a>
           <a class="tag nav-chip" href="#account" data-page-link="account">Account</a>
         </nav>
+        <details class="mobile-nav">
+          <summary aria-label="Open navigation">Menu</summary>
+          <div class="mobile-nav-panel">
+            <a href="#home" data-page-link="home">Home</a>
+            <a href="#workspace" data-page-link="workspace">Workspace</a>
+            <a href="#proof" data-page-link="proof">Proof</a>
+            <a href="#ready" data-page-link="ready">Ready</a>
+            <a href="#account" data-page-link="account">Account</a>
+          </div>
+        </details>
         <div class="top-right">
           <div class="account-panel">
             <span class="tag" id="account-mode">Guest</span>
@@ -2396,36 +2649,41 @@
         <section class="card workspace-main">
           <div>
             <h2 class="panel-title" id="project-title">Untitled project</h2>
-            <div class="workspace-tabs">
+            <div class="workspace-tabs workspace-tabs-legacy" aria-hidden="true">
               <button class="tab-btn active" type="button" data-tab="inputs">Inputs</button>
               <button class="tab-btn" type="button" data-tab="analysis">Analysis</button>
               <button class="tab-btn" type="button" data-tab="suggestions">Suggestions</button>
               <button class="tab-btn" type="button" data-tab="export">Export</button>
             </div>
             <div class="workflow-strip" id="workflow-strip" aria-label="Workspace progress">
-              <button class="flow-step is-active" type="button" data-step="inputs" aria-label="Inputs">01</button>
-              <button class="flow-step" type="button" data-step="analysis" aria-label="Analysis">02</button>
-              <button class="flow-step" type="button" data-step="suggestions" aria-label="Suggestions">03</button>
-              <button class="flow-step" type="button" data-step="export" aria-label="Export">04</button>
+              <button class="flow-step is-active" type="button" data-step="inputs" aria-label="Inputs"><span>01</span> Inputs</button>
+              <button class="flow-step" type="button" data-step="analysis" aria-label="Analysis"><span>02</span> Analysis</button>
+              <button class="flow-step" type="button" data-step="suggestions" aria-label="Suggestions"><span>03</span> Suggestions</button>
+              <button class="flow-step" type="button" data-step="export" aria-label="Export"><span>04</span> Export</button>
             </div>
-            <div class="workflow-step-hints" id="workflow-step-hints">
-              <p class="workflow-step-hint" id="hint-inputs" data-step-hint="inputs">Inputs: ready.</p>
-              <p class="workflow-step-hint" id="hint-analysis" data-step-hint="analysis">Analysis: add source and run analysis to unlock.</p>
-              <p class="workflow-step-hint" id="hint-suggestions" data-step-hint="suggestions">Suggestions: run analysis first.</p>
-              <p class="workflow-step-hint" id="hint-export" data-step-hint="export">Export: complete Suggestions first.</p>
+            <div class="workspace-next-step">
+              <span class="next-step-label">Next step</span>
+              <p class="context-strip" id="workflow-hint" role="status" aria-live="polite">Add a transcript or load the demo, then run analysis.</p>
             </div>
-            <p class="context-strip" id="workflow-hint" role="status" aria-live="polite"></p>
-            <div class="workflow-progress" id="workflow-progress">
-              <div class="workflow-progress-track">
-                <span id="workflow-progress-fill" class="workflow-progress-fill"></span>
+            <div class="workspace-telemetry" aria-hidden="true">
+              <div class="workflow-step-hints" id="workflow-step-hints">
+                <p class="workflow-step-hint" id="hint-inputs" data-step-hint="inputs">Inputs: ready.</p>
+                <p class="workflow-step-hint" id="hint-analysis" data-step-hint="analysis">Analysis: add source and run analysis to unlock.</p>
+                <p class="workflow-step-hint" id="hint-suggestions" data-step-hint="suggestions">Suggestions: run analysis first.</p>
+                <p class="workflow-step-hint" id="hint-export" data-step-hint="export">Export: complete Suggestions first.</p>
               </div>
-              <p class="workflow-progress-label" id="workflow-progress-label">0/4 complete</p>
-            </div>
-            <div class="state-badges">
-              <span class="state-badge" id="workflow-state">Workflow: 0/4</span>
-              <span class="state-badge" id="step-state">Step: Inputs</span>
-              <span class="state-badge" id="segments-state">Segments: 0</span>
-              <span class="state-badge" id="file-state">No source loaded</span>
+              <div class="workflow-progress" id="workflow-progress">
+                <div class="workflow-progress-track">
+                  <span id="workflow-progress-fill" class="workflow-progress-fill"></span>
+                </div>
+                <p class="workflow-progress-label" id="workflow-progress-label">0/4 complete</p>
+              </div>
+              <div class="state-badges">
+                <span class="state-badge" id="workflow-state">Workflow: 0/4</span>
+                <span class="state-badge" id="step-state">Step: Inputs</span>
+                <span class="state-badge" id="segments-state">Segments: 0</span>
+                <span class="state-badge" id="file-state">No source loaded</span>
+              </div>
             </div>
           </div>
           <div class="panels">
