@@ -2834,6 +2834,12 @@
         background: rgba(255,24,48,0.12);
         color: #fff;
       }
+      .brand .tag {
+        border-color: rgba(255,255,255,0.13) !important;
+        background: #2a2a2a !important;
+        color: #e1e1dc !important;
+        box-shadow: none !important;
+      }
     </style>
   </head>
   <body>
@@ -3256,7 +3262,7 @@
                       <label class="workspace-label" for="competition-mode">Handoff mode</label>
                       <div class="verdict-row">
                         <select id="competition-mode" style="max-width: 260px;">
-                          <option value="judge">Judge scoreboard</option>
+                          <option value="judge">Submission evidence rubric</option>
                           <option value="creator">Creator handoff</option>
                         </select>
                         <span id="verdict-pill" class="state-badge">No verdict yet</span>
@@ -3267,10 +3273,10 @@
                       </p>
                     </div>
                     <div class="export-box">
-                      <label class="workspace-label" for="judge-scorecard">Judge-ready scorecard</label>
-                      <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to generate a judge-ready scorecard.</p>
-                      <pre id="judge-scorecard" class="judge-pack">No scorecard available.</pre>
-                      <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy scorecard summary</button>
+                      <label class="workspace-label" for="judge-scorecard">Submission evidence rubric</label>
+                      <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to assess observable proof against the four hackathon criteria.</p>
+                      <pre id="judge-scorecard" class="judge-pack">No evidence rubric available.</pre>
+                      <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy evidence rubric</button>
                     </div>
                   </div>
                 </section>
@@ -4524,42 +4530,87 @@
           .join("");
       }
 
+      function getRubricStatus(score) {
+        if (score >= 4) return "Demonstrated";
+        if (score >= 2) return "Partially demonstrated";
+        return "Not assessable yet";
+      }
+
+      function assessHackathonRubric(project) {
+        const safeProject = project || {};
+        const segments = safeProject.segments || [];
+        const clips = safeProject.clips || [];
+        const findings = safeProject.evidenceFindings || [];
+        const recommendations = safeProject.recommendations || [];
+        const retentionPoints = safeProject.analytics?.retentionPoints || [];
+        const hasAnalysis = safeProject.status === "analyzed";
+        const hasTranscript = Boolean(String(safeProject.transcript || "").trim()) || segments.length > 0;
+        const hasSourceLinkedFinding = findings.some((item) => item.segmentIndex >= 0);
+        const hasAction = recommendations.some((item) => item.recommendedAction && item.isPrimary);
+        const hasValidation = recommendations.some((item) => item.validation);
+        const hasDecision = Object.values(safeProject.recommendationDecisions || {}).some((value) => value === "accepted" || value === "revise");
+        const hasMetadata = Boolean(safeProject.metadata?.title || safeProject.metadata?.description || (safeProject.metadata?.seo?.titles || []).length);
+        const hasStudioEvidence = retentionPoints.length >= 3;
+        const hasNonDemoEvidence = hasStudioEvidence && safeProject.analytics?.sourceKind !== "demo";
+        const hasConfidence = findings.some((item) => item.confidence && item.confidence !== "Insufficient data");
+        const hasMissingDataGuard = recommendations.some((item) => String(item.compared || "").includes("No matched channel baseline"));
+        const criteria = [
+          {
+            key: "functionality",
+            label: "Functionality",
+            score: [hasTranscript, hasAnalysis, segments.length > 0, clips.length > 0, hasMetadata].filter(Boolean).length,
+            evidence: `${hasTranscript ? "Source loaded" : "No source"}; ${hasAnalysis ? "analysis completed" : "analysis not run"}; ${segments.length} parsed segments; ${clips.length} clip candidates; ${hasMetadata ? "metadata generated" : "metadata missing"}.`,
+            missing: hasAnalysis && clips.length > 0 && hasMetadata ? "No blocking workflow proof is missing." : "Run the full source-to-export workflow to demonstrate the remaining steps."
+          },
+          {
+            key: "creativity",
+            label: "Creativity",
+            score: [hasStudioEvidence, hasSourceLinkedFinding, hasAction, hasValidation, findings.some((item) => item.type === "spike")].filter(Boolean).length,
+            evidence: `${hasStudioEvidence ? "Retention evidence present" : "No retention evidence"}; ${hasSourceLinkedFinding ? "timestamp linked to transcript" : "no linked moment"}; ${hasAction ? "editor action generated" : "no action"}; ${hasValidation ? "validation path included" : "no validation path"}.`,
+            missing: "Originality versus competing tools is a judge decision; this rubric only verifies that the metric-to-edit mechanism is visible."
+          },
+          {
+            key: "technicalExecution",
+            label: "Technical execution",
+            score: [hasAnalysis, hasStudioEvidence, hasSourceLinkedFinding, hasConfidence, hasMissingDataGuard].filter(Boolean).length,
+            evidence: `${hasAnalysis ? "deterministic run completed" : "run missing"}; ${hasStudioEvidence ? `${retentionPoints.length} retention points` : "no analytics points"}; ${hasSourceLinkedFinding ? "source synchronization visible" : "source link missing"}; ${hasConfidence ? "confidence stated" : "confidence missing"}; ${hasMissingDataGuard ? "baseline limitation disclosed" : "baseline limitation not applicable or not shown"}.`,
+            missing: hasNonDemoEvidence ? "Matched-channel baseline remains optional evidence, not yet imported." : "Import non-demo Studio data to demonstrate the pipeline beyond labelled sample evidence."
+          },
+          {
+            key: "realWorldUsefulness",
+            label: "Real-world usefulness",
+            score: [hasSourceLinkedFinding, hasAction, hasDecision, hasMetadata, hasNonDemoEvidence].filter(Boolean).length,
+            evidence: `${hasSourceLinkedFinding ? "exact source moment" : "no exact moment"}; ${hasAction ? "editor instruction" : "no editor instruction"}; ${hasDecision ? "editor decision saved" : "no saved decision"}; ${hasMetadata ? "handoff output present" : "handoff output missing"}; ${hasNonDemoEvidence ? "creator-supplied analytics" : "sample-only or no analytics"}.`,
+            missing: hasNonDemoEvidence && hasDecision ? "Validate with a creator/editor using a real project to prove time saved." : "Use real creator data and save an editor decision before claiming operational usefulness."
+          }
+        ].map((item) => ({ ...item, status: getRubricStatus(item.score) }));
+        const evidenceScore = criteria.reduce((sum, item) => sum + item.score, 0);
+        return {
+          criteria,
+          evidenceScore,
+          demonstratedCount: criteria.filter((item) => item.status === "Demonstrated").length,
+          partialCount: criteria.filter((item) => item.status === "Partially demonstrated").length,
+        };
+      }
+
       function getJudgeScorecardText(project) {
         const safeProject = project || {};
-        const topClips = (safeProject.clips || []).slice(0, 3);
-        const mode = getCompetitionMode();
-        const verdict = getCompetitionVerdict(safeProject, mode);
-        const clipSummary = topClips.length
-          ? topClips
-              .map((clip, index) => {
-                const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.duration}s)`;
-                const reason = (clip.reasons || [])[0] || "No key reason captured.";
-                return `${index + 1}. ${label} -> ${clip.score}/100 | ${reason}`;
-              })
-              .join("\n")
-          : "No clip recommendations yet.";
-        const seo = safeProject.metadata?.seo || {};
-        const bestTitle = safeProject.metadata?.title || "Not generated yet.";
-        const bestDescription = safeProject.metadata?.description || "Not generated yet.";
-        const tags = [...(safeProject.metadata?.tags || []), ...(seo.hashtags || [])].slice(0, 6).join(", ");
+        const rubric = assessHackathonRubric(safeProject);
         return [
-          "DropFix judge-ready summary",
+          "DropFix submission evidence rubric",
           `Project: ${safeProject.name || "Untitled"}`,
           `Profile: ${safeProject.profile || "standard"}`,
-          `Mode: ${mode}`,
+          "Scope: scores measure observable submission evidence, not likelihood of winning or YouTube performance.",
           "",
-          `Verdict: ${verdict.label}`,
-          `Reason: ${verdict.rationale}`,
-          `Quality score: ${safeProject.qualityScore || 0}/100`,
-          `Segments parsed: ${(safeProject.segments || []).length}`,
-          `Action confidence: ${safeProject.qualityScore >= 70 ? "High - publishable with current clips" : safeProject.qualityScore >= 55 ? "Moderate - review hooks and pacing" : "Low - needs rework"}`,
-          `Top clips:`,
-          clipSummary,
-          `SEO title sample: ${bestTitle}`,
-          `SEO description sample: ${bestDescription}`,
-          `Tag stack: ${tags || "not generated"}`,
+          ...rubric.criteria.flatMap((item) => [
+            `${item.label}: ${item.status} (${item.score}/5 evidence checks)`,
+            `  Evidence: ${item.evidence}`,
+            `  Missing proof: ${item.missing}`
+          ]),
           "",
-          `Judge-ready next step: ${safeProject.qualityScore >= 70 ? "Copy judge handoff bundle, then download packet" : "Improve hook and pacing, then re-run analysis"}`,
+          `Evidence coverage: ${rubric.evidenceScore}/20`,
+          `Criteria demonstrated: ${rubric.demonstratedCount}/4`,
+          "Final judging of creativity and real-world impact belongs to the hackathon judges.",
           `Generated: ${(safeProject.lastEdited || new Date().toISOString()).slice(0, 10)}`
         ].join("\n");
       }
@@ -4569,47 +4620,18 @@
       }
 
       function getCompetitionVerdict(project, mode = "judge") {
-        const safeProject = project || {};
-        const quality = clampPercent(safeProject.qualityScore || 0);
+        const rubric = assessHackathonRubric(project);
         if (mode === "creator") {
-          if (quality >= 75) {
-            return {
-              label: "Creator-ready",
-              rationale: "Strong retention stack with clean clip hierarchy."
-            };
-          }
-          if (quality >= 60) {
-            return {
-              label: "Publishable with small edits",
-              rationale: "Core structure is strong; improve 1-2 weak bridge moments."
-            };
-          }
           return {
-            label: "Needs rework",
-            rationale: "Hook clarity and pacing are not stable enough for immediate upload."
-          };
-        }
-        if (quality >= 80) {
-          return {
-            label: "Award-worthy candidate",
-            rationale: "High-confidence, consistent hook-retention signal across top clips."
-          };
-        }
-        if (quality >= 65) {
-          return {
-            label: "Strong publish candidate",
-            rationale: "Meets most judge criteria with clear actionable improvement points."
-          };
-        }
-        if (quality >= 50) {
-          return {
-            label: "Needs targeted refinement",
-            rationale: "Good direction but should adjust opening cadence before judging."
+            label: `${rubric.demonstratedCount}/4 creator-value criteria demonstrated`,
+            rationale: `Evidence coverage is ${rubric.evidenceScore}/20. Save an editor decision and use non-demo analytics before making a stronger creator-value claim.`,
+            rubric
           };
         }
         return {
-          label: "Not competition-ready",
-          rationale: "Retain and analyze a stronger opening before submission."
+          label: `${rubric.demonstratedCount}/4 criteria demonstrated`,
+          rationale: `Evidence coverage is ${rubric.evidenceScore}/20. Missing proof is listed criterion-by-criterion; this is not a predicted judge result.`,
+          rubric
         };
       }
 
@@ -4622,46 +4644,43 @@
         const safeProject = project || {};
         const mode = modeOverride || getCompetitionMode();
         const verdict = getCompetitionVerdict(safeProject, mode);
-        const topClip = (safeProject.clips || [])[0];
+        const rubric = verdict.rubric || assessHackathonRubric(safeProject);
         const rows = [
           "project_name",
           "profile",
-          "quality_score",
           "mode",
-          "verdict",
-          "top_clip",
-          "top_clip_score",
-          "segments",
+          "evidence_coverage",
+          "criteria_demonstrated",
+          "functionality",
+          "creativity",
+          "technical_execution",
+          "real_world_usefulness",
           "generated_at"
         ];
         const row = [
           safeProject.name || "Untitled",
           safeProject.profile || "standard",
-          clampPercent(safeProject.qualityScore || 0),
           mode,
-          verdict.label,
-          topClip ? `${formatDuration(topClip.start)}-${formatDuration(topClip.end)} (${topClip.duration}s)` : "N/A",
-          topClip ? topClip.score : "N/A",
-          (safeProject.segments || []).length,
+          `${rubric.evidenceScore}/20`,
+          `${rubric.demonstratedCount}/4`,
+          `${rubric.criteria[0].status} (${rubric.criteria[0].score}/5)`,
+          `${rubric.criteria[1].status} (${rubric.criteria[1].score}/5)`,
+          `${rubric.criteria[2].status} (${rubric.criteria[2].score}/5)`,
+          `${rubric.criteria[3].status} (${rubric.criteria[3].score}/5)`,
           (safeProject.lastEdited || new Date().toISOString()).slice(0, 10)
         ];
         return `${rows.map(escapeCsvCell).join(",")}\n${row.map(escapeCsvCell).join(",")}`;
       }
 
-      function getVerdictToneClass(mode, quality) {
-        if (mode === "creator") {
-          if (quality >= 75 || quality >= 60) {
-            return "status-good";
-          }
-          return "status-risks";
-        }
-        if (quality >= 80) {
+      function getVerdictToneClass(mode, verdict) {
+        const demonstrated = verdict?.rubric?.demonstratedCount || 0;
+        if (demonstrated >= 4) {
           return "status-strong";
         }
-        if (quality >= 65) {
+        if (demonstrated >= 2) {
           return "status-good";
         }
-        if (quality >= 50) {
+        if (demonstrated >= 1) {
           return "status-watch";
         }
         return "status-risks";
@@ -4671,6 +4690,7 @@
         const safeProject = project || {};
         const verdictJudge = getCompetitionVerdict(safeProject, "judge");
         const verdictCreator = getCompetitionVerdict(safeProject, "creator");
+        const rubric = verdictJudge.rubric || assessHackathonRubric(safeProject);
         const topClips = (safeProject.clips || []).slice(0, 3).map((clip, index) => ({
           rank: index + 1,
           start: formatDuration(clip.start),
@@ -4726,12 +4746,11 @@
           `Generated: ${packet.generatedAt}`,
           `Project: ${packet.projectName}`,
           `Profile: ${packet.profile}`,
-          `Quality score: ${packet.qualityScore}`,
+          `Evidence coverage: ${packet.submissionEvidence.evidenceScore}/20`,
           `Segments: ${packet.segments}`,
           "",
-          `Judge verdict: ${packet.verdicts.judge.label}`,
-          `Creator verdict: ${packet.verdicts.creator.label}`,
-          `Judge rationale: ${packet.verdicts.judge.rationale}`,
+          `Submission evidence: ${packet.verdicts.judge.label}`,
+          `Assessment scope: ${packet.verdicts.judge.rationale}`,
           "",
           "Top clips (up to 3):",
           ...(topClipLines.length ? topClipLines : ["  No clips were generated yet."]),
@@ -4880,9 +4899,8 @@
         }
         setExportControlStates(project);
         const verdict = getCompetitionVerdict(project, getCompetitionMode());
-        const verdictQuality = clampPercent(project.qualityScore || 0);
         const verdictTone = project.status === "analyzed"
-          ? getVerdictToneClass(getCompetitionMode(), verdictQuality)
+          ? getVerdictToneClass(getCompetitionMode(), verdict)
           : "status-watch";
         el.verdictPill.className = `state-badge ${verdictTone}`;
         el.verdictPill.classList.toggle("is-ready", hasAnalyzed);
@@ -4894,13 +4912,13 @@
           el.verdictPill.dataset.analysisState = String(project.lastEdited);
         }
         el.verdictNote.textContent = project.status === "analyzed"
-          ? `Verdict: ${verdict.rationale}`
-          : "Run analysis to generate a verdict and enable competition exports.";
+          ? verdict.rationale
+          : "Run analysis to assess observable evidence and enable export artifacts.";
         const judgeScorecard = getJudgeScorecardText(project);
         el.judgeScorecard.textContent = judgeScorecard;
         el.judgeScorecardStatus.textContent = project.status === "analyzed"
-          ? "Judge-ready summary is ready. Copy for judge review."
-          : "Run analysis to generate a judge-ready scorecard.";
+          ? "Evidence rubric is ready. It distinguishes demonstrated proof from missing proof."
+          : "Run analysis to generate an evidence rubric.";
         renderClipCards(project);
         renderQualityNarrative(project);
         renderHandoffActivity(project);
@@ -5642,7 +5660,7 @@
           statusMessage: safeError,
           profile: safeProject.profile || "shorts",
           sourceType: safeProject.sourceType || "text",
-          qualityScore: clampPercent(safeProject.qualityScore || 0),
+          submissionEvidence: rubric,
           segments: (safeProject.segments || []).length,
           clipSummary: clips.slice(0, 5).map((clip) => ({
             start: clip.start,
@@ -6033,7 +6051,7 @@
         }
         el.copyJudgeScorecard.textContent = copied ? "Judge scorecard copied" : "Copy failed";
         setTimeout(() => {
-          el.copyJudgeScorecard.textContent = "Copy judge scorecard";
+          el.copyJudgeScorecard.textContent = "Copy evidence rubric";
         }, 1200);
       });
       el.copyJudgeHandoff.addEventListener("click", async () => {
