@@ -1423,6 +1423,73 @@
         background: rgba(255, 0, 0, 0.13);
       }
 
+      .nav-chip[aria-current="page"] {
+        background: linear-gradient(180deg, rgba(255, 0, 0, 0.24), rgba(255, 0, 0, 0.12));
+        border-color: var(--yt-red-soft);
+      }
+
+      .top-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+      }
+
+      .account-panel {
+        display: flex;
+        align-items: center;
+        gap: 0.42rem;
+        flex-wrap: wrap;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-border);
+        border-radius: var(--radius-md);
+        padding: 0.38rem 0.55rem;
+      }
+
+      .account-meta {
+        color: var(--text-muted);
+        font-size: var(--text-xs);
+        line-height: 1.2;
+        margin: 0;
+        max-width: 250px;
+      }
+
+      .account-form {
+        display: none;
+        align-items: center;
+        gap: 0.42rem;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .account-form.is-open {
+        display: inline-flex;
+      }
+
+      .account-input {
+        min-height: 33px;
+        border-radius: var(--radius-pill);
+        border: 1px solid var(--surface-border);
+        background: var(--control-bg);
+        color: var(--text-primary);
+        padding: 0 0.6rem;
+        width: 180px;
+        font-size: var(--text-sm);
+      }
+
+      .account-input:focus-visible {
+        outline: 2px solid transparent;
+        box-shadow: 0 0 0 4px var(--focus-ring);
+      }
+
+      .app-page {
+        display: none;
+      }
+
+      .app-page.is-active {
+        display: block;
+      }
+
       @media (max-width: 980px) {
         .hero-grid,
         .workspace-shell,
@@ -1475,14 +1542,31 @@
           <span class="tag">YouTube Hackathon</span>
         </div>
         <nav class="links" aria-label="Primary navigation">
-          <a class="tag nav-chip" href="#judge-demo">Judge demo</a>
-          <a class="tag nav-chip" href="#workspace">Workspace</a>
-          <a class="tag nav-chip" href="#proof">Proof</a>
-          <a class="tag nav-chip" href="#ready">Ready-to-use</a>
+          <a class="tag nav-chip" href="#home" data-page-link="home">Home</a>
+          <a class="tag nav-chip" href="#workspace" data-page-link="workspace">Workspace</a>
+          <a class="tag nav-chip" href="#proof" data-page-link="proof">Proof</a>
+          <a class="tag nav-chip" href="#ready" data-page-link="ready">Ready-to-use</a>
+          <a class="tag nav-chip" href="#account" data-page-link="account">Account</a>
         </nav>
+        <div class="top-right">
+          <div class="account-panel">
+            <span class="tag" id="account-mode">Guest</span>
+            <p class="account-meta" id="account-identity">Local guest workspace</p>
+            <button class="small-btn subtle" id="open-signin" type="button">Sign in</button>
+            <button class="small-btn subtle" id="use-guest" type="button">Use guest</button>
+            <button class="small-btn subtle" id="sign-out" type="button">Sign out</button>
+            <div class="account-form" id="account-form">
+              <input id="account-name" class="account-input" type="text" placeholder="Display name" aria-label="Display name" />
+              <input id="account-email" class="account-input" type="email" placeholder="Email" aria-label="Email" />
+              <button class="small-btn primary" id="account-save" type="button">Save account</button>
+              <button class="small-btn subtle" id="account-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
       </header>
 
-      <section class="hero">
+      <section class="app-page is-active" data-page="home" id="page-home">
+        <section class="hero">
         <div class="hero-grid">
           <div class="hero-copy">
             <h1>DropFix turns raw transcript into a judge-ready creator handoff.</h1>
@@ -1504,10 +1588,10 @@
             </ul>
           </aside>
         </div>
-      </section>
+        </section>
 
-      <section class="section-title" id="judge-demo">Judge Demo (One click)</section>
-      <section class="proof">
+        <section class="section-title" id="judge-demo">Judge Demo (One click)</section>
+        <section class="proof">
         <p style="margin: 0 0 0.85rem">Use this to show the full claim-to-action loop in under 30 seconds:</p>
         <div class="inline-row" style="align-items: center; justify-content: flex-start; gap: 0.6rem; margin-bottom: 0.75rem">
           <button id="run-demo" class="btn primary" type="button">Run live demo workflow</button>
@@ -1520,8 +1604,10 @@
           <li>Moves into Suggestions and Export tabs with handoff-ready artifacts</li>
         </ol>
         <p class="helper" style="margin: 0.55rem 0 0">Designed for judges and creators who want to verify workflow value immediately.</p>
+        </section>
       </section>
 
+      <section class="app-page" data-page="workspace" id="page-workspace">
       <section id="workspace" class="workspace-shell">
         <aside class="card">
           <h2 class="panel-title">Workspace</h2>
@@ -1820,9 +1906,11 @@
           </div>
         </section>
       </section>
+      </section>
 
-      <section class="section-title" id="proof">Judge-ready proof points</section>
-      <section class="proof">
+      <section class="app-page" data-page="proof" id="page-proof">
+        <section class="section-title" id="proof">Judge-ready proof points</section>
+        <section class="proof">
         <p style="margin: 0;">What this implementation proves for real judging:</p>
         <ul>
           <li>Upload or paste transcripts and parse them into analysis-ready segments entirely in-browser.</li>
@@ -1831,15 +1919,33 @@
           <li>Export judge artifacts (scorecard, verdicts, CSV row, and packet) with one-click copy/download.</li>
           <li>Track every handoff action with timestamped evidence for transparent review.</li>
         </ul>
+        </section>
       </section>
 
-      <section class="section-title" id="ready">Built for clients and judges</section>
-      <section class="proof">
+      <section class="app-page" data-page="ready" id="page-ready">
+        <section class="section-title" id="ready">Built for clients and judges</section>
+        <section class="proof">
         <p style="margin: 0;">
           This is a complete front-end workflow: load source text, tune scoring strategy,
           review explainable recommendations, then export a handoff package.
           It is production-style, stable, and browser-first.
         </p>
+        </section>
+      </section>
+
+      <section class="app-page" data-page="account" id="page-account">
+        <section class="section-title">Account and saved workspaces</section>
+        <section class="proof">
+          <p style="margin: 0 0 0.55rem">
+            Your work is saved in browser local storage by account. Sign in to move your projects to a persistent account key.
+            Guest mode stays local and private to this browser profile.
+          </p>
+          <ul>
+            <li>Local account mode: sign in with email and optional name.</li>
+            <li>Guest mode: quick start with local-only storage.</li>
+            <li>All workspace data is available instantly across pages once you sign in.</li>
+          </ul>
+        </section>
       </section>
 
       <footer>
@@ -1853,7 +1959,10 @@
     </main>
 
     <script>
-      const STORAGE_KEY = "dropfix-workspace-v3";
+      const LEGACY_WORKSPACE_KEY = "dropfix-workspace-v3";
+      const WORKSPACE_KEY_PREFIX = "dropfix-workspace-v3:user:";
+      const AUTH_SESSION_KEY = "dropfix-auth-session-v1";
+      const DEFAULT_ACCOUNT_NAME = "Guest";
       const FILLERS = /\b(uh+|um+|you know|like|so|actually|basically|basically|like,)\b/gi;
       const MAX_BYTES = 1_000_000;
       const FILES = {
@@ -1954,12 +2063,31 @@
 
       const state = {
         activeTab: "inputs",
+        activePage: "home",
         projects: [],
         currentId: null,
-        analyzing: false
+        analyzing: false,
+        account: {
+          mode: "guest",
+          id: "guest",
+          email: "",
+          name: DEFAULT_ACCOUNT_NAME
+        }
       };
 
       const el = {
+        pages: Array.from(document.querySelectorAll(".app-page")),
+        pageLinks: Array.from(document.querySelectorAll('[data-page-link]')),
+        accountMode: document.getElementById("account-mode"),
+        accountIdentity: document.getElementById("account-identity"),
+        openSigninButton: document.getElementById("open-signin"),
+        useGuestButton: document.getElementById("use-guest"),
+        signOutButton: document.getElementById("sign-out"),
+        accountForm: document.getElementById("account-form"),
+        accountName: document.getElementById("account-name"),
+        accountEmail: document.getElementById("account-email"),
+        accountSaveButton: document.getElementById("account-save"),
+        accountCancelButton: document.getElementById("account-cancel"),
         projectCount: document.getElementById("project-count"),
         projectList: document.getElementById("project-list"),
         projectTitle: document.getElementById("project-title"),
@@ -2065,6 +2193,194 @@
         return validActivity
           .filter((entry) => entry && typeof entry === "object" && typeof entry.at === "string")
           .slice(-12);
+      }
+
+      function getGuestAccount() {
+        return {
+          mode: "guest",
+          id: "guest",
+          email: "",
+          name: DEFAULT_ACCOUNT_NAME
+        };
+      }
+
+      function safeTrim(value) {
+        return typeof value === "string" ? value.trim() : "";
+      }
+
+      function encodeStorageId(email) {
+        const normalized = safeTrim(email).toLowerCase();
+        if (!normalized) {
+          return null;
+        }
+        try {
+          return btoa(unescape(encodeURIComponent(normalized))).replace(/=+$/, "");
+        } catch {
+          return normalized.replace(/[^a-z0-9]/gi, "-");
+        }
+      }
+
+      function normalizeAccount(raw) {
+        if (!raw || raw.mode !== "signed-in") {
+          return getGuestAccount();
+        }
+        const normalizedEmail = safeTrim(raw.email).toLowerCase();
+        const id = encodeStorageId(normalizedEmail);
+        if (!normalizedEmail || !id) {
+          return getGuestAccount();
+        }
+        return {
+          mode: "signed-in",
+          id,
+          email: normalizedEmail,
+          name: safeTrim(raw.name) || normalizedEmail.split("@")[0] || "Creator"
+        };
+      }
+
+      function getWorkspaceStorageKey(account = state.account) {
+        if (!account || account.mode !== "signed-in" || !account.id) {
+          return LEGACY_WORKSPACE_KEY;
+        }
+        return `${WORKSPACE_KEY_PREFIX}${account.id}`;
+      }
+
+      function parseHashRoute(rawHash) {
+        const hash = safeTrim((rawHash || "").replace(/^#/, "").toLowerCase());
+        if (!hash || hash === "home") {
+          return { page: "home", anchor: null };
+        }
+        if (hash === "judge-demo") {
+          return { page: "home", anchor: "judge-demo" };
+        }
+        if (["workspace", "proof", "ready", "account"].includes(hash)) {
+          return { page: hash, anchor: null };
+        }
+        return { page: "home", anchor: null };
+      }
+
+      function setAccountFormOpen(isOpen) {
+        if (!el.accountForm) {
+          return;
+        }
+        el.accountForm.classList.toggle("is-open", !!isOpen);
+      }
+
+      function syncPageLinksForHash(page) {
+        el.pageLinks.forEach((link) => {
+          link.setAttribute("aria-current", link.dataset.pageLink === page ? "page" : "false");
+        });
+      }
+
+      function setActivePage(page, anchor = null, updateLocation = true) {
+        const nextPage = ["home", "workspace", "proof", "ready", "account"].includes(page) ? page : "home";
+        state.activePage = nextPage;
+        el.pages.forEach((pageEl) => {
+          pageEl.classList.toggle("is-active", pageEl.dataset.page === nextPage);
+        });
+        syncPageLinksForHash(nextPage);
+        if (updateLocation) {
+          const nextHash = `#${anchor || nextPage}`;
+          if (location.hash !== nextHash) {
+            history.replaceState(null, "", nextHash);
+          }
+        }
+        if (nextPage === "home" && anchor) {
+          const anchorEl = document.getElementById(anchor);
+          if (anchorEl) {
+            requestAnimationFrame(() => {
+              anchorEl.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+          }
+        } else if (nextPage === "home") {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      }
+
+      function applyPageFromHash() {
+        const route = parseHashRoute(location.hash);
+        setActivePage(route.page, route.anchor, true);
+      }
+
+      function loadAuthSession() {
+        const raw = localStorage.getItem(AUTH_SESSION_KEY);
+        if (!raw) {
+          state.account = getGuestAccount();
+          return;
+        }
+        try {
+          state.account = normalizeAccount(JSON.parse(raw));
+        } catch {
+          state.account = getGuestAccount();
+        }
+      }
+
+      function saveAuthSession() {
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(state.account));
+      }
+
+      function renderAccountPanel() {
+        const isSignedIn = state.account.mode === "signed-in";
+        el.accountMode.textContent = isSignedIn ? "Signed in" : "Guest";
+        if (isSignedIn) {
+          const name = safeTrim(state.account.name) || "Creator";
+          const email = safeTrim(state.account.email) || "local account";
+          el.accountIdentity.textContent = `${name} (${email})`;
+        } else {
+          el.accountIdentity.textContent = "Local guest workspace";
+        }
+        el.openSigninButton.hidden = isSignedIn;
+        el.useGuestButton.hidden = !isSignedIn;
+        el.signOutButton.hidden = !isSignedIn;
+        setAccountFormOpen(false);
+      }
+
+      function applyWorkspaceForAccount(nextAccount, options = { migrateGuest: false }) {
+        const previousKey = getWorkspaceStorageKey();
+        const normalized = normalizeAccount(nextAccount);
+        const nextKey = normalized.mode === "signed-in" ? `${WORKSPACE_KEY_PREFIX}${normalized.id}` : LEGACY_WORKSPACE_KEY;
+        const switchingAccount = previousKey !== nextKey;
+        state.account = normalized;
+        saveAuthSession();
+        if (normalized.mode === "signed-in" && options.migrateGuest) {
+          const legacyWorkspace = localStorage.getItem(LEGACY_WORKSPACE_KEY);
+          if (legacyWorkspace && !localStorage.getItem(nextKey)) {
+            localStorage.setItem(nextKey, legacyWorkspace);
+          }
+        }
+        if (switchingAccount) {
+          state.projects = [];
+          state.currentId = null;
+          initFromWorkspace();
+        }
+        renderAccountPanel();
+      }
+
+      function switchToGuestMode() {
+        applyWorkspaceForAccount(getGuestAccount());
+      }
+
+      function openSignInForm() {
+        el.accountName.value = state.account.mode === "signed-in" ? safeTrim(state.account.name) : "";
+        el.accountEmail.value = state.account.mode === "signed-in" ? safeTrim(state.account.email) : "";
+        setAccountFormOpen(true);
+      }
+
+      function saveAccountSessionFromForm() {
+        const email = safeTrim(el.accountEmail.value);
+        const name = safeTrim(el.accountName.value);
+        if (!email) {
+          setIngestError("Please enter an email to sign in.");
+          return;
+        }
+        const emailLike = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        if (!emailLike.test(email)) {
+          setIngestError("Please use a valid email format.");
+          return;
+        }
+        const nextAccount = normalizeAccount({ mode: "signed-in", name, email });
+        applyWorkspaceForAccount(nextAccount, { migrateGuest: true });
+        setAccountFormOpen(false);
+        setIngestError("");
       }
 
       function getHandoffActionLabel(action) {
@@ -2680,11 +2996,16 @@
       }
 
       function persistWorkspace() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ projects: state.projects, currentId: state.currentId }));
+        const storageKey = getWorkspaceStorageKey();
+        localStorage.setItem(storageKey, JSON.stringify({ projects: state.projects, currentId: state.currentId }));
       }
 
       function loadWorkspace() {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const storageKey = getWorkspaceStorageKey();
+        let raw = localStorage.getItem(storageKey);
+        if (!raw && state.account?.mode === "guest" && storageKey !== LEGACY_WORKSPACE_KEY) {
+          raw = localStorage.getItem(LEGACY_WORKSPACE_KEY);
+        }
         if (!raw) {
           return;
         }
@@ -3529,6 +3850,23 @@
         document.body.removeChild(link);
       }
 
+      el.pageLinks.forEach((pageLink) => {
+        pageLink.addEventListener("click", (event) => {
+          event.preventDefault();
+          const hash = pageLink.getAttribute("href") || "#home";
+          const route = parseHashRoute(hash);
+          setActivePage(route.page, route.anchor || null, true);
+        });
+      });
+
+      window.addEventListener("hashchange", applyPageFromHash);
+
+      el.openSigninButton?.addEventListener("click", openSignInForm);
+      el.accountCancelButton?.addEventListener("click", () => setAccountFormOpen(false));
+      el.accountSaveButton?.addEventListener("click", saveAccountSessionFromForm);
+      el.useGuestButton?.addEventListener("click", switchToGuestMode);
+      el.signOutButton?.addEventListener("click", switchToGuestMode);
+
       document.querySelectorAll(".tab-btn").forEach((button) => {
         button.addEventListener("click", () => {
           if (button.disabled) {
@@ -3781,6 +4119,9 @@
         persistProject();
       });
 
+      loadAuthSession();
+      renderAccountPanel();
+      applyPageFromHash();
       initFromWorkspace();
       switchTab(state.activeTab);
     </script>
