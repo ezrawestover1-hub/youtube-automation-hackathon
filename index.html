@@ -666,6 +666,27 @@
         color: #c9d5eb;
       }
 
+      .readiness-list {
+        margin: 0.5rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.42rem;
+      }
+
+      .readiness-list li {
+        font-size: 0.84rem;
+        color: #9fb2d6;
+      }
+
+      .readiness-list li.done {
+        color: #d4ffe2;
+      }
+
+      .readiness-label {
+        margin-left: 0.4rem;
+      }
+
       .context-strip {
         margin-top: 0.4rem;
         border: 1px dashed rgba(123, 139, 168, 0.2);
@@ -1614,12 +1635,16 @@
 
                 <section class="tab-panel" id="export">
                   <h3 class="panel-title">Ready-to-use outputs</h3>
-                  <div class="summary-grid">
+                    <div class="summary-grid">
                     <div class="metric">
                       <strong>Export package summary</strong>
                       <p class="helper export-status" id="export-summary">No export-ready data yet. Analyze a transcript to unlock handoff artifacts.</p>
                       <p class="helper analysis-ready-note" id="export-hint">Run analysis, then use Suggestions to finalize SEO before exporting judge packets.</p>
                       <p class="helper" id="export-handoff-status">Handoff status: analysis required.</p>
+                    </div>
+                    <div class="export-box">
+                      <label class="workspace-label" for="export-readiness-list">Judge-readiness checklist</label>
+                      <ul id="export-readiness-list" class="readiness-list"></ul>
                     </div>
                     <div class="export-actions">
                       <button id="copy-metadata" class="small-btn subtle" type="button">Copy metadata JSON</button>
@@ -1862,6 +1887,7 @@
         downloadJudgeCsv: document.getElementById("download-judge-csv"),
         downloadJudgePacket: document.getElementById("download-judge-packet"),
         exportHandoffStatus: document.getElementById("export-handoff-status"),
+        exportReadinessList: document.getElementById("export-readiness-list"),
       };
 
       function clamp(value, min, max) {
@@ -2720,6 +2746,7 @@
         const safeProject = project || {};
         const hasAnalyzed = safeProject.status === "analyzed";
         const hasSeoOutput = (safeProject.metadata?.seo?.titles || []).length > 0 || (safeProject.metadata?.seo?.descriptionVariants || []).length > 0;
+        const hasClipOutput = (safeProject.clips || []).length > 0;
         const handoffReady = hasAnalyzed && hasSeoOutput;
         const readyForBasic = hasAnalyzed;
         [el.copyMetadata, el.copySession, el.downloadJson, el.downloadSummary].forEach((button) => {
@@ -2738,6 +2765,32 @@
         }
         if (el.copyJudgeHandoff) {
           el.copyJudgeHandoff.disabled = !handoffReady;
+        }
+        if (el.exportReadinessList) {
+          el.exportReadinessList.innerHTML = [
+            {
+              label: "Transcript analyzed",
+              status: hasAnalyzed,
+            },
+            {
+              label: "Clips generated",
+              status: hasClipOutput,
+            },
+            {
+              label: "SEO titles or descriptions generated",
+              status: hasSeoOutput,
+            },
+            {
+              label: "Judge handoff bundle ready",
+              status: handoffReady,
+            },
+            {
+              label: "CSV + scorecard actions active",
+              status: readyForBasic,
+            },
+          ]
+            .map(({ label, status }) => `<li class="${status ? "done" : ""}"><span>${status ? "PASS" : "TODO"}:</span><span class="readiness-label">${label}</span></li>`)
+            .join("");
         }
       }
 
