@@ -1311,6 +1311,120 @@
         gap: 0.65rem;
       }
 
+      .feedback-overview {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(160px, 0.6fr);
+        gap: 0.75rem;
+        align-items: stretch;
+        margin-bottom: 0.75rem;
+      }
+
+      .feedback-lead,
+      .feedback-quality {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.025);
+        padding: 0.8rem;
+      }
+
+      .feedback-lead strong,
+      .feedback-quality strong {
+        display: block;
+        color: var(--text-strong);
+        font-size: 0.94rem;
+        margin-bottom: 0.22rem;
+      }
+
+      .feedback-lead p,
+      .feedback-quality p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .feedback-quality {
+        border-color: rgba(255, 0, 0, 0.28);
+      }
+
+      .feedback-card {
+        position: relative;
+        border-left: 3px solid var(--red);
+      }
+
+      .feedback-card.preserve {
+        border-left-color: var(--green-deep);
+      }
+
+      .feedback-kicker {
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .feedback-title {
+        margin: 0.2rem 0 0;
+        color: var(--text-strong);
+        font-size: 1rem;
+      }
+
+      .evidence-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.7rem;
+      }
+
+      .evidence-cell {
+        min-width: 0;
+        padding: 0.52rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.16);
+      }
+
+      .evidence-cell span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.69rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .evidence-cell p {
+        margin: 0.28rem 0 0;
+        color: var(--text);
+        font-size: 0.82rem;
+        line-height: 1.42;
+      }
+
+      .feedback-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.7rem;
+        margin-top: 0.7rem;
+      }
+
+      .confidence-note {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .review-source {
+        white-space: nowrap;
+      }
+
+      @media (max-width: 640px) {
+        .feedback-overview,
+        .evidence-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .clip-card {
         border: 1px solid var(--line);
         border-radius: var(--radius-md);
@@ -1697,11 +1811,11 @@
               <button class="tab-btn" type="button" data-tab="suggestions">Suggestions</button>
               <button class="tab-btn" type="button" data-tab="export">Export</button>
             </div>
-            <div class="workflow-strip" id="workflow-strip" aria-label="Workspace steps">
-              <button class="flow-step is-active" type="button" data-step="inputs">Inputs</button>
-              <button class="flow-step" type="button" data-step="analysis">Analysis</button>
-              <button class="flow-step" type="button" data-step="suggestions">Suggestions</button>
-              <button class="flow-step" type="button" data-step="export">Export</button>
+            <div class="workflow-strip" id="workflow-strip" aria-label="Workspace progress">
+              <button class="flow-step is-active" type="button" data-step="inputs" aria-label="Inputs">01</button>
+              <button class="flow-step" type="button" data-step="analysis" aria-label="Analysis">02</button>
+              <button class="flow-step" type="button" data-step="suggestions" aria-label="Suggestions">03</button>
+              <button class="flow-step" type="button" data-step="export" aria-label="Export">04</button>
             </div>
             <div class="workflow-step-hints" id="workflow-step-hints">
               <p class="workflow-step-hint" id="hint-inputs" data-step-hint="inputs">Inputs: ready.</p>
@@ -1865,9 +1979,19 @@
             </section>
 
       <section class="tab-panel" id="suggestions">
-        <label class="workspace-label">Clip shortlist with transparent reasons</label>
+        <label class="workspace-label">Your editing decision queue</label>
+        <div class="feedback-overview" id="feedback-overview">
+          <div class="feedback-lead">
+            <strong>Evidence before advice</strong>
+            <p>Each recommendation separates what DropFix observed in your transcript from the edit it suggests. Connect channel analytics later to strengthen behavioral confidence.</p>
+          </div>
+          <div class="feedback-quality" id="feedback-quality">
+            <strong>Data quality: transcript-only</strong>
+            <p>Useful for structure and clip selection. Retention and CTR evidence are not connected in this browser demo.</p>
+          </div>
+        </div>
         <div id="clip-cards" class="clip-list">
-          <p class="muted">Run analysis to generate clips.</p>
+          <p class="muted">Run analysis to build your first editing decision queue.</p>
         </div>
         <label class="workspace-label" style="margin-top: 0.8rem;">Metadata suggestions</label>
         <div class="export-box">
@@ -1973,10 +2097,10 @@
                       </p>
                     </div>
                     <div class="export-box">
-                      <label class="workspace-label" for="judge-scorecard">Judge scorecard</label>
+                      <label class="workspace-label" for="judge-scorecard">Judge-ready scorecard</label>
                       <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to generate a judge-ready scorecard.</p>
                       <pre id="judge-scorecard" class="judge-pack">No scorecard available.</pre>
-                      <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy judge scorecard</button>
+                      <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy scorecard summary</button>
                     </div>
                   </div>
                 </section>
@@ -2196,6 +2320,7 @@
         dropzone: document.getElementById("dropzone"),
         autoClean: document.getElementById("auto-clean"),
         clipCards: document.getElementById("clip-cards"),
+        feedbackQuality: document.getElementById("feedback-quality"),
         metadataCloud: document.getElementById("metadata-cloud"),
         metadataNote: document.getElementById("metadata-note"),
         seoTone: document.getElementById("seo-tone"),
@@ -2872,6 +2997,7 @@
             text: segment.text,
             score: finalScore,
             duration: +(segment.end - segment.start).toFixed(1),
+            sourceIndex: index,
             signals: { hook, retention, clarity, pacing, novelty },
             reasons
           };
@@ -3227,7 +3353,7 @@
               .map((clip, index) => {
                 const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.duration}s)`;
                 const reason = (clip.reasons || [])[0] || "No key reason captured.";
-                return `${index + 1}) ${label} -> ${clip.score}/100 | ${reason}`;
+                return `${index + 1}. ${label} -> ${clip.score}/100 | ${reason}`;
               })
               .join("\n")
           : "No clip recommendations yet.";
@@ -3236,21 +3362,23 @@
         const bestDescription = safeProject.metadata?.description || "Not generated yet.";
         const tags = [...(safeProject.metadata?.tags || []), ...(seo.hashtags || [])].slice(0, 6).join(", ");
         return [
-          `DropFix Scorecard`,
+          "DropFix judge-ready summary",
           `Project: ${safeProject.name || "Untitled"}`,
           `Profile: ${safeProject.profile || "standard"}`,
+          `Mode: ${mode}`,
+          "",
+          `Verdict: ${verdict.label}`,
+          `Reason: ${verdict.rationale}`,
           `Quality score: ${safeProject.qualityScore || 0}/100`,
           `Segments parsed: ${(safeProject.segments || []).length}`,
+          `Action confidence: ${safeProject.qualityScore >= 70 ? "High - publishable with current clips" : safeProject.qualityScore >= 55 ? "Moderate - review hooks and pacing" : "Low - needs rework"}`,
           `Top clips:`,
           clipSummary,
           `SEO title sample: ${bestTitle}`,
           `SEO description sample: ${bestDescription}`,
           `Tag stack: ${tags || "not generated"}`,
-          `Mode: ${mode}`,
-          `Verdict: ${verdict.label}`,
-          `Reason: ${verdict.rationale}`,
           "",
-          `Recommended action: ${safeProject.qualityScore >= 65 ? "Publish with staged clips first" : "Rework hook and pacing before publish"}`,
+          `Judge-ready next step: ${safeProject.qualityScore >= 70 ? "Copy judge handoff bundle, then download packet" : "Improve hook and pacing, then re-run analysis"}`,
           `Generated: ${(safeProject.lastEdited || new Date().toISOString()).slice(0, 10)}`
         ].join("\n");
       }
@@ -3585,7 +3713,7 @@
         const judgeScorecard = getJudgeScorecardText(project);
         el.judgeScorecard.textContent = judgeScorecard;
         el.judgeScorecardStatus.textContent = project.status === "analyzed"
-          ? "Judge scorecard ready for copy."
+          ? "Judge-ready summary is ready. Copy for judge review."
           : "Run analysis to generate a judge-ready scorecard.";
         renderClipCards(project.clips || []);
         renderQualityNarrative(project);
@@ -3593,30 +3721,127 @@
         updateBadges();
       }
 
+      function escapeFeedbackHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;");
+      }
+
+      function getTranscriptConfidence(clip) {
+        const signalAverage = Object.values(clip.signals || {}).reduce((sum, value) => sum + value, 0) / 5;
+        if (signalAverage >= 80) {
+          return "Medium confidence: multiple transcript signals agree. Viewer behavior is not connected.";
+        }
+        return "Exploratory: based on transcript structure only. Validate with retention after publishing.";
+      }
+
+      function makeFeedbackFinding(kind, clip) {
+        const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)}`;
+        const strongestSignal = Object.entries(clip.signals || {})
+          .sort((a, b) => b[1] - a[1])[0]?.[0] || "clarity";
+        const opening = clip.text.split(/[.!?]/)[0].trim();
+        const actionLead = opening ? `Lead with “${opening.slice(0, 92)}${opening.length > 92 ? "..." : ""}”` : "Lead with the clearest claim";
+
+        if (kind === "tighten") {
+          return {
+            kind: "TIGHTEN",
+            className: "",
+            title: `Reduce friction around ${label}`,
+            observed: `Transcript pacing is ${clip.signals.pacing}/100, the weakest signal in this passage. This is a content-structure observation, not a retention measurement.`,
+            inferred: "The density may make the point harder to follow at full viewing speed, especially if this passage follows another setup section.",
+            recommended: `${actionLead}, then remove any repeated setup before the next concrete example. Re-check this edit against retention once analytics are connected.`,
+            confidence: getTranscriptConfidence(clip),
+          };
+        }
+
+        if (kind === "promote") {
+          return {
+            kind: "PROMOTE",
+            className: "preserve",
+            title: `Test this as the opening promise at ${label}`,
+            observed: `The opening has a ${clip.signals.hook}/100 hook signal and ${clip.signals.clarity}/100 clarity signal from its language and sentence structure.`,
+            inferred: "This is a plausible promise-first opening because it combines a clear claim with curiosity or payoff language.",
+            recommended: `${actionLead}, then move the explanation after the audience understands the payoff. Compare first-30-second retention against your usual format.`,
+            confidence: getTranscriptConfidence(clip),
+          };
+        }
+
+        return {
+          kind: "PRESERVE",
+          className: "preserve",
+          title: `Keep the pattern in ${label}`,
+          observed: `This is the strongest transcript segment at ${clip.score}/100. Its leading signal is ${strongestSignal} (${clip.signals[strongestSignal]}/100).`,
+          inferred: "The passage has the ingredients of a strong clip or payoff moment, but transcript evidence alone cannot confirm viewer replays or retention.",
+          recommended: `${actionLead}. Keep the phrasing intact in a cut, and reuse this promise-to-payoff pattern in a future script or Short.`,
+          confidence: getTranscriptConfidence(clip),
+        };
+      }
+
       function renderClipCards(clips) {
         if (!clips.length) {
-          el.clipCards.innerHTML = "<p class=\"muted\">Run analysis to generate clips.</p>";
+          el.clipCards.innerHTML = "<p class=\"muted\">Run analysis to build your first editing decision queue.</p>";
+          el.feedbackQuality.innerHTML = "<strong>Data quality: awaiting source</strong><p>Analyze a transcript to receive structural editing guidance. Connect analytics in a future version for behavior-backed diagnosis.</p>";
           return;
         }
-        const top = clips.slice(0, 6);
-        el.clipCards.innerHTML = top
-          .map((clip) => {
-            const label = `${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.duration}s)`;
-            const meter = `<div class=\"meter\"><div class=\"meter-fill\" style=\"width: ${clip.score}%\"></div></div>`;
+        const normalizedClips = clips.map((clip, index) => ({
+          ...clip,
+          sourceIndex: Number.isFinite(Number(clip.sourceIndex)) ? Number(clip.sourceIndex) : index,
+        }));
+        const strongest = normalizedClips[0];
+        const opening = normalizedClips.find((clip) => clip.sourceIndex === 0) || strongest;
+        const promoteClip = opening.sourceIndex !== strongest.sourceIndex
+          ? opening
+          : normalizedClips.find((clip) => clip.sourceIndex !== strongest.sourceIndex) || strongest;
+        const pacingRisk = [...normalizedClips]
+          .filter((clip) => clip.sourceIndex !== strongest.sourceIndex && clip.sourceIndex !== promoteClip.sourceIndex)
+          .sort((a, b) => a.signals.pacing - b.signals.pacing)[0] || clips[1] || strongest;
+        const findings = [
+          makeFeedbackFinding("preserve", strongest),
+          makeFeedbackFinding("promote", promoteClip),
+          makeFeedbackFinding("tighten", pacingRisk),
+        ];
+        const findingClips = [strongest, promoteClip, pacingRisk];
+        el.feedbackQuality.innerHTML = `<strong>Data quality: transcript-only</strong><p>${normalizedClips.length} passages scored for structure. Retention, CTR, comments, and channel baselines are not connected, so recommendations remain testable hypotheses.</p>`;
+        el.clipCards.innerHTML = findings
+          .map((finding, index) => {
+            const clip = findingClips[index];
             return `
-              <div class="clip-card">
+              <article class="clip-card feedback-card ${finding.className}">
                 <div class="clip-top">
-                  <span class="clip-segment">${label}</span>
+                  <span class="feedback-kicker">${finding.kind} | ${formatDuration(clip.start)}-${formatDuration(clip.end)}</span>
                   <span class="clip-score">${clip.score} / 100</span>
                 </div>
-                ${meter}
-                <ul class="reason-list">
-                  ${clip.reasons.map((reason) => `<li>${reason}</li>`).join("")}
-                </ul>
-              </div>
+                <h3 class="feedback-title">${escapeFeedbackHtml(finding.title)}</h3>
+                <div class="evidence-grid">
+                  <div class="evidence-cell"><span>Observed</span><p>${escapeFeedbackHtml(finding.observed)}</p></div>
+                  <div class="evidence-cell"><span>Interpretation</span><p>${escapeFeedbackHtml(finding.inferred)}</p></div>
+                  <div class="evidence-cell"><span>Next edit</span><p>${escapeFeedbackHtml(finding.recommended)}</p></div>
+                </div>
+                <div class="feedback-footer">
+                  <span class="confidence-note">${escapeFeedbackHtml(finding.confidence)}</span>
+                  <button class="small-btn review-source" type="button" data-review-source="${clip.sourceIndex}">Review source</button>
+                </div>
+              </article>
             `;
           })
           .join("");
+      }
+
+      function reviewFeedbackSource(sourceIndex) {
+        const project = getCurrentProject();
+        const clip = (project?.clips || []).find((item) => Number(item.sourceIndex) === Number(sourceIndex)) || (project?.clips || [])[Number(sourceIndex)];
+        if (!clip || !el.transcript.value) {
+          return;
+        }
+        switchTab("inputs");
+        const start = el.transcript.value.indexOf(clip.text);
+        if (start >= 0) {
+          el.transcript.focus();
+          el.transcript.setSelectionRange(start, start + clip.text.length);
+        }
+        el.parseStatus.textContent = `Reviewing source for ${formatDuration(clip.start)}-${formatDuration(clip.end)}. The relevant passage is highlighted below.`;
       }
 
       function renderQualityNarrative(project) {
@@ -3853,9 +4078,9 @@
         el.sourceType.value = "text";
         el.profile.value = "shorts";
         el.transcript.value = DEMO_TRANSCRIPT;
-        el.parseStatus.textContent = "Demo loaded. Starting analysis now.";
-        el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
-        el.ingestStatus.textContent = "Demo flow running: inputs \u2192 analysis \u2192 suggestions \u2192 export.";
+        el.parseStatus.textContent = "Live demo loaded with sample transcript. Running the full workflow now.";
+        el.parseMetrics.textContent = "Auto-loading, analyzing, then building SEO recommendations.";
+        el.ingestStatus.textContent = "Demo flow: Inputs -> Analysis -> Suggestions -> Export.";
         setDemoButtonState(true);
         el.demoState.textContent = "RUNNING";
         persistProject();
@@ -3880,7 +4105,8 @@
           addHandoffActivity(project, "run-demo-workflow");
           switchTab("export");
           el.demoState.textContent = "DONE";
-          el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
+          el.parseStatus.textContent = "Demo complete. Open Export to review the judge-ready score summary and download handoff artifacts.";
+          el.workflowHint.textContent = "Great: demo session is complete and ready for copy or download.";
         } catch (error) {
           const message = error?.message || "Demo flow did not complete. Please try again.";
           const failedPacket = makeLiveDemoPacket(project, {
@@ -4088,6 +4314,12 @@
       });
 
       el.runButton.addEventListener("click", runAnalysis);
+      el.clipCards.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-review-source]");
+        if (button) {
+          reviewFeedbackSource(button.dataset.reviewSource);
+        }
+      });
       el.seoGenerate.addEventListener("click", regenerateSeoPack);
       el.demoButton.addEventListener("click", runDemoFlow);
       el.copyJudgeScorecard.addEventListener("click", async () => {
@@ -4307,6 +4539,7 @@
     </script>
   </body>
 </html>
+
 
 
 
