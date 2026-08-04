@@ -416,6 +416,10 @@
         animation: buttonWorking 900ms infinite linear;
       }
 
+      .btn.working {
+        animation: buttonWorking 900ms infinite linear;
+      }
+
       .small-btn[disabled] {
         opacity: 0.58;
         cursor: not-allowed;
@@ -3257,16 +3261,23 @@
         el.runButton.textContent = isRunning ? "Analyzing..." : "Run analysis";
       }
 
+      function setDemoButtonState(isRunning) {
+        el.demoButton.disabled = isRunning;
+        el.demoButton.classList.toggle("working", isRunning);
+        el.demoButton.textContent = isRunning ? "Running live demo workflow..." : "Run live demo workflow";
+        el.demoState.textContent = isRunning ? "Running" : "Idle";
+      }
+
       function runAnalysis() {
         const project = ensureProject();
         if (!project.transcript && !project.segments.length) {
           setIngestError("No transcript or file loaded yet.");
-          return;
+          return false;
         }
         const rawText = el.transcript.value || project.transcript || "";
         if (!rawText.trim()) {
           setIngestError("No content found in transcript.");
-          return;
+          return false;
         }
         state.analyzing = true;
         setRunButtonState(true);
@@ -3283,13 +3294,13 @@
             if (!segments.length) {
               setIngestError("Could not generate valid segments from current input.");
               finishAnalysis();
-              return;
+              return false;
             }
             project.segments = segments;
           } catch (error) {
             setIngestError(error.message || "Input parser failed.");
             finishAnalysis();
-            return;
+            return false;
           }
         }
         try {
@@ -3313,13 +3324,18 @@
           renderIngestPanels(project);
           finishAnalysis();
           switchTab("suggestions");
+          return true;
         } catch {
           setIngestError("Analysis failed. Please re-run or edit source text and try again.");
           finishAnalysis();
+          return false;
         }
       }
 
       function runDemoFlow() {
+        if (state.analyzing || el.demoButton.disabled) {
+          return;
+        }
         const project = ensureProject();
         project.name = "DropFix Judge Demo";
         project.sourceType = "text";
@@ -3333,14 +3349,21 @@
         el.parseStatus.textContent = "Demo loaded. Starting analysis now.";
         el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
         el.ingestStatus.textContent = "Demo flow running: inputs → analysis → suggestions → export.";
+        setDemoButtonState(true);
         el.demoState.textContent = "Running";
         renderIngestPanels(project);
         persistProject();
         switchTab("analysis");
-        runAnalysis();
-        switchTab("suggestions");
-        el.demoState.textContent = "Done";
-        el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
+        const demoResult = runAnalysis();
+        if (demoResult) {
+          switchTab("suggestions");
+          el.demoState.textContent = "Done";
+          el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
+        } else {
+          el.demoState.textContent = "Idle";
+          el.parseStatus.textContent = "Demo flow did not complete. Please try again.";
+        }
+        setDemoButtonState(false);
       }
 
       function ensureProject() {
