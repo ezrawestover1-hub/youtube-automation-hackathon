@@ -369,7 +369,7 @@
         color: var(--text-primary);
         border-radius: var(--radius-md);
         min-height: var(--control-height-xs);
-        padding: 0 var(--space-md);
+        padding: 0.52rem 0.82rem;
         font-weight: 700;
         font-size: var(--text-sm);
         display: inline-flex;
@@ -410,6 +410,11 @@
         background: rgba(255, 255, 255, 0.02);
         border-color: rgba(255, 255, 255, 0.12);
         color: var(--text-primary);
+      }
+
+      .small-btn.ghost {
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.02);
       }
 
       .small-btn.working {
@@ -947,6 +952,11 @@
         flex-wrap: wrap;
         gap: var(--space-xs);
         margin: var(--space-sm) 0;
+        align-items: stretch;
+      }
+
+      .input-actions .small-btn {
+        min-height: 44px;
       }
 
       .field-toggle {
@@ -957,10 +967,25 @@
         font-size: var(--text-sm);
         color: #dce6f6;
         font-weight: 600;
+        padding: 0.42rem 0.5rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.03);
       }
 
       .file-upload {
         margin: 0;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .file-upload .file-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
         cursor: pointer;
       }
 
@@ -1000,16 +1025,19 @@
       textarea {
         width: 100%;
         border: 1px solid var(--control-border);
-        border-radius: var(--radius-md);
-        background: var(--control-bg);
+        background:
+          linear-gradient(180deg, rgba(13, 20, 29, 0.97), rgba(8, 13, 20, 0.94));
         color: var(--text-primary);
+        font-size: 0.93rem;
+        font-family: inherit;
+        border-radius: var(--radius-md);
         transition:
           border-color var(--duration-fast) var(--motion-snappy),
           box-shadow var(--duration-fast) var(--motion-snappy),
           transform var(--duration-fast) var(--motion-snappy);
         line-height: 1.45;
         min-height: var(--control-height-sm);
-        padding: 0.66rem 0.75rem;
+        padding: 0.72rem 0.82rem;
       }
 
       textarea {
@@ -1040,6 +1068,11 @@
           0 0 0 4px var(--focus-ring),
           0 10px 24px rgba(255, 0, 0, 0.16);
         transform: translateY(-1px);
+      }
+
+      input::placeholder,
+      textarea::placeholder {
+        color: #8893a4;
       }
 
       :where(button, [role="button"], input, select, textarea):focus-visible {
@@ -1110,8 +1143,8 @@
         position: relative;
         -webkit-appearance: none;
         appearance: none;
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         border: 2px solid var(--control-border);
         border-radius: 6px;
         background: #0d1425;
@@ -1157,6 +1190,38 @@
         margin: 0.35rem 0 0;
         font-size: 0.84rem;
         color: var(--text-muted);
+      }
+
+      .input-guide {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-left: 4px solid var(--yt-red);
+        border-radius: var(--radius-md);
+        padding: 0.7rem 0.75rem;
+        margin-bottom: 0.52rem;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .input-guide-title {
+        margin: 0 0 0.4rem;
+        font-size: 0.93rem;
+        color: #f2f6ff;
+        font-weight: 800;
+      }
+
+      .guide-list {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.45;
+        font-size: 0.84rem;
+      }
+
+      .guide-list li {
+        margin-bottom: 0.34rem;
+      }
+
+      .guide-list li strong {
+        color: #ecf2ff;
       }
 
       .muted {
@@ -1662,6 +1727,18 @@
             <section class="tab-panel active" id="inputs">
               <div class="two-col">
                 <article class="input-grid">
+                  <div class="input-guide">
+                    <p class="input-guide-title">New to DropFix? Do this first:</p>
+                    <ol class="guide-list">
+                      <li><strong>Pick your creator profile</strong> so scoring maps to your format.</li>
+                      <li><strong>Paste transcript text</strong> or use <strong>Upload file</strong>.</li>
+                      <li><strong>Run analysis</strong> to generate clips, confidence, and metadata-ready signals.</li>
+                    </ol>
+                    <p class="helper" style="margin: 0.28rem 0 0;">
+                      Tip: if you want a quick first run, click <strong>Load sample</strong>.
+                    </p>
+                  </div>
+
                   <label class="workspace-label" for="profile">Creator profile</label>
                   <select id="profile">
                     <option value="standard">Standard Creator</option>
@@ -1681,33 +1758,33 @@
                   <p class="helper">URL mode now gives transcript-ready fallback guidance until YouTube API integration is connected.</p>
 
                   <label class="workspace-label" for="transcript">Transcript content</label>
-                  <textarea id="transcript"></textarea>
+                  <textarea id="transcript" placeholder="Paste transcript or subtitle text here to begin."></textarea>
 
                   <div class="input-actions">
-                    <button id="run-analysis" class="small-btn" type="button">Run analysis</button>
-                    <button id="load-sample" class="small-btn" type="button">Load sample</button>
-                    <label class="small-btn file-upload" style="margin:0; cursor:pointer;">
-                      <input id="file-input" type="file" accept=".txt,.srt,.vtt,.csv" style="display:none" />
+                    <button id="run-analysis" class="small-btn primary" type="button">Run analysis</button>
+                    <button id="load-sample" class="small-btn subtle" type="button">Load sample</button>
+                    <label class="small-btn file-upload subtle">
+                      <input id="file-input" class="file-input" type="file" accept=".txt,.srt,.vtt,.csv" />
                       Upload file
                     </label>
-                    <button id="clear-input" class="small-btn" type="button">Clear</button>
+                    <button id="clear-input" class="small-btn ghost" type="button">Clear</button>
                   </div>
                   <label class="field-toggle">
                     <input id="auto-clean" type="checkbox" checked />
                     Auto-clean transcript (remove filler words)
                   </label>
-                  <p class="helper" id="parse-status">Drop your script/thumbnail brief file or paste transcript.</p>
+                  <p class="helper" id="parse-status">Paste transcript text, upload a file, or use sample. Then click Run analysis.</p>
                   <div class="analysis-notice" id="parse-metrics">
                     No parsed segments yet. Use <strong>Run analysis</strong> after loading text.
                   </div>
                 </article>
 
                 <article>
-                  <label class="workspace-label" for="dropzone">Drag and drop</label>
+                  <label class="workspace-label" for="dropzone">Need file upload instead?</label>
                   <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop transcript file">
                     <div>
                       <p style="margin: 0 0 0.35rem"><strong>Drop .txt, .srt, .vtt, or .csv</strong></p>
-                      <p class="helper" style="margin: 0">Supports timeline parsing and segment extraction.</p>
+                      <p class="helper" style="margin: 0">Drop in your subtitle file and we'll auto-extract timing + segment boundaries.</p>
                     </div>
                   </div>
                   <div class="summary-grid">
@@ -2405,28 +2482,28 @@
         export: "Export"
       };
       const WORKFLOW_HINTS = {
-        inputs: "Upload text or drag-and-drop a subtitle transcript, then run Analyze to score every segment.",
-        analysis: "Tune your scoring profile and rerun if needed to prioritize best clips.",
-        suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
-        export: "Copy or download the summary package and move straight into your YouTube publishing flow."
+        inputs: "New creator path: pick profile, then add transcript (paste, upload, or drop), then click Run analysis.",
+        analysis: "Tune your scoring profile and rerun if needed to prioritize your best clips.",
+        suggestions: "Review ranked clips, then generate metadata packs that match your selected tone.",
+        export: "Copy or download the export package and move directly into your publishing handoff."
       };
       const WORKFLOW_STEP_HINTS = {
-        inputs: "Inputs is available. Paste text, upload a transcript, or run sample.",
-        analysis: "Load/enter transcript and run Analyze to unlock Analysis.",
-        suggestions: "Run analysis to unlock Suggestions and clip ranking-based recommendations.",
-        export: "Generate SEO in Suggestions to unlock Export actions."
+        inputs: "Inputs is available. Paste text, upload a transcript, or use sample to complete your first run.",
+        analysis: "Run analysis now to unlock clip scoring and confidence indicators.",
+        suggestions: "Use analysis outputs to choose clips and generate metadata.",
+        export: "Generate SEO in Suggestions to unlock export actions."
       };
       const WORKFLOW_LOCK_HINTS = {
         inputs: "",
-        analysis: "Add text or file, then run Analyze to unlock Analysis.",
-        suggestions: "Run Analysis first to unlock Suggestions.",
+        analysis: "Add text or upload a file, then click Run analysis to unlock Analysis.",
+        suggestions: "Run analysis first to unlock Suggestions.",
         export: "Generate SEO packs in Suggestions to unlock Export."
       };
       const WORKFLOW_STEP_ORDER = ["inputs", "analysis", "suggestions", "export"];
       const WORKFLOW_LOCK_HINTS_BUBBLE = {
         inputs: "",
         analysis: "Complete Inputs before moving to Analysis.",
-        suggestions: "Run Analysis first so clips and metadata can be generated.",
+        suggestions: "Run analysis first so clips and metadata can be generated.",
         export: "Generate SEO in Suggestions before exporting."
       };
 
@@ -4004,9 +4081,9 @@
 
       el.sourceType.addEventListener("change", () => {
         if (el.sourceType.value === "url") {
-          el.parseStatus.textContent = "URL mode: paste transcript in textarea for now or use an exported subtitle file.";
+          el.parseStatus.textContent = "URL mode: paste transcript text now, then click Run analysis. Subtitle upload will be enabled with API integration.";
         } else {
-          el.parseStatus.textContent = "Choose file or paste text matching selected format.";
+          el.parseStatus.textContent = "Choose a matching file or paste transcript text, then click Run analysis.";
         }
       });
 
