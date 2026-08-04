@@ -2545,6 +2545,177 @@
           width: 100%;
         }
       }
+      /* Stronger composition: replace the prototype dashboard stack with one studio canvas. */
+      .workspace-shell {
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+        margin-top: 1.25rem;
+      }
+
+      .workspace-shell > aside.card {
+        display: grid;
+        grid-template-columns: auto auto minmax(0, 1fr);
+        align-items: center;
+        gap: 0.9rem;
+        padding: 0.62rem 0.78rem;
+        border-radius: 15px;
+        background: rgba(17,17,17,0.8);
+      }
+
+      .workspace-shell > aside .panel-title {
+        margin: 0;
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9c9c98;
+      }
+
+      .workspace-shell > aside .workspace-actions {
+        display: flex;
+        gap: 0.35rem;
+      }
+
+      .workspace-shell > aside .workspace-actions .small-btn {
+        min-height: 34px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.72rem;
+      }
+
+      .workspace-shell > aside #project-count {
+        display: none;
+      }
+
+      .workspace-shell > aside .projects {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.38rem;
+        min-width: 0;
+        margin: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .workspace-shell > aside .projects::-webkit-scrollbar {
+        display: none;
+      }
+
+      .workspace-main {
+        padding: clamp(1rem, 2.1vw, 1.75rem);
+        border-radius: 24px;
+        background: #101010;
+        box-shadow: 0 24px 70px rgba(0,0,0,0.2);
+      }
+
+      .workspace-main > div:first-child {
+        display: grid;
+        grid-template-columns: minmax(150px, 0.52fr) minmax(0, 1.48fr);
+        column-gap: 1.3rem;
+        align-items: center;
+      }
+
+      .workspace-main > div:first-child .panel-title {
+        margin: 0;
+        font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+      }
+
+      .workflow-strip {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 0;
+      }
+
+      .workspace-next-step {
+        grid-column: 1 / -1;
+        margin-top: 0.85rem;
+        border-left: 0;
+        border-radius: 12px;
+        background: linear-gradient(90deg, rgba(255,24,48,0.1), rgba(255,255,255,0.025) 46%);
+        box-shadow: inset 3px 0 0 var(--studio-red);
+      }
+
+      .panels {
+        margin-top: 1.3rem;
+        padding-top: 1.3rem;
+        border-top: 1px solid rgba(255,255,255,0.09);
+      }
+
+      .two-col {
+        gap: 1rem;
+      }
+
+      #inputs .input-grid {
+        padding: clamp(0.9rem, 1.7vw, 1.25rem);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.038), rgba(255,255,255,0.014));
+      }
+
+      #inputs textarea {
+        min-height: 250px;
+        font-size: 0.98rem;
+        line-height: 1.65;
+      }
+
+      #inputs .input-actions {
+        margin-top: 0.15rem;
+        padding: 0.65rem 0 0;
+        border-top: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .input-actions #run-analysis {
+        min-width: 250px;
+        background: linear-gradient(135deg, #ff1830 0%, #e30d26 100%);
+      }
+
+      .input-actions #run-analysis::after {
+        content: "→";
+        margin-left: 0.35rem;
+        font-size: 1rem;
+      }
+
+      .tab-panel > h3:first-child,
+      .tab-panel > .panel-title:first-child {
+        font-size: clamp(1.35rem, 2vw, 1.75rem);
+      }
+
+      @media (max-width: 980px) {
+        .workspace-shell > aside.card {
+          grid-template-columns: 1fr auto;
+          gap: 0.55rem;
+        }
+
+        .workspace-shell > aside .projects {
+          grid-column: 1 / -1;
+          justify-content: flex-start;
+          padding-top: 0.15rem;
+        }
+
+        .workspace-main > div:first-child {
+          display: block;
+        }
+
+        .workspace-main > div:first-child .panel-title {
+          margin-bottom: 0.75rem;
+        }
+
+        .workflow-strip {
+          margin: 0;
+        }
+
+        .workspace-next-step {
+          margin-top: 0.7rem;
+        }
+
+        #inputs .input-grid {
+          padding: 0.78rem;
+          border-radius: 14px;
+        }
+
+        #inputs textarea {
+          min-height: 210px;
+        }
+      }
     </style>
   </head>
   <body>
