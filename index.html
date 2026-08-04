@@ -989,6 +989,306 @@
         cursor: pointer;
       }
 
+      .evidence-status {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.65rem;
+        align-items: start;
+        margin-top: 0.72rem;
+        padding: 0.68rem 0.72rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.022);
+      }
+
+      .evidence-state {
+        color: #ffd0d0;
+        background: rgba(255, 0, 0, 0.12);
+        border: 1px solid rgba(255, 0, 0, 0.25);
+        border-radius: 999px;
+        padding: 0.18rem 0.46rem;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .evidence-status p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.84rem;
+        line-height: 1.45;
+      }
+
+      .evidence-timeline {
+        margin: 0.25rem 0 1rem;
+        padding: 0.85rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 0, 0, 0.025));
+      }
+
+      .timeline-heading,
+      .timeline-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: baseline;
+      }
+
+      .timeline-heading strong {
+        color: var(--text-strong);
+      }
+
+      .timeline-heading span,
+      .timeline-meta {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .retention-plot {
+        width: 100%;
+        height: 156px;
+        display: block;
+        margin: 0.58rem 0 0.42rem;
+        border-radius: 9px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .timeline-rail {
+        position: relative;
+        min-height: 54px;
+        margin-top: 0.72rem;
+        border-top: 1px solid var(--line);
+      }
+
+      .timeline-segment {
+        position: absolute;
+        top: 0.5rem;
+        left: var(--start);
+        width: max(var(--span), 76px);
+        max-width: calc(100% - var(--start));
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: left;
+        padding: 0.32rem 0.42rem;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-size: 0.72rem;
+        cursor: pointer;
+      }
+
+      .timeline-segment:hover {
+        border-color: rgba(255, 0, 0, 0.5);
+        background: rgba(255, 0, 0, 0.08);
+      }
+
+      .timeline-empty {
+        margin: 0.58rem 0 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+        line-height: 1.45;
+      }
+
+      .signal-list {
+        display: grid;
+        gap: 0.55rem;
+        margin: 0.65rem 0 1rem;
+      }
+
+      .signal-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.7rem;
+        align-items: center;
+        padding: 0.7rem;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--red);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.022);
+      }
+
+      .signal-card.spike {
+        border-left-color: var(--green-deep);
+      }
+
+      .signal-card.check {
+        border-left-color: #f6c65b;
+      }
+
+      .signal-card strong,
+      .signal-card p {
+        margin: 0;
+      }
+
+      .signal-card strong {
+        color: var(--text-strong);
+        font-size: 0.9rem;
+      }
+
+      .signal-card p {
+        margin-top: 0.2rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+        line-height: 1.42;
+      }
+
+      .recommendation-card {
+        border-left-width: 4px;
+      }
+
+      .recommendation-card.top-priority {
+        border-color: rgba(255, 0, 0, 0.45);
+        box-shadow: 0 10px 24px rgba(255, 0, 0, 0.08);
+      }
+
+      .recommendation-summary {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        align-items: center;
+        margin: 0.55rem 0 0.2rem;
+      }
+
+      .recommendation-summary p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .assessment-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.38rem;
+        margin-top: 0.65rem;
+      }
+
+      .assessment-grid span {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.32rem 0.42rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        font-size: 0.72rem;
+      }
+
+      .assessment-grid b {
+        color: var(--text-strong);
+      }
+
+      .recommendation-details {
+        margin-top: 0.68rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .recommendation-details summary {
+        cursor: pointer;
+        color: var(--text);
+      }
+
+      .decision-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.38rem;
+        margin-top: 0.55rem;
+      }
+
+      .decision-actions .small-btn.is-selected {
+        border-color: rgba(255, 0, 0, 0.65);
+        background: rgba(255, 0, 0, 0.14);
+        color: #fff;
+      }
+
+      .demo-guide {
+        margin: 0.2rem 0 0.85rem;
+        padding: 0.72rem;
+        border: 1px solid rgba(255, 0, 0, 0.28);
+        border-radius: var(--radius-md);
+        background: rgba(255, 0, 0, 0.06);
+      }
+
+      .demo-guide strong { color: var(--text-strong); }
+
+      .demo-guide p {
+        margin: 0.28rem 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .demo-walkthrough {
+        margin: 0.75rem 0;
+        padding: 0.76rem;
+        border: 1px solid rgba(255, 0, 0, 0.34);
+        border-radius: var(--radius-md);
+        background: linear-gradient(120deg, rgba(255, 0, 0, 0.11), rgba(255, 255, 255, 0.025));
+      }
+
+      .demo-walkthrough strong {
+        color: var(--text-strong);
+      }
+
+      .demo-walkthrough p {
+        margin: 0.24rem 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+        line-height: 1.42;
+      }
+
+      .demo-step-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.45rem;
+        margin-top: 0.66rem;
+      }
+
+      .demo-step-button {
+        min-height: 68px;
+        padding: 0.5rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .demo-step-button:hover,
+      .demo-step-button.active {
+        border-color: rgba(255, 0, 0, 0.58);
+        background: rgba(255, 0, 0, 0.1);
+      }
+
+      .demo-step-button span {
+        display: block;
+        color: #ffd0d0;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+
+      .demo-step-button b {
+        display: block;
+        margin-top: 0.16rem;
+        font-size: 0.83rem;
+      }
+
+      @media (max-width: 640px) {
+        .demo-step-row { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 640px) {
+        .assessment-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .input-grid {
         display: grid;
         gap: 0.68rem;
@@ -1861,12 +2161,22 @@
                     <option value="longwatch">Longwatch + Story Arc</option>
                   </select>
 
+                  <label class="workspace-label" for="creator-goal">Primary goal</label>
+                  <select id="creator-goal">
+                    <option value="watch-time">Maximize watch time</option>
+                    <option value="education">Teach more clearly</option>
+                    <option value="conversion">Improve conversion</option>
+                    <option value="sponsor">Protect sponsor requirements</option>
+                    <option value="community">Build audience community</option>
+                  </select>
+
                   <label class="workspace-label" for="source-type">Input mode</label>
                   <select id="source-type">
                     <option value="text">Paste / type transcript</option>
                     <option value="srt">SRT file</option>
                     <option value="vtt">VTT file</option>
-                    <option value="csv">CSV file</option>
+                    <option value="csv">Transcript CSV</option>
+                    <option value="studio-csv">YouTube Studio CSV</option>
                     <option value="url">YouTube URL (preview)</option>
                   </select>
                   <p class="helper">URL mode now gives transcript-ready fallback guidance until YouTube API integration is connected.</p>
@@ -1876,12 +2186,17 @@
 
                   <div class="input-actions">
                     <button id="run-analysis" class="small-btn primary" type="button">Run analysis</button>
-                    <button id="load-sample" class="small-btn subtle" type="button">Load sample</button>
+                    <button id="load-sample" class="small-btn subtle" type="button">Load transcript sample</button>
+                    <button id="load-studio-sample" class="small-btn subtle" type="button">Load full demo data</button>
                     <label class="small-btn file-upload subtle">
                       <input id="file-input" class="file-input" type="file" accept=".txt,.srt,.vtt,.csv" />
-                      Upload file
+                      Upload selected source
                     </label>
                     <button id="clear-input" class="small-btn ghost" type="button">Clear</button>
+                  </div>
+                  <div class="evidence-status" role="status" aria-live="polite">
+                    <span class="evidence-state" id="evidence-state">Transcript</span>
+                    <p id="evidence-detail">Transcript guidance is ready. Import a YouTube Studio CSV to add real retention and packaging evidence to this project.</p>
                   </div>
                   <label class="field-toggle">
                     <input id="auto-clean" type="checkbox" checked />
@@ -1923,6 +2238,16 @@
 
             <section class="tab-panel" id="analysis">
               <div class="analysis">
+                <label class="workspace-label">Evidence timeline</label>
+                <div class="evidence-timeline" id="evidence-timeline">
+                  <div class="timeline-heading"><strong>Waiting for evidence</strong><span>Import Studio data in Inputs</span></div>
+                  <p class="timeline-empty">Upload a matching transcript and YouTube Studio CSV to place content and viewing evidence on one timeline.</p>
+                </div>
+                <label class="workspace-label">Detected behavior signals</label>
+                <div class="signal-list" id="signal-list">
+                  <p class="muted">Analyze a transcript with Studio evidence to detect timestamped signals.</p>
+                </div>
+                <div class="demo-guide" id="demo-guide" hidden></div>
                 <label class="workspace-label">Scoring mode presets</label>
                 <div class="preset-row">
                   <button class="small-btn" data-preset="balanced" type="button">Balanced (default)</button>
@@ -1990,6 +2315,7 @@
             <p>Useful for structure and clip selection. Retention and CTR evidence are not connected in this browser demo.</p>
           </div>
         </div>
+        <div class="demo-walkthrough" id="demo-walkthrough" hidden></div>
         <div id="clip-cards" class="clip-list">
           <p class="muted">Run analysis to build your first editing decision queue.</p>
         </div>
@@ -2080,6 +2406,7 @@
                       <button id="copy-judge-handoff" class="small-btn primary" type="button">Copy judge handoff bundle</button>
                       <button id="download-json" class="small-btn subtle" type="button">Download JSON</button>
                       <button id="download-summary" class="small-btn subtle" type="button">Download summary</button>
+                      <button id="download-editor-brief" class="small-btn primary" type="button">Download editor brief</button>
                       <button id="download-judge-packet" class="small-btn subtle" type="button">Download judge packet</button>
                     </div>
                     <div class="export-box">
@@ -2306,6 +2633,7 @@
         flowSteps: Array.from(document.querySelectorAll(".flow-step")),
         profile: document.getElementById("profile"),
         profileQuick: document.getElementById("profile-quick"),
+        creatorGoal: document.getElementById("creator-goal"),
         sourceType: document.getElementById("source-type"),
         transcript: document.getElementById("transcript"),
         parseStatus: document.getElementById("parse-status"),
@@ -2316,11 +2644,18 @@
         ingestStatus: document.getElementById("ingest-status"),
         runButton: document.getElementById("run-analysis"),
         loadSample: document.getElementById("load-sample"),
+        loadStudioSample: document.getElementById("load-studio-sample"),
         fileInput: document.getElementById("file-input"),
         dropzone: document.getElementById("dropzone"),
         autoClean: document.getElementById("auto-clean"),
         clipCards: document.getElementById("clip-cards"),
         feedbackQuality: document.getElementById("feedback-quality"),
+        evidenceState: document.getElementById("evidence-state"),
+        evidenceDetail: document.getElementById("evidence-detail"),
+        evidenceTimeline: document.getElementById("evidence-timeline"),
+        signalList: document.getElementById("signal-list"),
+        demoGuide: document.getElementById("demo-guide"),
+        demoWalkthrough: document.getElementById("demo-walkthrough"),
         metadataCloud: document.getElementById("metadata-cloud"),
         metadataNote: document.getElementById("metadata-note"),
         seoTone: document.getElementById("seo-tone"),
@@ -2358,6 +2693,7 @@
         copySession: document.getElementById("copy-session"),
         downloadJson: document.getElementById("download-json"),
         downloadSummary: document.getElementById("download-summary"),
+        downloadEditorBrief: document.getElementById("download-editor-brief"),
         downloadJudgeCsv: document.getElementById("download-judge-csv"),
         downloadJudgePacket: document.getElementById("download-judge-packet"),
         exportHandoffStatus: document.getElementById("export-handoff-status"),
@@ -2594,6 +2930,7 @@
           "download-judge-csv": "Downloaded judge CSV row",
           "copy-metadata-json": "Copied metadata JSON",
           "download-summary": "Downloaded summary",
+          "download-editor-brief": "Downloaded editor brief",
           "download-json": "Downloaded project JSON",
           "copy-session": "Copied full session",
         };
@@ -3308,6 +3645,7 @@
         state.currentId = project.id;
         el.projectTitle.textContent = project.name;
         el.profile.value = project.profile || "standard";
+        el.creatorGoal.value = project.goal || "watch-time";
         el.sourceType.value = project.sourceType || "text";
         el.transcript.value = project.transcript || "";
         if (project.metadata?.seo?.tone && el.seoTone) {
@@ -3578,7 +3916,7 @@
         const hasClipOutput = (safeProject.clips || []).length > 0;
         const handoffReady = hasAnalyzed && hasSeoOutput;
         const readyForBasic = hasAnalyzed;
-        [el.copyMetadata, el.copySession, el.downloadJson, el.downloadSummary].forEach((button) => {
+        [el.copyMetadata, el.copySession, el.downloadJson, el.downloadSummary, el.downloadEditorBrief].forEach((button) => {
           if (button) {
             button.disabled = !readyForBasic;
           }
@@ -3642,6 +3980,11 @@
       }
 
       function renderIngestPanels(project) {
+        renderEvidenceStatus(project);
+        renderEvidenceTimeline(project);
+        renderEvidenceFindings(project);
+        renderDemoGuide(project);
+        renderDemoWalkthrough(project);
         const warnings = project.warnings || [];
         el.parseWarnings.innerHTML = warnings
           .map((warning) => `<li>${warning}</li>`)
@@ -3715,7 +4058,7 @@
         el.judgeScorecardStatus.textContent = project.status === "analyzed"
           ? "Judge-ready summary is ready. Copy for judge review."
           : "Run analysis to generate a judge-ready scorecard.";
-        renderClipCards(project.clips || []);
+        renderClipCards(project);
         renderQualityNarrative(project);
         renderHandoffActivity(project);
         updateBadges();
@@ -3779,12 +4122,123 @@
         };
       }
 
-      function renderClipCards(clips) {
+      const RECOMMENDATION_MIN_SCORE = 26;
+      const RECOMMENDATION_TOP_SCORE = 32;
+      const RECOMMENDATION_DIMENSIONS = [
+        ["Evidence", "evidenceQuality"],
+        ["Specificity", "specificity"],
+        ["Actionability", "actionability"],
+        ["Goal alignment", "goalAlignment"],
+        ["Confidence", "confidenceCalibration"],
+        ["Usefulness", "expectedUsefulness"],
+        ["Novelty", "novelty"],
+        ["Validation", "validationQuality"],
+      ];
+
+      function getCreatorGoal(project) {
+        return project?.goal || el.creatorGoal?.value || "watch-time";
+      }
+
+      function getGoalLabel(goal) {
+        return {
+          "watch-time": "maximize watch time",
+          education: "teach more clearly",
+          conversion: "improve conversion",
+          sponsor: "protect sponsor requirements",
+          community: "build audience community",
+        }[goal] || "support the creator's goal";
+      }
+
+      function getActionForFinding(finding, goal) {
+        if (finding.type === "spike") return "Preserve this passage in the cut, surface its payoff earlier in the script, and test whether it can become a standalone Short or repeatable series pattern.";
+        if (goal === "education") return "Open this section with the conclusion or worked example, then compress the setup into one bridging sentence before teaching the detail.";
+        if (goal === "conversion") return "State the practical outcome first, remove repeated setup, and place the next proof point immediately after the promise.";
+        if (goal === "sponsor") return "Keep the required message, but shorten its lead-in and bridge from the viewer payoff into the sponsor mention with one explicit benefit.";
+        if (goal === "community") return "Keep the core point, remove repeated setup, and turn the next beat into a specific viewer question or shared challenge.";
+        return "Cut repeated setup before this moment and enter on the first concrete claim, proof, or demonstration. Keep only the context needed to understand the payoff.";
+      }
+
+      function buildActionableRecommendations(project) {
+        const pointCount = project?.analytics?.retentionPoints?.length || 0;
+        const goal = getCreatorGoal(project);
+        return (project?.evidenceFindings || []).map((finding) => {
+          const isActionableEvent = finding.type === "drop" || finding.type === "spike";
+          const assessment = {
+            evidenceQuality: pointCount >= 6 ? 5 : pointCount >= 3 ? 3 : 1,
+            specificity: finding.segmentIndex >= 0 ? 5 : 4,
+            actionability: isActionableEvent ? 5 : 1,
+            goalAlignment: goal ? 5 : 2,
+            confidenceCalibration: finding.confidence?.includes("Low") ? 4 : 5,
+            expectedUsefulness: finding.type === "drop" ? 5 : finding.type === "spike" ? 4 : 2,
+            novelty: finding.segmentIndex >= 0 ? 5 : 3,
+            validationQuality: isActionableEvent ? 5 : 2,
+          };
+          const score = Object.values(assessment).reduce((sum, value) => sum + value, 0);
+          const compared = "No matched channel baseline is imported yet. This is a within-video event, not an underperformance claim.";
+          const recommendedAction = isActionableEvent ? getActionForFinding(finding, goal) : "Do not make a primary edit decision from this checkpoint alone. Import comparable videos before testing a packaging or opening diagnosis.";
+          const expectedImpact = finding.type === "drop"
+            ? `May reduce exits around this interval while supporting the goal to ${getGoalLabel(goal)}.`
+            : finding.type === "spike"
+              ? `May preserve a moment viewers revisit or seek out, while supporting the goal to ${getGoalLabel(goal)}.`
+              : "Not estimated until a comparable baseline is available.";
+          const validation = finding.type === "drop"
+            ? "On the next comparable upload or edit test, compare retention through this time range using the same traffic-source mix."
+            : finding.type === "spike"
+              ? "Reuse the pattern in a future cut, then compare replay behavior, retention shape, and audience response against a matched video."
+              : "Import a matched cohort, then compare CTR and opening retention before treating this as a diagnosis.";
+          return {
+            ...finding,
+            id: `rec-${finding.type}-${finding.segmentIndex}-${String(finding.title).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`,
+            assessment,
+            score,
+            isPrimary: isActionableEvent && score >= RECOMMENDATION_MIN_SCORE,
+            isTopPriority: isActionableEvent && score >= RECOMMENDATION_TOP_SCORE,
+            compared,
+            recommendedAction,
+            expectedImpact,
+            validation,
+          };
+        }).sort((a, b) => b.score - a.score || b.priority - a.priority);
+      }
+
+      function renderClipCards(project) {
+        const clips = project?.clips || [];
+        const recommendations = (project?.recommendations || []).filter((item) => item.isPrimary);
+        if (recommendations.length) {
+          const topCount = recommendations.filter((item) => item.isTopPriority).length;
+          const decidedCount = recommendations.filter((item) => getRecommendationDecision(project, item.id) !== "open").length;
+          el.feedbackQuality.innerHTML = `<strong>${recommendations.length} primary finding${recommendations.length === 1 ? "" : "s"} passed the quality gate</strong><p>${topCount} top priority finding${topCount === 1 ? "" : "s"} scored ${RECOMMENDATION_TOP_SCORE}/40 or higher. ${decidedCount}/${recommendations.length} editor decision${decidedCount === 1 ? "" : "s"} saved.</p>`;
+          el.clipCards.innerHTML = `
+            <div class="recommendation-summary"><p>Primary findings require at least ${RECOMMENDATION_MIN_SCORE}/40 across the locked assessment standard.</p><p>Goal: ${escapeFeedbackHtml(getGoalLabel(getCreatorGoal(project)))}</p></div>
+            ${recommendations.slice(0, 4).map((item) => `
+              <article class="clip-card feedback-card recommendation-card ${item.type === "spike" ? "preserve" : ""} ${item.isTopPriority ? "top-priority" : ""}">
+                <div class="clip-top"><span class="feedback-kicker">${item.isTopPriority ? "TOP PRIORITY" : "PRIMARY FINDING"} | ${escapeFeedbackHtml(item.title)}</span><span class="clip-score">${item.score} / 40</span></div>
+                <div class="evidence-grid">
+                  <div class="evidence-cell"><span>Observed</span><p>${escapeFeedbackHtml(item.observed)}</p></div>
+                  <div class="evidence-cell"><span>Compared</span><p>${escapeFeedbackHtml(item.compared)}</p></div>
+                  <div class="evidence-cell"><span>Interpretation</span><p>${escapeFeedbackHtml(item.context)}</p></div>
+                  <div class="evidence-cell"><span>Recommended action</span><p>${escapeFeedbackHtml(item.recommendedAction)}</p></div>
+                  <div class="evidence-cell"><span>Expected impact</span><p>${escapeFeedbackHtml(item.expectedImpact)}</p></div>
+                  <div class="evidence-cell"><span>Confidence</span><p>${escapeFeedbackHtml(item.confidence)}</p></div>
+                  <div class="evidence-cell"><span>Why this confidence</span><p>${escapeFeedbackHtml(`Based on ${item.assessment.evidenceQuality}/5 evidence quality, ${item.assessment.specificity}/5 specificity, and available transcript alignment.`)}</p></div>
+                  <div class="evidence-cell"><span>Validation</span><p>${escapeFeedbackHtml(item.validation)}</p></div>
+                </div>
+                <details class="recommendation-details"><summary>Why this passed the quality gate</summary><div class="assessment-grid">${RECOMMENDATION_DIMENSIONS.map(([label, key]) => `<span>${label}<b>${item.assessment[key]}/5</b></span>`).join("")}</div></details>
+                <div class="decision-actions">
+                  ${["accepted", "revise", "dismissed"].map((status) => `<button class="small-btn subtle ${getRecommendationDecision(project, item.id) === status ? "is-selected" : ""}" type="button" data-recommendation-decision="${item.id}" data-decision-status="${status}" aria-pressed="${getRecommendationDecision(project, item.id) === status}">${status === "accepted" ? "Accept edit" : status === "revise" ? "Mark for rewrite" : "Dismiss"}</button>`).join("")}
+                </div>
+                <div class="feedback-footer"><span class="confidence-note">${getRecommendationDecision(project, item.id) === "open" ? "Decision needed: choose an editor status to include this in the handoff." : `Decision saved: ${getRecommendationDecision(project, item.id)}.`} Structured score: ${item.score}/40.</span>${item.segmentIndex >= 0 ? `<button class="small-btn review-source" type="button" data-review-source="${item.segmentIndex}">Review source</button>` : ""}</div>
+              </article>
+            `).join("")}
+          `;
+          return;
+        }
         if (!clips.length) {
           el.clipCards.innerHTML = "<p class=\"muted\">Run analysis to build your first editing decision queue.</p>";
           el.feedbackQuality.innerHTML = "<strong>Data quality: awaiting source</strong><p>Analyze a transcript to receive structural editing guidance. Connect analytics in a future version for behavior-backed diagnosis.</p>";
           return;
         }
+        el.feedbackQuality.innerHTML = "<strong>Transcript candidates only</strong><p>No behavior-backed finding cleared the primary quality gate. These are structural clip candidates, not data-backed edit diagnoses.</p>";
         const normalizedClips = clips.map((clip, index) => ({
           ...clip,
           sourceIndex: Number.isFinite(Number(clip.sourceIndex)) ? Number(clip.sourceIndex) : index,
@@ -3844,6 +4298,47 @@
         el.parseStatus.textContent = `Reviewing source for ${formatDuration(clip.start)}-${formatDuration(clip.end)}. The relevant passage is highlighted below.`;
       }
 
+      function getRecommendationDecision(project, recommendationId) {
+        return project?.recommendationDecisions?.[recommendationId] || "open";
+      }
+
+      function setRecommendationDecision(recommendationId, status) {
+        const project = getCurrentProject();
+        if (!project || !["accepted", "revise", "dismissed"].includes(status)) return;
+        project.recommendationDecisions = project.recommendationDecisions || {};
+        project.recommendationDecisions[recommendationId] = status;
+        persistProject();
+        renderIngestPanels(project);
+      }
+
+      function makeEditorBrief(project) {
+        const safeProject = project || {};
+        const recommendations = (safeProject.recommendations || []).filter((item) => item.isPrimary && ["accepted", "revise"].includes(getRecommendationDecision(safeProject, item.id)));
+        const statusLabel = (item) => getRecommendationDecision(safeProject, item.id).toUpperCase();
+        const actionLines = recommendations.length
+          ? recommendations.map((item, index) => [
+              `${index + 1}. [${statusLabel(item)}] ${item.title}`,
+              `   Observed: ${item.observed}`,
+              `   Action: ${item.recommendedAction}`,
+              `   Expected impact: ${item.expectedImpact}`,
+              `   Validation: ${item.validation}`,
+            ].join("\n")).join("\n\n")
+          : "No primary editor actions are available yet. Import Studio evidence and run analysis, or review transcript candidates manually.";
+        return [
+          "DROP FIX EDITOR BRIEF",
+          `Project: ${safeProject.name || "Untitled project"}`,
+          `Primary goal: ${getGoalLabel(getCreatorGoal(safeProject))}`,
+          `Evidence source: ${safeProject.analytics?.sourceName || "Transcript-only"}`,
+          `Generated: ${(safeProject.lastEdited || new Date().toISOString()).replace("T", " ").slice(0, 16)}`,
+          "",
+          "EDITOR ACTIONS",
+          actionLines,
+          "",
+          "NOTE",
+          "Only accepted and revision-marked findings are included. Interpretations remain hypotheses until validated against comparable performance data.",
+        ].join("\n");
+      }
+
       function renderQualityNarrative(project) {
         const explanations = project.qualityExplanations || ["No analysis yet."];
         el.qualityExplanations.innerHTML = explanations.map((item) => `<li>${item}</li>`).join("");
@@ -3880,16 +4375,345 @@
 
       function parseUploadedFile(file) {
         const extension = (file.name.split(".").pop() || "").toLowerCase();
-        const mode = FILES[extension] || "text";
+        const mode = el.sourceType.value === "studio-csv" ? "studio-csv" : (FILES[extension] || "text");
         const reader = new FileReader();
         reader.onload = () => {
           const text = String(reader.result || "");
+          if (mode === "studio-csv") {
+            importStudioData(text, file.name, file.size);
+            return;
+          }
           processInput(text, mode, file.name, file.size);
         };
         reader.onerror = () => {
           setIngestError("Could not read file.");
         };
         reader.readAsText(file);
+      }
+
+      function parseCsvTable(rawText) {
+        const rows = [];
+        let row = [];
+        let cell = "";
+        let quoted = false;
+        for (let i = 0; i < rawText.length; i += 1) {
+          const char = rawText[i];
+          const next = rawText[i + 1];
+          if (char === '"' && quoted && next === '"') {
+            cell += '"';
+            i += 1;
+          } else if (char === '"') {
+            quoted = !quoted;
+          } else if (char === "," && !quoted) {
+            row.push(cell.trim());
+            cell = "";
+          } else if ((char === "\n" || char === "\r") && !quoted) {
+            if (char === "\r" && next === "\n") {
+              i += 1;
+            }
+            row.push(cell.trim());
+            if (row.some(Boolean)) {
+              rows.push(row);
+            }
+            row = [];
+            cell = "";
+          } else {
+            cell += char;
+          }
+        }
+        row.push(cell.trim());
+        if (row.some(Boolean)) {
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      function normalizeCsvHeader(value) {
+        return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+      }
+
+      function readCsvNumber(value) {
+        const cleaned = String(value || "").replace(/[%,$]/g, "").replace(/,/g, "").trim();
+        const result = Number(cleaned);
+        return Number.isFinite(result) ? result : null;
+      }
+
+      function readCsvTime(value) {
+        const parts = String(value || "").trim().split(":").map(Number);
+        if (parts.length === 1 && Number.isFinite(parts[0])) return parts[0];
+        if (parts.length === 2 && parts.every(Number.isFinite)) return parts[0] * 60 + parts[1];
+        if (parts.length === 3 && parts.every(Number.isFinite)) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        return null;
+      }
+
+      function parseStudioCsv(rawText) {
+        const table = parseCsvTable(rawText);
+        if (table.length < 2) throw new Error("Studio CSV needs a header row and at least one data row.");
+        const headers = table[0].map(normalizeCsvHeader);
+        const indexOf = (matches) => headers.findIndex((header) => matches.some((match) => header.includes(match)));
+        const timeIndex = indexOf(["elapsed video time", "elapsed time", "timestamp", "time"]);
+        const retentionIndex = indexOf(["audience watch ratio", "audience retention", "retention"]);
+        const impressionsIndex = indexOf(["impressions"]);
+        const ctrIndex = indexOf(["impressions click through rate", "ctr", "click through rate"]);
+        const viewsIndex = indexOf(["views"]);
+        const watchTimeIndex = indexOf(["watch time"]);
+        const rows = table.slice(1);
+        const retentionPoints = retentionIndex >= 0 && timeIndex >= 0
+          ? rows.map((row) => {
+              const time = readCsvTime(row[timeIndex]);
+              const rawRatio = readCsvNumber(row[retentionIndex]);
+              const ratio = rawRatio !== null && rawRatio <= 1 ? rawRatio * 100 : rawRatio;
+              return time !== null && ratio !== null ? { time, ratio: clampPercent(ratio) } : null;
+            }).filter(Boolean)
+          : [];
+        const readFirstMetric = (index) => index >= 0 ? rows.map((row) => readCsvNumber(row[index])).find((value) => value !== null) : null;
+        const metrics = Object.fromEntries(Object.entries({
+          impressions: readFirstMetric(impressionsIndex),
+          ctr: readFirstMetric(ctrIndex),
+          views: readFirstMetric(viewsIndex),
+          watchTime: readFirstMetric(watchTimeIndex),
+        }).filter(([, value]) => value !== null));
+        if (!retentionPoints.length && !Object.keys(metrics).length) {
+          throw new Error("Could not find retention, impressions, CTR, views, or watch-time columns in this CSV.");
+        }
+        return { rowCount: rows.length, retentionPoints, metrics };
+      }
+
+      function renderEvidenceStatus(project) {
+        const analytics = project?.analytics;
+        if (!analytics) {
+          el.evidenceState.textContent = "Transcript";
+          el.evidenceDetail.textContent = "Transcript guidance is ready. Import a YouTube Studio CSV to add real retention and packaging evidence to this project.";
+          return;
+        }
+        const retentionCount = analytics.retentionPoints?.length || 0;
+        const metricLabels = Object.keys(analytics.metrics || {}).map((key) => key.toUpperCase());
+        el.evidenceState.textContent = analytics.sourceKind === "demo" ? "Demo evidence" : "Studio data";
+        el.evidenceDetail.textContent = `${analytics.rowCount || 0} rows imported${retentionCount ? `, including ${retentionCount} retention points` : ""}${metricLabels.length ? ` and ${metricLabels.join(", ")}` : ""}. ${project?.transcript ? "Run analysis to pair it with the transcript." : "Add a transcript next so DropFix can connect evidence to editable moments."}`;
+      }
+
+      function renderDemoGuide(project) {
+        const isDemo = project?.analytics?.sourceKind === "demo" && project?.status === "analyzed";
+        el.demoGuide.hidden = !isDemo;
+        if (!isDemo) return;
+        el.demoGuide.innerHTML = "<strong>Judge demo path</strong><p>1. Inspect the labelled retention timeline. 2. Open a timestamped drop and review its transcript source. 3. Go to Suggestions, save an editor decision, then download the editor brief. Demo metrics are labelled sample evidence; the detection, quality gate, source links, saved decisions, and export are live browser functionality.</p>";
+      }
+
+      function renderDemoWalkthrough(project) {
+        const isDemo = project?.analytics?.sourceKind === "demo" && project?.status === "analyzed";
+        el.demoWalkthrough.hidden = !isDemo;
+        if (!isDemo) return;
+        const activeStep = state.activeTab;
+        el.demoWalkthrough.innerHTML = `
+          <strong>Guided judge demo</strong>
+          <p>Start here: DropFix found a real timestamped change in labelled demo evidence and converted it into an editor-ready action. Follow the three steps in order.</p>
+          <div class="demo-step-row">
+            <button class="demo-step-button ${activeStep === "suggestions" ? "active" : ""}" type="button" data-demo-step="suggestions"><span>01</span><b>Review the recommended edit</b></button>
+            <button class="demo-step-button ${activeStep === "analysis" ? "active" : ""}" type="button" data-demo-step="analysis"><span>02</span><b>See the evidence behind it</b></button>
+            <button class="demo-step-button ${activeStep === "export" ? "active" : ""}" type="button" data-demo-step="export"><span>03</span><b>Export brief</b></button>
+          </div>
+        `;
+      }
+
+      function navigateDemoStep(step) {
+        setActivePage("workspace", null, true);
+        switchTab(step);
+        document.getElementById("workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function renderEvidenceTimeline(project) {
+        const analytics = project?.analytics;
+        const points = [...(analytics?.retentionPoints || [])].sort((a, b) => a.time - b.time);
+        const segments = project?.segments || [];
+        if (!points.length) {
+          el.evidenceTimeline.innerHTML = "<div class=\"timeline-heading\"><strong>Transcript structure view</strong><span>Retention data not connected</span></div><p class=\"timeline-empty\">Import a YouTube Studio CSV with elapsed time and retention columns to align behavior evidence with your transcript. Until then, DropFix only scores transcript structure.</p>";
+          return;
+        }
+        const transcriptEnd = segments.at(-1)?.end || 0;
+        const duration = Math.max(points.at(-1)?.time || 0, transcriptEnd, 1);
+        const averageGap = points.length > 1 ? Math.round((points.at(-1).time - points[0].time) / (points.length - 1)) : 0;
+        const path = points.map((point, index) => {
+          const x = (point.time / duration) * 1000;
+          const y = 14 + ((100 - point.ratio) / 100) * 152;
+          return `${index ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`;
+        }).join(" ");
+        const dots = points.map((point) => {
+          const x = (point.time / duration) * 1000;
+          const y = 14 + ((100 - point.ratio) / 100) * 152;
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="#ff2020"><title>${formatDuration(point.time)}: ${point.ratio}% retention</title></circle>`;
+        }).join("");
+        const rail = segments.length
+          ? `<div class="timeline-rail">${segments.map((segment, index) => {
+              const start = Math.min(96, (segment.start / duration) * 100);
+              const span = Math.max(5, ((segment.end - segment.start) / duration) * 100);
+              return `<button type="button" class="timeline-segment" style="--start:${start.toFixed(2)}%; --span:${span.toFixed(2)}%;" data-timeline-segment="${index}" title="${escapeFeedbackHtml(segment.text)}">${formatDuration(segment.start)} ${escapeFeedbackHtml(segment.text)}</button>`;
+            }).join("")}</div>`
+          : "<p class=\"timeline-empty\">Retention data is imported. Add and run a matching transcript to create editable timeline passages.</p>";
+        const sourceLabel = analytics.sourceKind === "demo" ? "Labelled demo evidence" : "Imported Studio evidence";
+        el.evidenceTimeline.innerHTML = `
+          <div class="timeline-heading"><strong>${sourceLabel}</strong><span>${points.length} points${averageGap ? ` | about every ${averageGap}s` : ""}</span></div>
+          <svg class="retention-plot" viewBox="0 0 1000 180" role="img" aria-label="Audience retention timeline">
+            <line x1="0" y1="14" x2="1000" y2="14" stroke="rgba(255,255,255,0.12)" />
+            <line x1="0" y1="90" x2="1000" y2="90" stroke="rgba(255,255,255,0.08)" />
+            <line x1="0" y1="166" x2="1000" y2="166" stroke="rgba(255,255,255,0.12)" />
+            <path d="${path}" fill="none" stroke="#ff2020" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+            ${dots}
+          </svg>
+          <div class="timeline-meta"><span>00:00</span><span>${formatDuration(duration)}</span></div>
+          ${rail}
+        `;
+      }
+
+      function findSegmentAtTime(segments, time) {
+        if (!segments.length) return { segment: null, index: -1 };
+        const directIndex = segments.findIndex((segment) => time >= segment.start && time <= segment.end);
+        if (directIndex >= 0) return { segment: segments[directIndex], index: directIndex };
+        const nearestIndex = segments.reduce((bestIndex, segment, index) => {
+          const best = segments[bestIndex];
+          const bestDistance = Math.min(Math.abs(time - best.start), Math.abs(time - best.end));
+          const distance = Math.min(Math.abs(time - segment.start), Math.abs(time - segment.end));
+          return distance < bestDistance ? index : bestIndex;
+        }, 0);
+        return { segment: segments[nearestIndex], index: nearestIndex };
+      }
+
+      function getSignalConfidence(pointCount, magnitude, hasTranscriptMatch) {
+        if (pointCount >= 6 && magnitude >= 8 && hasTranscriptMatch) return "High confidence in the event; cause still needs validation.";
+        if (pointCount >= 4 && magnitude >= 5) return "Medium confidence; evidence localizes the event, not its cause.";
+        return "Low confidence; treat this as a hypothesis and gather more data.";
+      }
+
+      function detectEvidenceOpportunities(project) {
+        const points = [...(project?.analytics?.retentionPoints || [])].sort((a, b) => a.time - b.time);
+        const segments = project?.segments || [];
+        const findings = [];
+        if (points.length < 2) return findings;
+        const averageGap = points.length > 1 ? (points.at(-1).time - points[0].time) / (points.length - 1) : 0;
+        const dropThreshold = averageGap > 15 ? 8 : 5;
+        for (let index = 1; index < points.length; index += 1) {
+          const previous = points[index - 1];
+          const current = points[index];
+          const delta = +(current.ratio - previous.ratio).toFixed(1);
+          const eventTime = (previous.time + current.time) / 2;
+          const match = findSegmentAtTime(segments, eventTime);
+          if (delta <= -dropThreshold) {
+            findings.push({
+              type: "drop",
+              priority: Math.abs(delta) * 2,
+              segmentIndex: match.index,
+              title: `Retention drop at ${formatDuration(previous.time)}-${formatDuration(current.time)}`,
+              observed: `Retention fell ${Math.abs(delta)} percentage points, from ${previous.ratio}% to ${current.ratio}%, across one imported data interval.`,
+              context: match.segment ? `Linked transcript passage: “${match.segment.text.slice(0, 104)}${match.segment.text.length > 104 ? "..." : ""}”` : "No transcript passage is available at this interval.",
+              confidence: getSignalConfidence(points.length, Math.abs(delta), Boolean(match.segment)),
+            });
+          } else if (delta >= 3) {
+            findings.push({
+              type: "spike",
+              priority: delta,
+              segmentIndex: match.index,
+              title: `Interest spike at ${formatDuration(previous.time)}-${formatDuration(current.time)}`,
+              observed: `Retention increased ${delta} percentage points, from ${previous.ratio}% to ${current.ratio}%. This can indicate replaying, seeking, or segment value.`,
+              context: match.segment ? `Linked transcript passage: “${match.segment.text.slice(0, 104)}${match.segment.text.length > 104 ? "..." : ""}”` : "No transcript passage is available at this interval.",
+              confidence: getSignalConfidence(points.length, delta, Boolean(match.segment)),
+            });
+          }
+        }
+        const openingPoint = points.find((point) => point.time >= 30) || points.at(-1);
+        if (openingPoint) {
+          findings.push({
+            type: "check",
+            priority: 1,
+            segmentIndex: findSegmentAtTime(segments, openingPoint.time).index,
+            title: `Opening checkpoint at ${formatDuration(openingPoint.time)}`,
+            observed: `Imported retention is ${openingPoint.ratio}% at this point. ${project.analytics?.metrics?.ctr !== undefined ? `Imported CTR is ${project.analytics.metrics.ctr}%.` : "CTR was not supplied."}`,
+            context: "A channel and traffic-source cohort is not connected yet, so DropFix does not label this opening as strong or weak.",
+            confidence: "Context required: compare this against similar videos before diagnosing a promise mismatch.",
+          });
+        }
+        return findings.sort((a, b) => b.priority - a.priority).slice(0, 5);
+      }
+
+      function renderEvidenceFindings(project) {
+        const hasBehaviorData = (project?.analytics?.retentionPoints || []).length >= 2;
+        if (!hasBehaviorData) {
+          el.signalList.innerHTML = "<p class=\"muted\">Import a Studio CSV with retention points, then run analysis to detect timestamped behavior signals.</p>";
+          return;
+        }
+        if (project?.status !== "analyzed") {
+          el.signalList.innerHTML = "<p class=\"muted\">Studio evidence is loaded. Run analysis to align behavior signals with transcript passages.</p>";
+          return;
+        }
+        const findings = project.evidenceFindings || [];
+        if (!findings.length) {
+          el.signalList.innerHTML = "<p class=\"muted\">No sharp local change was detected at the available data resolution. This is not proof the video has no improvement opportunities.</p>";
+          return;
+        }
+        el.signalList.innerHTML = findings.map((finding, index) => `
+          <article class="signal-card ${finding.type}">
+            <div>
+              <strong>${escapeFeedbackHtml(finding.title)}</strong>
+              <p>${escapeFeedbackHtml(finding.observed)}</p>
+              <p>${escapeFeedbackHtml(finding.context)}</p>
+              <p>${escapeFeedbackHtml(finding.confidence)}</p>
+            </div>
+            ${finding.segmentIndex >= 0 ? `<button class="small-btn subtle" type="button" data-review-signal="${index}">Review source</button>` : ""}
+          </article>
+        `).join("");
+      }
+
+      function reviewEvidenceFinding(findingIndex) {
+        const finding = (getCurrentProject()?.evidenceFindings || [])[Number(findingIndex)];
+        if (finding?.segmentIndex >= 0) reviewTimelineSegment(finding.segmentIndex);
+      }
+
+      function reviewTimelineSegment(segmentIndex) {
+        const project = getCurrentProject();
+        const segment = (project?.segments || [])[Number(segmentIndex)];
+        if (!segment || !el.transcript.value) return;
+        switchTab("inputs");
+        const start = el.transcript.value.indexOf(segment.text);
+        if (start >= 0) {
+          el.transcript.focus();
+          el.transcript.setSelectionRange(start, start + segment.text.length);
+        }
+        el.parseStatus.textContent = `Reviewing timeline source at ${formatDuration(segment.start)}-${formatDuration(segment.end)}.`;
+      }
+
+      function importStudioData(rawText, fileName, fileSize = 0) {
+        const project = ensureProject();
+        try {
+          if (fileSize > MAX_BYTES) throw new Error("File exceeds the browser import cap.");
+          const parsed = parseStudioCsv(rawText);
+          project.analytics = {
+            ...parsed,
+            sourceKind: "studio-csv",
+            sourceName: fileName || "YouTube Studio export",
+            importedAt: new Date().toISOString(),
+          };
+          project.lastEdited = new Date().toISOString();
+          project.warnings = [];
+          persistProject();
+          renderEvidenceStatus(project);
+          el.parseStatus.textContent = `Studio data imported from ${fileName || "CSV"}.`;
+          el.parseMetrics.textContent = `${parsed.retentionPoints.length} retention points | ${Object.keys(parsed.metrics).length} packaging/performance metrics | ${parsed.rowCount} rows`;
+          el.ingestStatus.textContent = project.transcript ? "Evidence is ready. Run analysis to pair it with your transcript." : "Evidence is saved. Paste or upload the matching transcript next.";
+        } catch (error) {
+          setIngestError(error.message || "Studio CSV import failed.");
+        }
+      }
+
+      function getDemoStudioData() {
+        return {
+          sourceKind: "demo",
+          sourceName: "DropFix labelled demonstration data",
+          importedAt: new Date().toISOString(),
+          rowCount: 8,
+          metrics: { impressions: 12480, ctr: 7.2, views: 1326, watchTime: 83.4 },
+          retentionPoints: [
+            { time: 0, ratio: 100 }, { time: 12, ratio: 86 }, { time: 24, ratio: 81 }, { time: 36, ratio: 74 },
+            { time: 48, ratio: 66 }, { time: 60, ratio: 72 }, { time: 72, ratio: 59 }, { time: 84, ratio: 55 },
+          ],
+        };
       }
 
       function setIngestError(message) {
@@ -3922,6 +4746,7 @@
           project.confidence = clampPercent(55 + Math.min(45, segments.length * 2));
           project.status = "parsed";
           project.lastEdited = new Date().toISOString();
+          renderEvidenceStatus(project);
           project.name = fileName
             ? fileName.replace(/\\.[^.]+$/, "")
             : project.name;
@@ -3947,7 +4772,7 @@
       function setDemoButtonState(isRunning) {
         el.demoButton.disabled = isRunning;
         el.demoButton.classList.toggle("working", isRunning);
-        el.demoButton.textContent = isRunning ? "Running live demo workflow..." : "Run live demo workflow";
+        el.demoButton.textContent = isRunning ? "Opening guided demo..." : "Start guided judge demo";
         el.demoState.textContent = isRunning ? "RUNNING" : "IDLE";
       }
 
@@ -4028,6 +4853,7 @@
         }
         try {
           project.profile = el.profile.value;
+          project.goal = el.creatorGoal.value;
           const weights = getWeights();
           const result = scoreSegments(project.segments, weights, project.profile);
           project.clips = result.ordered;
@@ -4038,6 +4864,8 @@
           project.status = "analyzed";
           project.metadata = makeMetadataSuggestions(project);
           project.metadata.seo = makeSeoSuggestions(project);
+          project.evidenceFindings = detectEvidenceOpportunities(project);
+          project.recommendations = buildActionableRecommendations(project);
           project.qualityExplanations = qualityRationale(result.ordered, result.quality);
           project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
           project.lastEdited = new Date().toISOString();
@@ -4067,7 +4895,9 @@
         project.name = "DropFix Judge Demo";
         project.sourceType = "text";
         project.profile = "shorts";
+        project.goal = "watch-time";
         project.transcript = DEMO_TRANSCRIPT;
+        project.analytics = getDemoStudioData();
         project.status = "new";
         project.segments = [];
         project.clips = [];
@@ -4077,6 +4907,7 @@
         project.handoffActivityLog = [];
         el.sourceType.value = "text";
         el.profile.value = "shorts";
+        el.creatorGoal.value = "watch-time";
         el.transcript.value = DEMO_TRANSCRIPT;
         el.parseStatus.textContent = "Live demo loaded with sample transcript. Running the full workflow now.";
         el.parseMetrics.textContent = "Auto-loading, analyzing, then building SEO recommendations.";
@@ -4086,6 +4917,7 @@
         persistProject();
         renderIngestPanels(project);
         try {
+          setActivePage("workspace", null, true);
           switchTab("analysis");
           await new Promise((resolve) => setTimeout(resolve, 220));
           const demoResult = runAnalysis();
@@ -4095,29 +4927,16 @@
           project.metadata = project.metadata || {};
           project.metadata.seo = makeSeoSuggestions(project);
           project.metadata.seoGeneratedAt = new Date().toISOString();
-          project.lastHandoffCaptureAt = new Date().toISOString();
-          const demoPacket = makeLiveDemoPacket(project, { runId: demoRunId, status: "completed", mode: getCompetitionMode() });
-          const testFileName = `${demoRunId}.json`;
-          downloadFile(testFileName, JSON.stringify(demoPacket, null, 2), "application/json");
-          addHandoffActivity(project, "download-demo-test-packet", "Live demo output generated.");
           persistProject();
           renderIngestPanels(project);
           addHandoffActivity(project, "run-demo-workflow");
-          switchTab("export");
+          switchTab("suggestions");
+          document.getElementById("workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
           el.demoState.textContent = "DONE";
-          el.parseStatus.textContent = "Demo complete. Open Export to review the judge-ready score summary and download handoff artifacts.";
-          el.workflowHint.textContent = "Great: demo session is complete and ready for copy or download.";
+          el.parseStatus.textContent = "Guided demo ready. Start with the first editor action below, then use the three demo steps when you want to inspect evidence or export the brief.";
+          el.workflowHint.textContent = "You are in step 1 of 3: review the recommended editor action. Use Guided judge demo above to inspect its evidence or export the brief.";
         } catch (error) {
           const message = error?.message || "Demo flow did not complete. Please try again.";
-          const failedPacket = makeLiveDemoPacket(project, {
-            runId: demoRunId,
-            status: "failed",
-            mode: getCompetitionMode(),
-            error: message,
-          });
-          const failFileName = `${demoRunId}-failed.json`;
-          downloadFile(failFileName, JSON.stringify(failedPacket, null, 2), "application/json");
-          addHandoffActivity(project, "download-demo-test-packet", "Live demo fallback output generated.");
           el.demoState.textContent = "IDLE";
           el.parseStatus.textContent = message;
           setIngestError(message);
@@ -4191,6 +5010,7 @@
         project.status = "new";
         project.clips = [];
         project.metadata = { seo: {} };
+        project.analytics = null;
         project.qualityScore = 0;
         project.qualityLabel = "No run yet.";
         project.qualityExplanations = [];
@@ -4308,17 +5128,48 @@
       el.sourceType.addEventListener("change", () => {
         if (el.sourceType.value === "url") {
           el.parseStatus.textContent = "URL mode: paste transcript text now, then click Run analysis. Subtitle upload will be enabled with API integration.";
+        } else if (el.sourceType.value === "studio-csv") {
+          el.parseStatus.textContent = "Studio CSV mode: upload a YouTube Studio export first, then add the matching transcript to connect evidence to edits.";
         } else {
           el.parseStatus.textContent = "Choose a matching file or paste transcript text, then click Run analysis.";
         }
       });
 
+      el.creatorGoal.addEventListener("change", () => {
+        const project = getCurrentProject();
+        if (!project) return;
+        project.goal = el.creatorGoal.value;
+        persistProject();
+        if (project.status === "analyzed") runAnalysis();
+      });
+
       el.runButton.addEventListener("click", runAnalysis);
       el.clipCards.addEventListener("click", (event) => {
+        const decision = event.target.closest("button[data-recommendation-decision]");
+        if (decision) {
+          setRecommendationDecision(decision.dataset.recommendationDecision, decision.dataset.decisionStatus);
+          return;
+        }
         const button = event.target.closest("button[data-review-source]");
         if (button) {
           reviewFeedbackSource(button.dataset.reviewSource);
         }
+      });
+      el.evidenceTimeline.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-timeline-segment]");
+        if (button) {
+          reviewTimelineSegment(button.dataset.timelineSegment);
+        }
+      });
+      el.signalList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-review-signal]");
+        if (button) {
+          reviewEvidenceFinding(button.dataset.reviewSignal);
+        }
+      });
+      el.demoWalkthrough.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-demo-step]");
+        if (button) navigateDemoStep(button.dataset.demoStep);
       });
       el.seoGenerate.addEventListener("click", regenerateSeoPack);
       el.demoButton.addEventListener("click", runDemoFlow);
@@ -4391,6 +5242,25 @@
         el.parseMetrics.textContent = "Sample text loaded with clean timestamp-free sentences.";
         el.ingestStatus.textContent = "Ready to parse.";
         renderIngestPanels(project);
+      });
+
+      el.loadStudioSample?.addEventListener("click", () => {
+        const project = ensureProject();
+        project.transcript = DEMO_TRANSCRIPT;
+        project.analytics = getDemoStudioData();
+        project.sourceType = "text";
+        project.segments = [];
+        project.status = "new";
+        project.clips = [];
+        project.metadata = { seo: {} };
+        project.qualityScore = 0;
+        el.sourceType.value = "text";
+        el.transcript.value = DEMO_TRANSCRIPT;
+        persistProject();
+        renderIngestPanels(project);
+        el.parseStatus.textContent = "Labelled demo transcript and Studio evidence loaded. Run analysis to create the first edit queue.";
+        el.parseMetrics.textContent = "8 demo retention points | CTR, impressions, views, and watch time included.";
+        el.ingestStatus.textContent = "Demo evidence is clearly labelled and ready to pair with transcript analysis.";
       });
 
       el.fileInput.addEventListener("change", (event) => {
@@ -4513,6 +5383,14 @@
         const summary = `Project: ${project.name}\nProfile: ${project.profile}\nQuality score: ${project.qualityScore}\nSegments: ${project.segments.length}\nSuggested title: ${project.metadata?.title || "N/A"}\nDescription: ${project.metadata?.description || "N/A"}\nTags: ${(project.metadata?.tags || []).join(", ")}\n${seoLines.join("\n")}\n`;
         downloadFile(`${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix-summary.txt`, summary, "text/plain");
         addHandoffActivity(project, "download-summary");
+      });
+
+      el.downloadEditorBrief.addEventListener("click", () => {
+        const project = getCurrentProject();
+        if (!project || project.status !== "analyzed") return;
+        const filename = `${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix-editor-brief.txt`;
+        downloadFile(filename, makeEditorBrief(project), "text/plain");
+        addHandoffActivity(project, "download-editor-brief", "Editor brief downloaded.");
       });
 
       el.autoClean.addEventListener("change", () => {
