@@ -621,7 +621,8 @@
         border-color: rgba(255, 0, 0, 0.33);
       }
 
-      .flow-step:disabled {
+      .flow-step:disabled,
+      .flow-step.is-locked {
         opacity: 0.38;
         border-color: rgba(255, 255, 255, 0.14);
         color: #8795ad;
@@ -635,7 +636,8 @@
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
       }
 
-      .tab-btn:disabled {
+      .tab-btn:disabled,
+      .tab-btn.is-locked {
         opacity: 0.38;
         border-color: rgba(255, 255, 255, 0.16);
         color: #6f7f9b;
@@ -646,8 +648,10 @@
       }
 
       .tab-btn:disabled::before,
-      .flow-step:disabled::before {
-        content: "🔒";
+      .flow-step:disabled::before,
+      .tab-btn.is-locked::before,
+      .flow-step.is-locked::before {
+        content: "\1F512";
         font-size: 0.72rem;
         opacity: 0.85;
         margin-right: 0.2rem;
@@ -1103,6 +1107,7 @@
       }
 
       input[type="checkbox"] {
+        position: relative;
         -webkit-appearance: none;
         appearance: none;
         width: 18px;
@@ -1133,13 +1138,15 @@
       }
 
       input[type="checkbox"]:checked::before {
-        content: "";
-        width: 9px;
-        height: 5px;
-        border-left: 2px solid #f5f8ff;
-        border-bottom: 2px solid #f5f8ff;
-        transform: rotate(-45deg);
-        transform-origin: center;
+        content: "\2713";
+        color: #f5f8ff;
+        position: absolute;
+        left: 50%;
+        top: 46%;
+        transform: translate(-50%, -50%);
+        line-height: 1;
+        font-size: 11px;
+        font-weight: 800;
       }
 
       input[type="checkbox"]:active {
@@ -1504,7 +1511,7 @@
         <p style="margin: 0 0 0.85rem">Use this to show the full claim-to-action loop in under 30 seconds:</p>
         <div class="inline-row" style="align-items: center; justify-content: flex-start; gap: 0.6rem; margin-bottom: 0.75rem">
           <button id="run-demo" class="btn primary" type="button">Run live demo workflow</button>
-          <span class="tag" id="demo-state">Idle</span>
+          <span class="tag" id="demo-state">IDLE</span>
         </div>
         <ol class="helper" style="margin: 0; padding-left: 1.1rem; line-height: 1.55">
           <li>Loads a realistic transcript into Inputs</li>
@@ -2654,6 +2661,7 @@
           const key = stepButton.dataset.step;
           const enabled = isStepUnlocked(key, stepCompletion);
           stepButton.disabled = !enabled;
+          stepButton.classList.toggle("is-locked", !enabled);
           stepButton.classList.toggle("is-complete", stepCompletion[key]);
           stepButton.setAttribute("aria-current", stepButton.dataset.step === state.activeTab ? "step" : "false");
           stepButton.title = enabled ? "" : lockHints[key];
@@ -2662,6 +2670,7 @@
           const key = tabButton.dataset.tab;
           const enabled = isStepUnlocked(key, stepCompletion);
           tabButton.disabled = !enabled;
+          tabButton.classList.toggle("is-locked", !enabled);
           tabButton.title = enabled ? "" : lockHints[key];
         });
       }
@@ -3265,7 +3274,7 @@
         el.demoButton.disabled = isRunning;
         el.demoButton.classList.toggle("working", isRunning);
         el.demoButton.textContent = isRunning ? "Running live demo workflow..." : "Run live demo workflow";
-        el.demoState.textContent = isRunning ? "Running" : "Idle";
+        el.demoState.textContent = isRunning ? "RUNNING" : "IDLE";
       }
 
       function runAnalysis() {
@@ -3332,7 +3341,7 @@
         }
       }
 
-      function runDemoFlow() {
+      async function runDemoFlow() {
         if (state.analyzing || el.demoButton.disabled) {
           return;
         }
@@ -3350,17 +3359,18 @@
         el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
         el.ingestStatus.textContent = "Demo flow running: inputs → analysis → suggestions → export.";
         setDemoButtonState(true);
-        el.demoState.textContent = "Running";
+        el.demoState.textContent = "RUNNING";
         renderIngestPanels(project);
         persistProject();
         switchTab("analysis");
+        await new Promise((resolve) => setTimeout(resolve, 320));
         const demoResult = runAnalysis();
         if (demoResult) {
           switchTab("suggestions");
-          el.demoState.textContent = "Done";
+          el.demoState.textContent = "DONE";
           el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
         } else {
-          el.demoState.textContent = "Idle";
+          el.demoState.textContent = "IDLE";
           el.parseStatus.textContent = "Demo flow did not complete. Please try again.";
         }
         setDemoButtonState(false);
@@ -3759,5 +3769,6 @@
     </script>
   </body>
 </html>
+
 
 
