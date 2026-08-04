@@ -1355,6 +1355,7 @@
               <li><strong>Sprint 4</strong> implemented: explainable, adjustable scoring factors + rationale.</li>
               <li><strong>Sprint 5</strong> implemented: judge-mode verdict and CSV handoff export.</li>
               <li><strong>Sprint 6</strong> implemented: verdict-tone visual ranking + one-click judge packet export.</li>
+              <li><strong>Sprint 8</strong> implemented: lock-gated handoff state + one-click judge submission bundle copy.</li>
             </ul>
           </aside>
         </div>
@@ -1618,13 +1619,15 @@
                       <strong>Export package summary</strong>
                       <p class="helper export-status" id="export-summary">No export-ready data yet. Analyze a transcript to unlock handoff artifacts.</p>
                       <p class="helper analysis-ready-note" id="export-hint">Run analysis, then use Suggestions to finalize SEO before exporting judge packets.</p>
+                      <p class="helper" id="export-handoff-status">Handoff status: analysis required.</p>
                     </div>
                     <div class="export-actions">
                       <button id="copy-metadata" class="small-btn subtle" type="button">Copy metadata JSON</button>
                       <button id="copy-session" class="small-btn subtle" type="button">Copy full session</button>
+                      <button id="copy-judge-handoff" class="small-btn primary" type="button">Copy judge handoff bundle</button>
                       <button id="download-json" class="small-btn subtle" type="button">Download JSON</button>
                       <button id="download-summary" class="small-btn subtle" type="button">Download summary</button>
-                      <button id="download-judge-packet" class="small-btn primary" type="button">Download judge packet</button>
+                      <button id="download-judge-packet" class="small-btn subtle" type="button">Download judge packet</button>
                     </div>
                     <div class="export-box">
                       <label class="workspace-label" for="competition-mode">Handoff mode</label>
@@ -1658,14 +1661,15 @@
         <ul>
           <li>Transcript and subtitle ingestion works in-browser with clear parse feedback.</li>
           <li>Project workspace stores multiple projects with autosave and reload continuity.</li>
-          <li>Clip scoring is explainable with visible top reasons and interactive weighting.</li>
-          <li>SEO assistant now generates A/B titles, descriptions, and tag suggestions from the parsed transcript.</li>
-          <li>Judge scorecard is generated with one-click copy for quick competition judging/handoff review.</li>
-          <li>Competition mode supports one-line verdicts and CSV row export for head-to-head judging.</li>
-          <li>Judge packet export bundles verdict, scorecard, top clips, and both judge/creator comparisons into one submission file.</li>
-          <li>Output artifacts can be copied and downloaded with no local install.</li>
-        </ul>
-      </section>
+                    <li>Clip scoring is explainable with visible top reasons and interactive weighting.</li>
+                    <li>SEO assistant now generates A/B titles, descriptions, and tag suggestions from the parsed transcript.</li>
+                    <li>Judge scorecard is generated with one-click copy for quick competition judging/handoff review.</li>
+                    <li>Competition mode supports one-line verdicts and CSV row export for head-to-head judging.</li>
+                    <li>Judge packet export bundles verdict, scorecard, top clips, and both judge/creator comparisons into one submission file.</li>
+                    <li>Export actions now lock/unlock by readiness state, and one-click handoff bundle copy is added for judges.</li>
+                    <li>Output artifacts can be copied and downloaded with no local install.</li>
+                  </ul>
+                </section>
 
       <section class="section-title" id="ready">Built for clients and judges</section>
       <section class="proof">
@@ -1850,12 +1854,14 @@
         judgeScorecard: document.getElementById("judge-scorecard"),
         judgeScorecardStatus: document.getElementById("judge-scorecard-status"),
         copyJudgeScorecard: document.getElementById("copy-judge-scorecard"),
+        copyJudgeHandoff: document.getElementById("copy-judge-handoff"),
         copyMetadata: document.getElementById("copy-metadata"),
         copySession: document.getElementById("copy-session"),
         downloadJson: document.getElementById("download-json"),
         downloadSummary: document.getElementById("download-summary"),
         downloadJudgeCsv: document.getElementById("download-judge-csv"),
         downloadJudgePacket: document.getElementById("download-judge-packet"),
+        exportHandoffStatus: document.getElementById("export-handoff-status"),
       };
 
       function clamp(value, min, max) {
@@ -2663,6 +2669,78 @@
         };
       }
 
+      function makeJudgeHandoffBundle(project) {
+        const safeProject = project || {};
+        const packet = makeJudgePacket(safeProject);
+        const seo = safeProject.metadata?.seo || {};
+        const topClipLines = (safeProject.clips || [])
+          .slice(0, 3)
+          .map((clip, index) => `#${index + 1} ${formatDuration(clip.start)}-${formatDuration(clip.end)} (${clip.score}) - ${clip.reasons?.[0] || "n/a"}`);
+        const titleLines = (seo.titles || []).length > 0
+          ? seo.titles.map((title, index) => `  ${index + 1}. ${title}`).join("\n")
+          : "  No SEO titles generated yet.";
+        const descLines = (seo.descriptionVariants || []).length > 0
+          ? seo.descriptionVariants.map((desc, index) => `  ${index + 1}. ${desc}`).join("\n")
+          : "  No SEO descriptions generated yet.";
+        const hashtags = (seo.hashtags || []).length > 0
+          ? (seo.hashtags || []).join(", ")
+          : "No hashtag block generated yet.";
+        return [
+          "DropFix judge handoff bundle",
+          `Generated: ${packet.generatedAt}`,
+          `Project: ${packet.projectName}`,
+          `Profile: ${packet.profile}`,
+          `Quality score: ${packet.qualityScore}`,
+          `Segments: ${packet.segments}`,
+          "",
+          `Judge verdict: ${packet.verdicts.judge.label}`,
+          `Creator verdict: ${packet.verdicts.creator.label}`,
+          `Judge rationale: ${packet.verdicts.judge.rationale}`,
+          "",
+          "Top clips (up to 3):",
+          ...(topClipLines.length ? topClipLines : ["  No clips were generated yet."]),
+          "",
+          "SEO title options:",
+          titleLines,
+          "",
+          "SEO description options:",
+          descLines,
+          "",
+          `SEO hashtags: ${hashtags}`,
+          "",
+          "Judge CSV row (judge mode):",
+          makeJudgeCsvRow(safeProject, "judge"),
+          "",
+          "Judge scorecard:",
+          packet.scorecardText,
+        ].join("\n");
+      }
+
+      function setExportControlStates(project) {
+        const safeProject = project || {};
+        const hasAnalyzed = safeProject.status === "analyzed";
+        const hasSeoOutput = (safeProject.metadata?.seo?.titles || []).length > 0 || (safeProject.metadata?.seo?.descriptionVariants || []).length > 0;
+        const handoffReady = hasAnalyzed && hasSeoOutput;
+        const readyForBasic = hasAnalyzed;
+        [el.copyMetadata, el.copySession, el.downloadJson, el.downloadSummary].forEach((button) => {
+          if (button) {
+            button.disabled = !readyForBasic;
+          }
+        });
+        if (el.copyJudgeScorecard) {
+          el.copyJudgeScorecard.disabled = !readyForBasic;
+        }
+        if (el.downloadJudgeCsv) {
+          el.downloadJudgeCsv.disabled = !readyForBasic;
+        }
+        if (el.downloadJudgePacket) {
+          el.downloadJudgePacket.disabled = !handoffReady;
+        }
+        if (el.copyJudgeHandoff) {
+          el.copyJudgeHandoff.disabled = !handoffReady;
+        }
+      }
+
       function renderIngestPanels(project) {
         const warnings = project.warnings || [];
         el.parseWarnings.innerHTML = warnings
@@ -2703,13 +2781,17 @@
         if (!hasAnalyzed) {
           el.exportSummary.textContent = "No export-ready data yet. Run analysis to generate clips + metadata.";
           el.exportHint.textContent = "Run analysis, then tune SEO in Suggestions before exporting judge artifacts.";
+          el.exportHandoffStatus.textContent = "Handoff status: analysis required before exports unlock.";
         } else if (!hasSeoOutput) {
           el.exportSummary.textContent = `${clipCount} clip recommendation${clipCount === 1 ? "" : "s"} are ready.`;
           el.exportHint.textContent = "Generate SEO in Suggestions to unlock the complete judge handoff package.";
+          el.exportHandoffStatus.textContent = "Handoff status: SEO required before judge handoff bundle can be copied.";
         } else {
           el.exportSummary.textContent = `${clipCount} clip recommendations and SEO artifacts ready for handoff.`;
-          el.exportHint.textContent = "Primary handoff: download the judge packet first, then CSV/scorecard for judge review.";
+          el.exportHint.textContent = "Primary handoff: copy the judge handoff bundle first, then CSV/scorecard for judge review.";
+          el.exportHandoffStatus.textContent = "Handoff status: READY -- copy bundle before export downloads.";
         }
+        setExportControlStates(project);
         const verdict = getCompetitionVerdict(project, getCompetitionMode());
         const quality = clampPercent(project.qualityScore || 0);
         const verdictTone = project.status === "analyzed"
@@ -2732,9 +2814,6 @@
         el.judgeScorecardStatus.textContent = project.status === "analyzed"
           ? "Judge scorecard ready for copy."
           : "Run analysis to generate a judge-ready scorecard.";
-        el.copyJudgeScorecard.disabled = project.status !== "analyzed";
-        el.downloadJudgeCsv.disabled = project.status !== "analyzed";
-        el.downloadJudgePacket.disabled = project.status !== "analyzed";
         renderClipCards(project.clips || []);
         renderQualityNarrative(project);
         updateBadges();
@@ -3136,6 +3215,18 @@
           el.copyJudgeScorecard.textContent = "Copy judge scorecard";
         }, 1200);
       });
+      el.copyJudgeHandoff.addEventListener("click", async () => {
+        const project = getCurrentProject();
+        const handoffReady = project?.status === "analyzed" && ((project.metadata?.seo?.titles || []).length > 0 || (project.metadata?.seo?.descriptionVariants || []).length > 0);
+        if (!project || !handoffReady) {
+          return;
+        }
+        const copied = await copyTextToClipboard(makeJudgeHandoffBundle(project));
+        el.copyJudgeHandoff.textContent = copied ? "Judge handoff bundle copied" : "Copy failed";
+        setTimeout(() => {
+          el.copyJudgeHandoff.textContent = "Copy judge handoff bundle";
+        }, 1200);
+      });
       el.competitionMode.addEventListener("change", () => {
         const project = getCurrentProject();
         if (project?.status === "analyzed") {
@@ -3144,7 +3235,8 @@
       });
       el.downloadJudgeCsv.addEventListener("click", () => {
         const project = getCurrentProject();
-        if (!project || project.status !== "analyzed") {
+        const ready = project?.status === "analyzed";
+        if (!ready) {
           return;
         }
         const csv = makeJudgeCsvRow(project);
@@ -3153,7 +3245,8 @@
       });
       el.downloadJudgePacket.addEventListener("click", () => {
         const project = getCurrentProject();
-        if (!project || project.status !== "analyzed") {
+        const ready = project?.status === "analyzed" && ((project.metadata?.seo?.titles || []).length > 0 || (project.metadata?.seo?.descriptionVariants || []).length > 0);
+        if (!ready) {
           return;
         }
         const packet = makeJudgePacket(project);
@@ -3239,6 +3332,9 @@
 
       el.copyMetadata.addEventListener("click", async () => {
         const project = getCurrentProject();
+        if (!project || !project.status || project.status !== "analyzed") {
+          return;
+        }
         if (!project?.metadata) {
           return;
         }
@@ -3252,7 +3348,7 @@
 
       el.copySession.addEventListener("click", async () => {
         const project = getCurrentProject();
-        if (!project) {
+        if (!project || project.status !== "analyzed") {
           return;
         }
         const payload = JSON.stringify(project, null, 2);
@@ -3265,7 +3361,7 @@
 
       el.downloadJson.addEventListener("click", () => {
         const project = getCurrentProject();
-        if (!project) {
+        if (!project || project.status !== "analyzed") {
           return;
         }
         downloadFile(`${project.name.replace(/\s+/g, "-").toLowerCase()}-dropfix.json`, JSON.stringify(project, null, 2), "application/json");
@@ -3273,7 +3369,7 @@
 
       el.downloadSummary.addEventListener("click", () => {
         const project = getCurrentProject();
-        if (!project) {
+        if (!project || project.status !== "analyzed") {
           return;
         }
         const seoLines = [
