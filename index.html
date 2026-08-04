@@ -386,6 +386,29 @@
           0 4px 14px rgba(123, 139, 168, 0.08);
       }
 
+      .small-btn.primary {
+        background: linear-gradient(160deg, rgba(20, 30, 54, 0.95), rgba(25, 44, 78, 0.9));
+        border-color: rgba(123, 139, 168, 0.7);
+        color: #f3f8ff;
+        font-weight: 800;
+      }
+
+      .small-btn.subtle {
+        background: rgba(255, 255, 255, 0.02);
+        border-color: rgba(255, 255, 255, 0.12);
+        color: var(--text-primary);
+      }
+
+      .small-btn.working {
+        animation: buttonWorking 900ms infinite linear;
+      }
+
+      .small-btn[disabled] {
+        opacity: 0.58;
+        cursor: not-allowed;
+        filter: saturate(0.72);
+      }
+
       .small-btn[data-preset] {
         background: rgba(255, 255, 255, 0.03);
       }
@@ -395,6 +418,23 @@
       .flow-step:active,
       .btn:active {
         transform: translateY(1px) scale(0.98);
+      }
+
+      .export-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+      }
+
+      .verdict-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .verdict-row .small-btn {
+        min-width: 194px;
       }
 
       .projects {
@@ -564,6 +604,35 @@
         line-height: 1.25;
       }
 
+      .state-badge.is-working {
+        color: #f3f8ff;
+        border-color: rgba(123, 139, 168, 0.55);
+        background: rgba(123, 139, 168, 0.16);
+        position: relative;
+        padding-left: 1.55rem;
+      }
+
+      .state-badge.is-working::before {
+        content: "";
+        position: absolute;
+        left: 0.58rem;
+        top: 50%;
+        width: 7px;
+        height: 7px;
+        transform: translateY(-50%);
+        border-radius: 999px;
+        background: #f3f8ff;
+        animation: statusPulse 720ms ease-in-out infinite;
+      }
+
+      .state-badge.is-ready {
+        box-shadow: 0 0 0 1px rgba(111, 220, 145, 0.36);
+      }
+
+      .state-badge.pulse {
+        animation: badgePulse 560ms var(--motion-natural);
+      }
+
       .state-badge.status-strong {
         background: rgba(111, 220, 145, 0.12);
         color: #d5ffdf;
@@ -586,6 +655,15 @@
         background: rgba(255, 148, 148, 0.12);
         color: #ffdddd;
         border-color: rgba(255, 148, 148, 0.45);
+      }
+
+      .export-status {
+        display: block;
+        min-height: 2.15rem;
+      }
+
+      .analysis-ready-note {
+        color: #c9d5eb;
       }
 
       .context-strip {
@@ -662,6 +740,47 @@
         to {
           opacity: 1;
           transform: translateY(0);
+        }
+      }
+
+      @keyframes statusPulse {
+        0%,
+        100% {
+          transform: translateY(-50%) scale(0.85);
+          opacity: 0.55;
+        }
+
+        50% {
+          transform: translateY(-50%) scale(1.1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes badgePulse {
+        from {
+          transform: scale(0.98);
+        }
+
+        55% {
+          transform: scale(1.015);
+        }
+
+        to {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes buttonWorking {
+        0% {
+          box-shadow: 0 0 0 0 rgba(123, 139, 168, 0);
+        }
+
+        70% {
+          box-shadow: 0 0 0 6px rgba(123, 139, 168, 0.16);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(123, 139, 168, 0);
         }
       }
 
@@ -1492,45 +1611,43 @@
         </div>
       </section>
 
-            <section class="tab-panel" id="export">
-              <h3 class="panel-title">Ready-to-use outputs</h3>
-              <div class="summary-grid">
-                <div class="metric">
-                  <strong>Export package summary</strong>
-                  <p class="helper" id="export-summary">No exports available. Run analysis first.</p>
-                </div>
-                <div class="inline-row">
-                  <button id="copy-metadata" class="small-btn" type="button">Copy metadata JSON</button>
-                  <button id="copy-session" class="small-btn" type="button">Copy full session</button>
-                  <button id="download-json" class="small-btn" type="button">Download JSON</button>
-                  <button id="download-summary" class="small-btn" type="button">Download summary</button>
-                  <button id="download-judge-packet" class="small-btn" type="button">Download judge packet</button>
-                </div>
-                <div class="analysis-notice" id="export-hint">
-                  Export is generated locally from current project state for client handoff.
-                </div>
-                <div class="export-box">
-                  <label class="workspace-label" for="competition-mode">Handoff mode</label>
-                  <div class="inline-row" style="align-items: center;">
-                    <select id="competition-mode" style="max-width: 260px;">
-                      <option value="judge">Judge scoreboard</option>
-                      <option value="creator">Creator handoff</option>
-                    </select>
-                    <span id="verdict-pill" class="state-badge">No verdict yet</span>
-                    <button id="download-judge-csv" class="small-btn" type="button">Download judge CSV row</button>
+                <section class="tab-panel" id="export">
+                  <h3 class="panel-title">Ready-to-use outputs</h3>
+                  <div class="summary-grid">
+                    <div class="metric">
+                      <strong>Export package summary</strong>
+                      <p class="helper export-status" id="export-summary">No export-ready data yet. Analyze a transcript to unlock handoff artifacts.</p>
+                      <p class="helper analysis-ready-note" id="export-hint">Run analysis, then use Suggestions to finalize SEO before exporting judge packets.</p>
+                    </div>
+                    <div class="export-actions">
+                      <button id="copy-metadata" class="small-btn subtle" type="button">Copy metadata JSON</button>
+                      <button id="copy-session" class="small-btn subtle" type="button">Copy full session</button>
+                      <button id="download-json" class="small-btn subtle" type="button">Download JSON</button>
+                      <button id="download-summary" class="small-btn subtle" type="button">Download summary</button>
+                      <button id="download-judge-packet" class="small-btn primary" type="button">Download judge packet</button>
+                    </div>
+                    <div class="export-box">
+                      <label class="workspace-label" for="competition-mode">Handoff mode</label>
+                      <div class="verdict-row">
+                        <select id="competition-mode" style="max-width: 260px;">
+                          <option value="judge">Judge scoreboard</option>
+                          <option value="creator">Creator handoff</option>
+                        </select>
+                        <span id="verdict-pill" class="state-badge">No verdict yet</span>
+                        <button id="download-judge-csv" class="small-btn" type="button">Download judge CSV row</button>
+                      </div>
+                      <p id="verdict-note" class="helper" style="margin: 0.5rem 0 0 0">
+                        Switch mode to update the verdict + CSV row header for quick judge/creator comparisons.
+                      </p>
+                    </div>
+                    <div class="export-box">
+                      <label class="workspace-label" for="judge-scorecard">Judge scorecard</label>
+                      <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to generate a judge-ready scorecard.</p>
+                      <pre id="judge-scorecard" class="judge-pack">No scorecard available.</pre>
+                      <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy judge scorecard</button>
+                    </div>
                   </div>
-                  <p id="verdict-note" class="helper" style="margin: 0.5rem 0 0 0">
-                    Switch mode to update your one-line verdict and CSV heading for quick comparison.
-                  </p>
-                </div>
-                <div class="export-box">
-                  <label class="workspace-label" for="judge-scorecard">Judge scorecard</label>
-                  <p id="judge-scorecard-status" class="helper" style="margin: 0 0 0.45rem 0">Run analysis to generate a judge-ready scorecard.</p>
-                  <pre id="judge-scorecard" class="judge-pack">No scorecard available.</pre>
-                  <button id="copy-judge-scorecard" class="small-btn" type="button">Copy judge scorecard</button>
-                </div>
-              </div>
-            </section>
+                </section>
           </div>
         </section>
       </section>
@@ -1726,6 +1843,7 @@
         weightElements: Array.from(document.querySelectorAll("input[data-weight]")),
         analysisNotices: {},
         exportSummary: document.getElementById("export-summary"),
+        exportHint: document.getElementById("export-hint"),
         competitionMode: document.getElementById("competition-mode"),
         verdictPill: document.getElementById("verdict-pill"),
         verdictNote: document.getElementById("verdict-note"),
@@ -2235,7 +2353,7 @@
         const project = getCurrentProject();
         const stateInfo = getWorkflowStepState(project);
         const { completion: stepCompletion, totalSegments, fileType } = stateInfo;
-        const status = state.analyzing ? "Analyzing" : "Ready";
+        const status = state.analyzing ? "Analyzing..." : "Ready";
         const stepLabels = {
           inputs: "Inputs",
           analysis: "Analysis",
@@ -2249,6 +2367,7 @@
           export: "Copy or download the summary package and move straight into your YouTube publishing flow."
         };
         el.statusState.textContent = status;
+        el.statusState.className = `state-badge ${state.analyzing ? "status-good is-working" : "status-watch"}`;
         el.autosaveState.textContent = "Autosave: on";
         el.stepState.textContent = `Step: ${stepLabels[state.activeTab] || "Inputs"}`;
         el.segmentsState.textContent = `Segments: ${totalSegments}`;
@@ -2578,16 +2697,33 @@
         el.seoRationale.textContent = project.metadata?.seo?.rationale
           ? project.metadata.seo.rationale.join(" | ")
           : "Generate SEO pack to see tone-specific title/description variants.";
-        el.exportSummary.textContent = project.status === "analyzed"
-          ? `${project.clips?.length || 0} clip recommendations ready for use.`
-          : "No exports available. Run analysis first.";
+        const hasAnalyzed = project.status === "analyzed";
+        const hasSeoOutput = (project.metadata?.seo?.titles || []).length > 0 || (project.metadata?.seo?.descriptionVariants || []).length > 0;
+        const clipCount = project.clips?.length || 0;
+        if (!hasAnalyzed) {
+          el.exportSummary.textContent = "No export-ready data yet. Run analysis to generate clips + metadata.";
+          el.exportHint.textContent = "Run analysis, then tune SEO in Suggestions before exporting judge artifacts.";
+        } else if (!hasSeoOutput) {
+          el.exportSummary.textContent = `${clipCount} clip recommendation${clipCount === 1 ? "" : "s"} are ready.`;
+          el.exportHint.textContent = "Generate SEO in Suggestions to unlock the complete judge handoff package.";
+        } else {
+          el.exportSummary.textContent = `${clipCount} clip recommendations and SEO artifacts ready for handoff.`;
+          el.exportHint.textContent = "Primary handoff: download the judge packet first, then CSV/scorecard for judge review.";
+        }
         const verdict = getCompetitionVerdict(project, getCompetitionMode());
         const quality = clampPercent(project.qualityScore || 0);
         const verdictTone = project.status === "analyzed"
           ? getVerdictToneClass(getCompetitionMode(), quality)
           : "status-watch";
         el.verdictPill.className = `state-badge ${verdictTone}`;
+        el.verdictPill.classList.toggle("is-ready", hasAnalyzed);
+        el.verdictPill.classList.remove("pulse");
         el.verdictPill.textContent = project.status === "analyzed" ? verdict.label : "Run analysis";
+        if (hasAnalyzed && el.verdictPill.dataset.analysisState !== String(project.lastEdited)) {
+          void el.verdictPill.offsetWidth;
+          el.verdictPill.classList.add("pulse");
+          el.verdictPill.dataset.analysisState = String(project.lastEdited);
+        }
         el.verdictNote.textContent = project.status === "analyzed"
           ? `Verdict: ${verdict.rationale}`
           : "Run analysis to generate a verdict and enable competition exports.";
@@ -2724,6 +2860,12 @@
         }
       }
 
+      function setRunButtonState(isRunning) {
+        el.runButton.disabled = isRunning;
+        el.runButton.classList.toggle("working", isRunning);
+        el.runButton.textContent = isRunning ? "Analyzing..." : "Run analysis";
+      }
+
       function runAnalysis() {
         const project = ensureProject();
         if (!project.transcript && !project.segments.length) {
@@ -2736,37 +2878,52 @@
           return;
         }
         state.analyzing = true;
+        setRunButtonState(true);
         updateBadges();
         const mode = el.sourceType.value;
+        const finishAnalysis = () => {
+          state.analyzing = false;
+          setRunButtonState(false);
+          updateBadges();
+        };
         if (mode !== "url") {
-          const segments = parseInput(rawText, mode === "text" ? "text" : mode);
-          if (!segments.length) {
-            setIngestError("Could not generate valid segments from current input.");
-            state.analyzing = false;
-            updateBadges();
+          try {
+            const segments = parseInput(rawText, mode === "text" ? "text" : mode);
+            if (!segments.length) {
+              setIngestError("Could not generate valid segments from current input.");
+              finishAnalysis();
+              return;
+            }
+            project.segments = segments;
+          } catch (error) {
+            setIngestError(error.message || "Input parser failed.");
+            finishAnalysis();
             return;
           }
-          project.segments = segments;
         }
-        project.profile = el.profile.value;
-        const weights = getWeights();
-        const result = scoreSegments(project.segments, weights, project.profile);
-        project.clips = result.ordered;
-        project.qualityScore = result.quality;
-        project.weights = weights;
-        project.status = "analyzed";
-        project.metadata = makeMetadataSuggestions(project);
-        project.metadata.seo = makeSeoSuggestions(project);
-        project.qualityExplanations = qualityRationale(result.ordered, result.quality);
-        project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
-        project.lastEdited = new Date().toISOString();
-        project.confidence = project.confidence || clampPercent(65);
-        project.warnings = [];
-        persistProject();
-        renderIngestPanels(project);
-        state.analyzing = false;
-        updateBadges();
-        switchTab("suggestions");
+        try {
+          project.profile = el.profile.value;
+          const weights = getWeights();
+          const result = scoreSegments(project.segments, weights, project.profile);
+          project.clips = result.ordered;
+          project.qualityScore = result.quality;
+          project.weights = weights;
+          project.status = "analyzed";
+          project.metadata = makeMetadataSuggestions(project);
+          project.metadata.seo = makeSeoSuggestions(project);
+          project.qualityExplanations = qualityRationale(result.ordered, result.quality);
+          project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
+          project.lastEdited = new Date().toISOString();
+          project.confidence = project.confidence || clampPercent(65);
+          project.warnings = [];
+          persistProject();
+          renderIngestPanels(project);
+          finishAnalysis();
+          switchTab("suggestions");
+        } catch {
+          setIngestError("Analysis failed. Please re-run or edit source text and try again.");
+          finishAnalysis();
+        }
       }
 
       function runDemoFlow() {
