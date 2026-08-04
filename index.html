@@ -508,6 +508,34 @@
         align-items: center;
       }
 
+      .workflow-step-hints {
+        margin-top: 0.42rem;
+        display: grid;
+        gap: 0.32rem;
+      }
+
+      .workflow-step-hint {
+        margin: 0;
+        padding: 0.2rem 0.55rem;
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #bfd0eb;
+        font-size: var(--text-xs);
+      }
+
+      .workflow-step-hint.is-active {
+        color: #eaf4ff;
+        border-color: rgba(111, 220, 145, 0.45);
+        background: rgba(111, 220, 145, 0.08);
+      }
+
+      .workflow-step-hint.is-locked {
+        color: #ffcf99;
+        border-color: rgba(255, 148, 84, 0.35);
+        background: rgba(255, 148, 84, 0.08);
+      }
+
       .tab-btn {
         border: 1px solid var(--line);
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
@@ -1491,6 +1519,12 @@
               <button class="flow-step" type="button" data-step="suggestions">03 Suggestions</button>
               <button class="flow-step" type="button" data-step="export">04 Export</button>
             </div>
+            <div class="workflow-step-hints" id="workflow-step-hints">
+              <p class="workflow-step-hint" id="hint-inputs" data-step-hint="inputs">Inputs: ready.</p>
+              <p class="workflow-step-hint" id="hint-analysis" data-step-hint="analysis">Analysis: add source and run analysis to unlock.</p>
+              <p class="workflow-step-hint" id="hint-suggestions" data-step-hint="suggestions">Suggestions: run analysis first.</p>
+              <p class="workflow-step-hint" id="hint-export" data-step-hint="export">Export: complete Suggestions first.</p>
+            </div>
             <p class="context-strip" id="workflow-hint" role="status" aria-live="polite"></p>
             <div class="workflow-progress" id="workflow-progress">
               <div class="workflow-progress-track">
@@ -1942,6 +1976,12 @@
         weightTotal: document.getElementById("weight-total"),
         weightElements: Array.from(document.querySelectorAll("input[data-weight]")),
         analysisNotices: {},
+        workflowStepHints: {
+          inputs: document.getElementById("hint-inputs"),
+          analysis: document.getElementById("hint-analysis"),
+          suggestions: document.getElementById("hint-suggestions"),
+          export: document.getElementById("hint-export"),
+        },
         exportSummary: document.getElementById("export-summary"),
         exportHint: document.getElementById("export-hint"),
         competitionMode: document.getElementById("competition-mode"),
@@ -2543,6 +2583,18 @@
           suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
           export: "Copy or download the summary package and move straight into your YouTube publishing flow."
         };
+        const stepHints = {
+          inputs: "Inputs is available. Paste text, upload a transcript, or run sample.",
+          analysis: "Load/enter transcript and run Analyze to unlock Analysis.",
+          suggestions: "Run analysis to unlock Suggestions and clip ranking-based recommendations.",
+          export: "Generate SEO in Suggestions to unlock Export actions."
+        };
+        const lockedStepHints = {
+          inputs: "Inputs is ready.",
+          analysis: "Locked: add source, then run Analyze.",
+          suggestions: "Locked: run Analysis before clips are available.",
+          export: "Locked: generate SEO in Suggestions first."
+        };
         const lockHints = {
           inputs: "",
           analysis: "Add text or file, then run Analyze to unlock Analysis.",
@@ -2563,6 +2615,15 @@
         el.progressFill.style.width = `${progressPercent}%`;
         el.progressLabel.textContent = `${completed}/${totalSteps} steps complete`;
         el.workflowState.textContent = completed === totalSteps ? "Workflow complete" : `${stepLabels[state.activeTab] || "Inputs"} is the active stage`;
+        Object.keys(el.workflowStepHints).forEach((key) => {
+          const hint = el.workflowStepHints[key];
+          const enabled = isStepUnlocked(key, stepCompletion);
+          const active = state.activeTab === key;
+          const stepLocked = !enabled;
+          hint.textContent = (active ? "Active: " : "") + (stepLocked ? lockedStepHints[key] : stepHints[key]);
+          hint.classList.toggle("is-active", active);
+          hint.classList.toggle("is-locked", stepLocked);
+        });
         el.flowSteps.forEach((stepButton) => {
           const key = stepButton.dataset.step;
           const enabled = isStepUnlocked(key, stepCompletion);
