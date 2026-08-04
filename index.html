@@ -2846,6 +2846,65 @@
         border-color: rgba(255,255,255,0.14) !important;
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.06) !important;
       }
+      /* Evidence provenance stays visible without competing with the primary action. */
+      .evidence-import-guide {
+        margin-top: 0.2rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+      }
+
+      .evidence-import-guide summary {
+        padding: 0.68rem 0.78rem;
+        color: #d8d8d3;
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-weight: 750;
+      }
+
+      .evidence-import-guide ol,
+      .evidence-import-guide p {
+        margin: 0 0.85rem;
+        color: #b8b8b3;
+        font-size: 0.82rem;
+        line-height: 1.55;
+      }
+
+      .evidence-import-guide ol {
+        padding-left: 1.8rem;
+      }
+
+      .evidence-import-guide p {
+        padding: 0.65rem 0.7rem;
+        border-left: 2px solid #8e8e88;
+        background: rgba(255,255,255,0.035);
+      }
+
+      .evidence-status {
+        border-color: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.025);
+      }
+      /* Final micro-polish: keep future steps legible and mobile anchors breathable. */
+      .flow-step.is-locked,
+      .flow-step:disabled {
+        opacity: 0.84;
+        color: #c2c2bd;
+      }
+
+      .flow-step.is-locked span,
+      .flow-step:disabled span {
+        color: #a7a7a1;
+      }
+
+      #workspace {
+        scroll-margin-top: 6rem;
+      }
+
+      @media (max-width: 980px) {
+        #workspace.workspace-shell {
+          margin-top: 1.7rem;
+        }
+      }
     </style>
   </head>
   <body>
@@ -3031,7 +3090,7 @@
                     <option value="srt">SRT file</option>
                     <option value="vtt">VTT file</option>
                     <option value="csv">Transcript CSV</option>
-                    <option value="studio-csv">YouTube Studio CSV</option>
+                    <option value="studio-csv">YouTube Studio CSV (real analytics)</option>
                     <option value="url">YouTube URL (preview)</option>
                   </select>
                   <p class="helper">URL mode now gives transcript-ready fallback guidance until YouTube API integration is connected.</p>
@@ -3042,7 +3101,7 @@
                   <div class="input-actions">
                     <button id="run-analysis" class="small-btn primary" type="button">Run analysis</button>
                     <button id="load-sample" class="small-btn subtle" type="button">Load transcript sample</button>
-                    <button id="load-studio-sample" class="small-btn subtle" type="button">Load full demo data</button>
+                    <button id="load-studio-sample" class="small-btn subtle" type="button">Load labelled demo data</button>
                     <label class="small-btn file-upload subtle">
                       <input id="file-input" class="file-input" type="file" accept=".txt,.srt,.vtt,.csv" />
                       Upload selected source
@@ -3053,6 +3112,15 @@
                     <span class="evidence-state" id="evidence-state">Transcript</span>
                     <p id="evidence-detail">Transcript guidance is ready. Import a YouTube Studio CSV to add real retention and packaging evidence to this project.</p>
                   </div>
+                  <details class="evidence-import-guide">
+                    <summary>Use real YouTube Studio evidence</summary>
+                    <ol>
+                      <li>Choose <strong>YouTube Studio CSV (real analytics)</strong> above.</li>
+                      <li>Upload a CSV with <strong>elapsed time</strong> and <strong>audience retention</strong> columns. CTR, impressions, views, and watch time are optional.</li>
+                      <li>Paste or upload the matching transcript, then run analysis to connect a behavior change to an editable moment.</li>
+                    </ol>
+                    <p><strong>Important:</strong> labelled demo data proves the browser workflow. Only your imported Studio data can support creator-specific findings.</p>
+                  </details>
                   <label class="field-toggle">
                     <input id="auto-clean" type="checkbox" checked />
                     Auto-clean transcript (remove filler words)
@@ -5355,21 +5423,26 @@
       function renderEvidenceStatus(project) {
         const analytics = project?.analytics;
         if (!analytics) {
-          el.evidenceState.textContent = "Transcript";
-          el.evidenceDetail.textContent = "Transcript guidance is ready. Import a YouTube Studio CSV to add real retention and packaging evidence to this project.";
+          el.evidenceState.textContent = "Transcript only";
+          el.evidenceDetail.textContent = "Structural guidance is available. No behavior claim, channel comparison, or creator-specific performance conclusion is available until a matching YouTube Studio CSV is imported.";
           return;
         }
         const retentionCount = analytics.retentionPoints?.length || 0;
         const metricLabels = Object.keys(analytics.metrics || {}).map((key) => key.toUpperCase());
-        el.evidenceState.textContent = analytics.sourceKind === "demo" ? "Demo evidence" : "Studio data";
-        el.evidenceDetail.textContent = `${analytics.rowCount || 0} rows imported${retentionCount ? `, including ${retentionCount} retention points` : ""}${metricLabels.length ? ` and ${metricLabels.join(", ")}` : ""}. ${project?.transcript ? "Run analysis to pair it with the transcript." : "Add a transcript next so DropFix can connect evidence to editable moments."}`;
+        if (analytics.sourceKind === "demo") {
+          el.evidenceState.textContent = "Labelled demo evidence";
+          el.evidenceDetail.textContent = `${analytics.rowCount || 0} synthetic sample rows${retentionCount ? `, including ${retentionCount} retention points` : ""}. This demonstrates DropFix's detection and export workflow, but it cannot support creator-specific performance claims.`;
+          return;
+        }
+        el.evidenceState.textContent = "Imported Studio evidence";
+        el.evidenceDetail.textContent = `${analytics.rowCount || 0} rows imported${retentionCount ? `, including ${retentionCount} retention points` : ""}${metricLabels.length ? ` and ${metricLabels.join(", ")}` : ""}. ${project?.transcript ? "Run analysis to pair this creator data with transcript moments." : "Add the matching transcript next so DropFix can connect creator evidence to editable moments."}`;
       }
 
       function renderDemoGuide(project) {
         const isDemo = project?.analytics?.sourceKind === "demo" && project?.status === "analyzed";
         el.demoGuide.hidden = !isDemo;
         if (!isDemo) return;
-        el.demoGuide.innerHTML = "<strong>Judge demo path</strong><p>1. Inspect the labelled retention timeline. 2. Open a timestamped drop and review its transcript source. 3. Go to Suggestions, save an editor decision, then download the editor brief. Demo metrics are labelled sample evidence; the detection, quality gate, source links, saved decisions, and export are live browser functionality.</p>";
+        el.demoGuide.innerHTML = "<strong>Guided workflow demonstration</strong><p>1. Inspect the labelled sample retention timeline. 2. Open a timestamped drop and review its transcript source. 3. Go to Suggestions, save an editor decision, then download the editor brief. The data is synthetic and cannot prove creator performance; the detection, source links, saved decisions, and export are live browser functionality.</p>";
       }
 
       function renderDemoWalkthrough(project) {
@@ -5578,7 +5651,7 @@
       function getDemoStudioData() {
         return {
           sourceKind: "demo",
-          sourceName: "DropFix labelled demonstration data",
+          sourceName: "DropFix synthetic demonstration data",
           importedAt: new Date().toISOString(),
           rowCount: 8,
           metrics: { impressions: 12480, ctr: 7.2, views: 1326, watchTime: 83.4 },
@@ -6131,9 +6204,9 @@
         el.transcript.value = DEMO_TRANSCRIPT;
         persistProject();
         renderIngestPanels(project);
-        el.parseStatus.textContent = "Labelled demo transcript and Studio evidence loaded. Run analysis to create the first edit queue.";
-        el.parseMetrics.textContent = "8 demo retention points | CTR, impressions, views, and watch time included.";
-        el.ingestStatus.textContent = "Demo evidence is clearly labelled and ready to pair with transcript analysis.";
+        el.parseStatus.textContent = "Labelled synthetic demo transcript and evidence loaded. Run analysis to create the first edit queue.";
+        el.parseMetrics.textContent = "8 synthetic retention points | sample CTR, impressions, views, and watch time included.";
+        el.ingestStatus.textContent = "This demo proves the workflow only. Import your Studio CSV for creator-specific evidence.";
       });
 
       el.fileInput.addEventListener("change", (event) => {
