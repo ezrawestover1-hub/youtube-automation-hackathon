@@ -618,8 +618,12 @@
       }
 
       .flow-step:disabled {
-        opacity: 0.46;
+        opacity: 0.38;
+        border-color: rgba(255, 255, 255, 0.14);
+        color: #8795ad;
+        background: rgba(7, 11, 18, 0.72);
         cursor: not-allowed;
+        pointer-events: none;
         filter: grayscale(0.2);
       }
 
@@ -628,9 +632,26 @@
       }
 
       .tab-btn:disabled {
-        opacity: 0.46;
+        opacity: 0.38;
+        border-color: rgba(255, 255, 255, 0.16);
+        color: #6f7f9b;
+        background: rgba(7, 11, 18, 0.72);
         cursor: not-allowed;
         filter: grayscale(0.2);
+        pointer-events: none;
+      }
+
+      .tab-btn:disabled::before,
+      .flow-step:disabled::before {
+        content: "🔒";
+        font-size: 0.72rem;
+        opacity: 0.85;
+        margin-right: 0.2rem;
+      }
+
+      .tab-btn:disabled:focus-visible,
+      .flow-step:disabled:focus-visible {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24);
       }
 
       .state-badges {
