@@ -1419,11 +1419,10 @@
       <section class="hero">
         <div class="hero-grid">
           <div class="hero-copy">
-            <h1>A browser-only YouTube creator helper built for judges and real creators.</h1>
+            <h1>DropFix turns raw transcript into a judge-ready creator handoff.</h1>
             <p class="lead">
-              DropFix now supports transcript ingestion, session persistence, and explainable scoring.
-              You can run the full workflow from any browser and export usable clip + metadata
-              recommendations without setup.
+              Run transcript analysis, clip ranking, and SEO drafting entirely in-browser.
+              No installs, no setup, no API keys required to demo.
             </p>
             <div class="cta-row">
               <a class="btn primary" href="#workspace">Open production workspace</a>
@@ -1449,10 +1448,10 @@
           <span class="tag" id="demo-state">Idle</span>
         </div>
         <ol class="helper" style="margin: 0; padding-left: 1.1rem; line-height: 1.55">
-          <li>Loads a realistic transcript sample into Inputs</li>
-          <li>Parses segments, analyzes quality, and generates rationale</li>
-          <li>Creates ranked clips + metadata + SEO variants</li>
-          <li>Moves into Suggestions and Export tabs with handoff data ready</li>
+          <li>Loads a realistic transcript into Inputs</li>
+          <li>Parses segments, scores clip candidates, and records rationale</li>
+          <li>Builds ranked clip picks plus metadata and SEO variants</li>
+          <li>Moves into Suggestions and Export tabs with handoff-ready artifacts</li>
         </ol>
         <p class="helper" style="margin: 0.55rem 0 0">Designed for judges and creators who want to verify workflow value immediately.</p>
       </section>
@@ -1752,21 +1751,22 @@
 
       <section class="section-title" id="proof">Judge-ready proof points</section>
       <section class="proof">
-        <p style="margin: 0;">What this page demonstrates for a real judge workflow:</p>
+        <p style="margin: 0;">What this implementation proves for real judging:</p>
         <ul>
           <li>Upload or paste transcripts and parse them into analysis-ready segments entirely in-browser.</li>
-          <li>Run explainable clip scoring, regenerate with tuning, and persist project states safely.</li>
-          <li>Generate SEO title/description/tag suggestions for immediate creator handoff.</li>
-          <li>Produce judge artifacts (scorecard, verdicts, CSV row, and packet) with copy/download actions.</li>
-          <li>Track handoff actions with timestamped evidence to support transparent judging review.</li>
+          <li>Run explainable clip scoring, tune weighting, and persist workflow state automatically.</li>
+          <li>Generate title, description, and tag recommendations for practical creator handoff.</li>
+          <li>Export judge artifacts (scorecard, verdicts, CSV row, and packet) with one-click copy/download.</li>
+          <li>Track every handoff action with timestamped evidence for transparent review.</li>
         </ul>
       </section>
 
       <section class="section-title" id="ready">Built for clients and judges</section>
       <section class="proof">
         <p style="margin: 0;">
-          This page is designed as a complete front-end workflow: drop source file, tune scoring strategy,
-          review explainable recommendations, then export a handoff package. It is production-style and browser friendly.
+          This is a complete front-end workflow: load source text, tune scoring strategy,
+          review explainable recommendations, then export a handoff package.
+          It is production-style, stable, and browser-first.
         </p>
       </section>
 
@@ -3234,9 +3234,9 @@
         el.transcript.value = DEMO_TRANSCRIPT;
         project.lastHandoffCaptureAt = null;
         project.handoffActivityLog = [];
-        el.parseStatus.textContent = "Demo loaded. Running analysis now.";
-        el.parseMetrics.textContent = "Parsing demo transcript and generating evidence-first output.";
-        el.ingestStatus.textContent = "Demo workflow running.";
+        el.parseStatus.textContent = "Demo loaded. Starting analysis now.";
+        el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
+        el.ingestStatus.textContent = "Demo flow running: inputs → analysis → suggestions → export.";
         el.demoState.textContent = "Running";
         renderIngestPanels(project);
         persistProject();
@@ -3244,7 +3244,7 @@
         runAnalysis();
         switchTab("suggestions");
         el.demoState.textContent = "Done";
-        el.parseStatus.textContent = "Demo complete. Export/metadata panels are ready.";
+        el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
       }
 
       function ensureProject() {
