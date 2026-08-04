@@ -687,6 +687,30 @@
         margin-left: 0.4rem;
       }
 
+      .handoff-banner {
+        margin-top: 0.4rem;
+        border: 1px solid rgba(111, 220, 145, 0.2);
+        background: rgba(111, 220, 145, 0.08);
+        border-radius: var(--radius-md);
+        padding: 0.55rem 0.65rem;
+        color: #d4ffe2;
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+
+      .handoff-banner.blocked {
+        border-color: rgba(255, 148, 148, 0.34);
+        background: rgba(255, 148, 148, 0.08);
+        color: #ffd6d6;
+      }
+
+      .handoff-meta {
+        color: #d4ffe2;
+        margin: 0.34rem 0 0;
+        font-size: 0.76rem;
+        opacity: 0.95;
+      }
+
       .context-strip {
         margin-top: 0.4rem;
         border: 1px dashed rgba(123, 139, 168, 0.2);
@@ -1646,6 +1670,11 @@
                       <label class="workspace-label" for="export-readiness-list">Judge-readiness checklist</label>
                       <ul id="export-readiness-list" class="readiness-list"></ul>
                     </div>
+                    <div class="export-box" id="handoff-banner-wrap">
+                      <label class="workspace-label" for="handoff-banner">Handoff status banner</label>
+                      <p id="handoff-banner" class="handoff-banner blocked">Handoff status: analysis required to unlock export actions.</p>
+                      <p id="handoff-banner-meta" class="handoff-meta helper">Snapshot not captured yet.</p>
+                    </div>
                     <div class="export-actions">
                       <button id="copy-metadata" class="small-btn subtle" type="button">Copy metadata JSON</button>
                       <button id="copy-session" class="small-btn subtle" type="button">Copy full session</button>
@@ -1888,6 +1917,8 @@
         downloadJudgePacket: document.getElementById("download-judge-packet"),
         exportHandoffStatus: document.getElementById("export-handoff-status"),
         exportReadinessList: document.getElementById("export-readiness-list"),
+        handoffBanner: document.getElementById("handoff-banner"),
+        handoffBannerMeta: document.getElementById("handoff-banner-meta"),
       };
 
       function clamp(value, min, max) {
@@ -1896,6 +1927,21 @@
 
       function clampPercent(value) {
         return clamp(Math.round(value), 0, 100);
+      }
+
+      function formatAuditStamp(value) {
+        const date = value ? new Date(value) : null;
+        if (!date || Number.isNaN(date.getTime())) {
+          return "not captured";
+        }
+        return date.toLocaleString([], {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
       }
 
       function formatDuration(seconds) {
@@ -2792,6 +2838,21 @@
             .map(({ label, status }) => `<li class="${status ? "done" : ""}"><span>${status ? "PASS" : "TODO"}:</span><span class="readiness-label">${label}</span></li>`)
             .join("");
         }
+        if (el.handoffBanner && el.handoffBannerMeta) {
+          if (!hasAnalyzed) {
+            el.handoffBanner.className = "handoff-banner blocked";
+            el.handoffBanner.textContent = "Handoff status: analysis required.";
+            el.handoffBannerMeta.textContent = "Run analysis to generate clips and SEO before judge submission.";
+          } else if (!hasSeoOutput) {
+            el.handoffBanner.className = "handoff-banner blocked";
+            el.handoffBanner.textContent = "Handoff status: SEO required.";
+            el.handoffBannerMeta.textContent = "Generate SEO titles/descriptions to unlock handoff bundle and judge packet.";
+          } else {
+            el.handoffBanner.className = "handoff-banner";
+            el.handoffBanner.textContent = `Handoff status: READY -- ${safeProject.name || "project"} is judge-ready.`;
+            el.handoffBannerMeta.textContent = `Last handoff capture: ${formatAuditStamp(safeProject.lastHandoffCaptureAt)}`;
+          }
+        }
       }
 
       function renderIngestPanels(project) {
@@ -3275,6 +3336,11 @@
           return;
         }
         const copied = await copyTextToClipboard(makeJudgeHandoffBundle(project));
+        if (copied) {
+          project.lastHandoffCaptureAt = new Date().toISOString();
+          persistProject();
+          renderIngestPanels(project);
+        }
         el.copyJudgeHandoff.textContent = copied ? "Judge handoff bundle copied" : "Copy failed";
         setTimeout(() => {
           el.copyJudgeHandoff.textContent = "Copy judge handoff bundle";
