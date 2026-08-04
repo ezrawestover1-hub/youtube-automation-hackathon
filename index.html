@@ -3350,30 +3350,47 @@
         project.sourceType = "text";
         project.profile = "shorts";
         project.transcript = DEMO_TRANSCRIPT;
+        project.status = "new";
+        project.segments = [];
+        project.clips = [];
+        project.qualityScore = 0;
+        project.metadata = { seo: {} };
+        project.lastHandoffCaptureAt = null;
+        project.handoffActivityLog = [];
         el.sourceType.value = "text";
         el.profile.value = "shorts";
         el.transcript.value = DEMO_TRANSCRIPT;
-        project.lastHandoffCaptureAt = null;
-        project.handoffActivityLog = [];
         el.parseStatus.textContent = "Demo loaded. Starting analysis now.";
         el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
         el.ingestStatus.textContent = "Demo flow running: inputs → analysis → suggestions → export.";
         setDemoButtonState(true);
         el.demoState.textContent = "RUNNING";
-        renderIngestPanels(project);
         persistProject();
-        switchTab("analysis");
-        await new Promise((resolve) => setTimeout(resolve, 320));
-        const demoResult = runAnalysis();
-        if (demoResult) {
-          switchTab("suggestions");
+        renderIngestPanels(project);
+        try {
+          switchTab("analysis");
+          await new Promise((resolve) => setTimeout(resolve, 220));
+          const demoResult = runAnalysis();
+          if (!demoResult) {
+            throw new Error("Demo analysis failed. Transcript did not produce valid clips.");
+          }
+          project.metadata = project.metadata || {};
+          project.metadata.seo = makeSeoSuggestions(project);
+          project.metadata.seoGeneratedAt = new Date().toISOString();
+          project.lastHandoffCaptureAt = new Date().toISOString();
+          persistProject();
+          renderIngestPanels(project);
+          addHandoffActivity(project, "run-demo-workflow");
+          switchTab("export");
           el.demoState.textContent = "DONE";
           el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
-        } else {
+        } catch (error) {
           el.demoState.textContent = "IDLE";
-          el.parseStatus.textContent = "Demo flow did not complete. Please try again.";
+          el.parseStatus.textContent = error.message || "Demo flow did not complete. Please try again.";
+          setIngestError(error.message || "Demo flow did not complete. Please try again.");
+        } finally {
+          setDemoButtonState(false);
         }
-        setDemoButtonState(false);
       }
 
       function ensureProject() {
