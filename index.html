@@ -3757,6 +3757,9 @@
         if (state.analyzing || el.demoButton.disabled) {
           return;
         }
+        if (state.activePage !== "workspace") {
+          setActivePage("workspace", null, true);
+        }
         const demoRunId = `dropfix-live-demo-${new Date().toISOString().replace(/[:.]/g, "-").toLowerCase()}`;
         const project = ensureProject();
         project.name = "DropFix Judge Demo";
