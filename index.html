@@ -2716,6 +2716,124 @@
           min-height: 210px;
         }
       }
+      /* Final workspace refinement: force the studio composition and clarify hierarchy. */
+      #workspace.workspace-shell {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      #workspace.workspace-shell > aside.card,
+      #workspace.workspace-shell > .workspace-main {
+        grid-column: 1;
+        width: 100%;
+      }
+
+      .flow-step.is-locked,
+      .flow-step:disabled {
+        opacity: 0.72;
+        color: #ababab;
+      }
+
+      .flow-step.is-locked span,
+      .flow-step:disabled span {
+        color: #898989;
+      }
+
+      .input-actions #run-analysis {
+        min-height: 56px;
+        min-width: 284px;
+        padding-inline: 1.35rem;
+        font-size: 0.98rem;
+        letter-spacing: -0.01em;
+        box-shadow: 0 12px 28px rgba(255,24,48,0.24), inset 0 1px 0 rgba(255,255,255,0.3);
+      }
+
+      .project-overflow {
+        position: relative;
+      }
+
+      .project-overflow summary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 34px;
+        padding: 0.4rem 0.62rem;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 9px;
+        background: transparent;
+        color: #adadaa;
+        cursor: pointer;
+        font-size: 0.72rem;
+        font-weight: 750;
+        list-style: none;
+      }
+
+      .project-overflow summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .project-overflow summary:hover,
+      .project-overflow[open] summary {
+        color: #fff;
+        border-color: rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.05);
+      }
+
+      .project-overflow-panel {
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 0;
+        z-index: 25;
+        min-width: 142px;
+        padding: 0.35rem;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 11px;
+        background: #191919;
+        box-shadow: 0 18px 36px rgba(0,0,0,0.42);
+      }
+
+      .project-overflow-panel #delete-project {
+        width: 100%;
+        border-color: rgba(255,24,48,0.32);
+        background: rgba(255,24,48,0.09);
+        color: #ffc8ce;
+        box-shadow: none;
+      }
+
+      .project-overflow-panel #delete-project:hover {
+        border-color: rgba(255,24,48,0.7);
+        background: rgba(255,24,48,0.18);
+        color: #fff;
+      }
+
+      @media (max-width: 980px) {
+        .input-actions #run-analysis {
+          min-height: 54px;
+          min-width: 0;
+        }
+      }
+      /* Header belongs to the black studio system, not a blue dashboard theme. */
+      .top-bar {
+        background: rgba(9,9,9,0.94) !important;
+        border-color: rgba(255,255,255,0.13);
+        box-shadow: 0 16px 38px rgba(0,0,0,0.42);
+      }
+
+      .brand > span:first-child {
+        color: #f7f7f5;
+      }
+
+      .top-bar .tag,
+      .top-bar .nav-chip {
+        background: rgba(255,255,255,0.035);
+        color: #b9b9b5;
+      }
+
+      .top-bar .nav-chip:hover,
+      .top-bar .nav-chip.is-active,
+      .top-bar .nav-chip[aria-current="page"] {
+        background: rgba(255,24,48,0.12);
+        color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -2807,7 +2925,12 @@
           <h2 class="panel-title">Workspace</h2>
           <div class="workspace-actions">
             <button id="new-project" class="small-btn" type="button">+ New project</button>
-            <button id="delete-project" class="small-btn" type="button" title="Delete current project">Delete current</button>
+            <details class="project-overflow">
+              <summary aria-label="Project options">More</summary>
+              <div class="project-overflow-panel">
+                <button id="delete-project" class="small-btn" type="button" title="Delete current project">Delete project</button>
+              </div>
+            </details>
           </div>
           <p class="helper" id="project-count">0 saved projects</p>
           <div id="project-list" class="projects" aria-live="polite"></div>
@@ -4895,7 +5018,8 @@
             novelty: finding.segmentIndex >= 0 ? 3 : 2,
             validationQuality: isActionableEvent ? 4 : 2,
           };
-          const score = Object.values(assessment).reduce((sum, value) => sum + value, 0);
+          const scoreCeiling = hasChannelBaseline ? 34 : isDemoEvidence ? 30 : 32;
+          const score = Math.min(scoreCeiling, Object.values(assessment).reduce((sum, value) => sum + value, 0));
           const compared = "No matched channel baseline is imported yet. This is a within-video event, not an underperformance claim.";
           const recommendedAction = isActionableEvent ? getActionForFinding(finding, goal) : "Do not make a primary edit decision from this checkpoint alone. Import comparable videos before testing a packaging or opening diagnosis.";
           const expectedImpact = finding.type === "drop"
@@ -4925,6 +5049,9 @@
 
       function renderClipCards(project) {
         const clips = project?.clips || [];
+        if (project?.evidenceFindings?.length) {
+          project.recommendations = buildActionableRecommendations(project);
+        }
         const recommendations = (project?.recommendations || []).filter((item) => item.isPrimary);
         if (recommendations.length) {
           const topCount = recommendations.filter((item) => item.isTopPriority).length;
