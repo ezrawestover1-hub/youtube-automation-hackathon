@@ -542,6 +542,11 @@
         transform: translateY(-1px);
       }
 
+      .tab-btn:disabled:hover,
+      .flow-step:disabled:hover {
+        transform: none;
+      }
+
       .workflow-strip {
         margin-top: 0.75rem;
         display: flex;
@@ -2538,6 +2543,12 @@
           suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
           export: "Copy or download the summary package and move straight into your YouTube publishing flow."
         };
+        const lockHints = {
+          inputs: "",
+          analysis: "Add text or file, then run Analyze to unlock Analysis.",
+          suggestions: "Run Analysis first to unlock Suggestions.",
+          export: "Generate SEO packs in Suggestions to unlock Export."
+        };
         el.statusState.textContent = status;
         el.statusState.className = `state-badge ${state.analyzing ? "status-good is-working" : "status-watch"}`;
         el.autosaveState.textContent = "Autosave: on";
@@ -2558,11 +2569,13 @@
           stepButton.disabled = !enabled;
           stepButton.classList.toggle("is-complete", stepCompletion[key]);
           stepButton.setAttribute("aria-current", stepButton.dataset.step === state.activeTab ? "step" : "false");
+          stepButton.title = enabled ? "" : lockHints[key];
         });
         document.querySelectorAll(".tab-btn").forEach((tabButton) => {
           const key = tabButton.dataset.tab;
           const enabled = isStepUnlocked(key, stepCompletion);
           tabButton.disabled = !enabled;
+          tabButton.title = enabled ? "" : lockHints[key];
         });
       }
 
