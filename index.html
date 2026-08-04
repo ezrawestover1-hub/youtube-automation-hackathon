@@ -627,8 +627,8 @@
         border-color: rgba(255, 255, 255, 0.14);
         color: #8795ad;
         background: rgba(7, 11, 18, 0.72);
-        cursor: not-allowed;
-        pointer-events: none;
+        cursor: pointer;
+        pointer-events: auto;
         filter: grayscale(0.2);
       }
 
@@ -642,16 +642,16 @@
         border-color: rgba(255, 255, 255, 0.16);
         color: #6f7f9b;
         background: rgba(7, 11, 18, 0.72);
-        cursor: not-allowed;
+        cursor: pointer;
         filter: grayscale(0.2);
-        pointer-events: none;
+        pointer-events: auto;
       }
 
       .tab-btn:disabled::before,
       .flow-step:disabled::before,
       .tab-btn.is-locked::before,
       .flow-step.is-locked::before {
-        content: "🔒";
+        content: "\01F512";
         font-size: 0.72rem;
         opacity: 0.85;
         margin-right: 0.2rem;
@@ -2386,6 +2386,7 @@
       function getHandoffActionLabel(action) {
         const map = {
           "copy-handoff-bundle": "Copied judge handoff bundle",
+          "download-demo-test-packet": "Downloaded live demo test packet",
           "download-judge-packet": "Downloaded judge packet",
           "copy-judge-scorecard": "Copied judge scorecard",
           "download-judge-csv": "Downloaded judge CSV row",
@@ -2395,6 +2396,81 @@
           "copy-session": "Copied full session",
         };
         return map[action] || action;
+      }
+
+      const WORKFLOW_STEP_LABELS = {
+        inputs: "Inputs",
+        analysis: "Analysis",
+        suggestions: "Suggestions",
+        export: "Export"
+      };
+      const WORKFLOW_HINTS = {
+        inputs: "Upload text or drag-and-drop a subtitle transcript, then run Analyze to score every segment.",
+        analysis: "Tune your scoring profile and rerun if needed to prioritize best clips.",
+        suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
+        export: "Copy or download the summary package and move straight into your YouTube publishing flow."
+      };
+      const WORKFLOW_STEP_HINTS = {
+        inputs: "Inputs is available. Paste text, upload a transcript, or run sample.",
+        analysis: "Load/enter transcript and run Analyze to unlock Analysis.",
+        suggestions: "Run analysis to unlock Suggestions and clip ranking-based recommendations.",
+        export: "Generate SEO in Suggestions to unlock Export actions."
+      };
+      const WORKFLOW_LOCK_HINTS = {
+        inputs: "",
+        analysis: "Add text or file, then run Analyze to unlock Analysis.",
+        suggestions: "Run Analysis first to unlock Suggestions.",
+        export: "Generate SEO packs in Suggestions to unlock Export."
+      };
+      const WORKFLOW_STEP_ORDER = ["inputs", "analysis", "suggestions", "export"];
+      const WORKFLOW_LOCK_HINTS_BUBBLE = {
+        inputs: "",
+        analysis: "Complete Inputs before moving to Analysis.",
+        suggestions: "Run Analysis first so clips and metadata can be generated.",
+        export: "Generate SEO in Suggestions before exporting."
+      };
+
+      function getStepLockHint(stepKey) {
+        return WORKFLOW_LOCK_HINTS_BUBBLE[stepKey] || "Complete the previous workflow step first.";
+      }
+
+      function getNearestAccessibleStep(stepKey, completion) {
+        const safeCompletion = completion || {};
+        const targetIndex = WORKFLOW_STEP_ORDER.indexOf(stepKey);
+        if (targetIndex === -1) {
+          return "inputs";
+        }
+        for (let index = targetIndex; index >= 0; index--) {
+          const candidate = WORKFLOW_STEP_ORDER[index];
+          if (isStepUnlocked(candidate, safeCompletion)) {
+            return candidate;
+          }
+        }
+        return "inputs";
+      }
+
+      function tryWorkspaceStepSwitch(stepKey) {
+        const project = getCurrentProject();
+        const stepState = getWorkflowStepState(project);
+        if (!stepState) {
+          return false;
+        }
+        const targetStep = isStepUnlocked(stepKey, stepState.completion) ? stepKey : getNearestAccessibleStep(stepKey, stepState.completion);
+        if (targetStep !== stepKey) {
+          if (el.workflowHint) {
+            el.workflowHint.textContent = `${getStepLockHint(stepKey)} Redirecting to ${WORKFLOW_STEP_LABELS[targetStep] || targetStep}.`;
+          }
+          switchTab(targetStep);
+          return true;
+        }
+        if (!targetStep) {
+          return false;
+        }
+        if (el.workflowHint) {
+          el.workflowHint.textContent = WORKFLOW_HINTS[targetStep] || WORKFLOW_HINTS.inputs;
+        }
+        switchTab(targetStep);
+        return true;
       }
 
       function addHandoffActivity(project, action, details = "") {
@@ -2877,6 +2953,7 @@
         const safeProject = project || {};
         const totalSegments = (safeProject.segments || []).length;
         const hasParsed = totalSegments > 0;
+        const hasTranscript = Boolean((safeProject.transcript || "").trim());
         const hasAnalysis = safeProject.status === "analyzed" && Array.isArray(safeProject.clips) && safeProject.clips.length > 0;
         const hasSeo =
           hasAnalysis &&
@@ -2889,7 +2966,7 @@
           Boolean(safeProject.metadata?.title || safeProject.metadata?.description);
         return {
           completion: {
-            inputs: safeProject.status !== "needs-fix" && (hasParsed || safeProject.status === "analyzed"),
+            inputs: hasTranscript || hasParsed || safeProject.status === "analyzed",
             analysis: hasAnalysis,
             suggestions: hasSeo,
             export: hasExport
@@ -2920,74 +2997,48 @@
         const stateInfo = getWorkflowStepState(project);
         const { completion: stepCompletion, totalSegments, fileType } = stateInfo;
         const status = state.analyzing ? "Analyzing..." : "Ready";
-        const stepLabels = {
-          inputs: "Inputs",
-          analysis: "Analysis",
-          suggestions: "Suggestions",
-          export: "Export"
-        };
-        const workflowHints = {
-          inputs: "Upload text or drag-and-drop a subtitle transcript, then run Analyze to score every segment.",
-          analysis: "Tune your scoring profile and rerun if needed to prioritize best clips.",
-          suggestions: "Pick top clips, then generate metadata packs that match your chosen tone.",
-          export: "Copy or download the summary package and move straight into your YouTube publishing flow."
-        };
-        const stepHints = {
-          inputs: "Inputs is available. Paste text, upload a transcript, or run sample.",
-          analysis: "Load/enter transcript and run Analyze to unlock Analysis.",
-          suggestions: "Run analysis to unlock Suggestions and clip ranking-based recommendations.",
-          export: "Generate SEO in Suggestions to unlock Export actions."
-        };
-        const lockedStepHints = {
-          inputs: "Inputs is ready.",
-          analysis: "Locked: add source, then run Analyze.",
-          suggestions: "Locked: run Analysis before clips are available.",
-          export: "Locked: generate SEO in Suggestions first."
-        };
-        const lockHints = {
-          inputs: "",
-          analysis: "Add text or file, then run Analyze to unlock Analysis.",
-          suggestions: "Run Analysis first to unlock Suggestions.",
-          export: "Generate SEO packs in Suggestions to unlock Export."
-        };
         el.statusState.textContent = status;
         el.statusState.className = `state-badge ${state.analyzing ? "status-good is-working" : "status-watch"}`;
         el.autosaveState.textContent = "Autosave: on";
-        el.stepState.textContent = `Step: ${stepLabels[state.activeTab] || "Inputs"}`;
+        el.stepState.textContent = `Step: ${WORKFLOW_STEP_LABELS[state.activeTab] || "Inputs"}`;
         el.segmentsState.textContent = `Segments: ${totalSegments}`;
         el.fileState.textContent = `Source: ${fileType}`;
         el.profileQuick.textContent = `${el.profile.options[el.profile.selectedIndex].text}`;
-        el.workflowHint.textContent = workflowHints[state.activeTab] || workflowHints.inputs;
+        el.workflowHint.textContent = WORKFLOW_HINTS[state.activeTab] || WORKFLOW_HINTS.inputs;
         const completed = Object.values(stepCompletion).filter(Boolean).length;
         const totalSteps = Object.keys(stepCompletion).length;
         const progressPercent = Math.round((completed / totalSteps) * 100);
         el.progressFill.style.width = `${progressPercent}%`;
         el.progressLabel.textContent = `${completed}/${totalSteps} steps complete`;
-        el.workflowState.textContent = completed === totalSteps ? "Workflow complete" : `${stepLabels[state.activeTab] || "Inputs"} is the active stage`;
+        el.workflowState.textContent = completed === totalSteps ? "Workflow complete" : `${WORKFLOW_STEP_LABELS[state.activeTab] || "Inputs"} is the active stage`;
         Object.keys(el.workflowStepHints).forEach((key) => {
           const hint = el.workflowStepHints[key];
           const enabled = isStepUnlocked(key, stepCompletion);
           const active = state.activeTab === key;
           const stepLocked = !enabled;
-          hint.textContent = (active ? "Active: " : "") + (stepLocked ? lockedStepHints[key] : stepHints[key]);
+          hint.textContent = (active ? "Active: " : "") + (stepLocked ? `Locked: ${WORKFLOW_STEP_HINTS[key]}` : WORKFLOW_STEP_HINTS[key]);
           hint.classList.toggle("is-active", active);
           hint.classList.toggle("is-locked", stepLocked);
         });
         el.flowSteps.forEach((stepButton) => {
           const key = stepButton.dataset.step;
           const enabled = isStepUnlocked(key, stepCompletion);
-          stepButton.disabled = !enabled;
           stepButton.classList.toggle("is-locked", !enabled);
           stepButton.classList.toggle("is-complete", stepCompletion[key]);
+          stepButton.disabled = false;
+          stepButton.setAttribute("aria-disabled", String(!enabled));
           stepButton.setAttribute("aria-current", stepButton.dataset.step === state.activeTab ? "step" : "false");
-          stepButton.title = enabled ? "" : lockHints[key];
+          stepButton.title = enabled ? "" : WORKFLOW_LOCK_HINTS[key];
         });
         document.querySelectorAll(".tab-btn").forEach((tabButton) => {
           const key = tabButton.dataset.tab;
           const enabled = isStepUnlocked(key, stepCompletion);
-          tabButton.disabled = !enabled;
           tabButton.classList.toggle("is-locked", !enabled);
-          tabButton.title = enabled ? "" : lockHints[key];
+          tabButton.disabled = false;
+          tabButton.classList.toggle("active", tabButton.dataset.tab === state.activeTab);
+          tabButton.setAttribute("aria-current", tabButton.dataset.tab === state.activeTab ? "page" : "false");
+          tabButton.setAttribute("aria-disabled", String(!enabled));
+          tabButton.title = enabled ? "" : WORKFLOW_LOCK_HINTS[key];
         });
       }
 
@@ -3393,8 +3444,8 @@
         const confidence = clampPercent(project.confidence || 0);
         el.confidenceBar.style.width = `${confidence}%`;
         el.confidenceText.textContent = `Confidence: ${confidence}%`;
-        const quality = clampPercent(project.qualityScore || 0);
-        el.qualityBar.style.width = `${quality}%`;
+        const qualityPercent = clampPercent(project.qualityScore || 0);
+        el.qualityBar.style.width = `${qualityPercent}%`;
         el.qualitySummary.textContent = project.qualityLabel || "No run yet.";
         el.metadataCloud.innerHTML = (project.metadata && project.metadata.tags && project.metadata.tags.length)
           ? project.metadata.tags.map((tag) => `<span>${tag}</span>`).join("")
@@ -3438,9 +3489,9 @@
         }
         setExportControlStates(project);
         const verdict = getCompetitionVerdict(project, getCompetitionMode());
-        const quality = clampPercent(project.qualityScore || 0);
+        const verdictQuality = clampPercent(project.qualityScore || 0);
         const verdictTone = project.status === "analyzed"
-          ? getVerdictToneClass(getCompetitionMode(), quality)
+          ? getVerdictToneClass(getCompetitionMode(), verdictQuality)
           : "status-watch";
         el.verdictPill.className = `state-badge ${verdictTone}`;
         el.verdictPill.classList.toggle("is-ready", hasAnalyzed);
@@ -3598,6 +3649,46 @@
         el.demoState.textContent = isRunning ? "RUNNING" : "IDLE";
       }
 
+      function makeLiveDemoPacket(project, options = {}) {
+        const safeProject = project || {};
+        const clips = safeProject.clips || [];
+        const safeMode = options.mode || getCompetitionMode();
+        const safeStatus = options.status || "completed";
+        const safeError = typeof options.error === "string" ? options.error : "";
+        const seo = safeProject.metadata?.seo || {};
+        return {
+          runType: "live-demo",
+          runId: options.runId || `demo-${new Date().toISOString()}`,
+          demoName: safeProject.name || "DropFix Judge Demo",
+          projectId: safeProject.id || null,
+          generatedAt: new Date().toISOString(),
+          status: safeStatus,
+          statusMessage: safeError,
+          profile: safeProject.profile || "shorts",
+          sourceType: safeProject.sourceType || "text",
+          qualityScore: clampPercent(safeProject.qualityScore || 0),
+          segments: (safeProject.segments || []).length,
+          clipSummary: clips.slice(0, 5).map((clip) => ({
+            start: clip.start,
+            end: clip.end,
+            score: clip.score,
+            reasons: clip.reasons,
+          })),
+          seo: {
+            titles: seo.titles || [],
+            descriptionVariants: seo.descriptionVariants || [],
+            tags: seo.tags || [],
+            hashtags: seo.hashtags || [],
+          },
+          handoffReady: ((seo.titles || []).length > 0 || (seo.descriptionVariants || []).length > 0),
+          competition: {
+            mode: safeMode,
+            verdict: getCompetitionVerdict(safeProject, safeMode),
+          },
+          scorecard: getJudgeScorecardText(safeProject),
+        };
+      }
+
       function runAnalysis() {
         const project = ensureProject();
         if (!project.transcript && !project.segments.length) {
@@ -3666,6 +3757,7 @@
         if (state.analyzing || el.demoButton.disabled) {
           return;
         }
+        const demoRunId = `dropfix-live-demo-${new Date().toISOString().replace(/[:.]/g, "-").toLowerCase()}`;
         const project = ensureProject();
         project.name = "DropFix Judge Demo";
         project.sourceType = "text";
@@ -3683,7 +3775,7 @@
         el.transcript.value = DEMO_TRANSCRIPT;
         el.parseStatus.textContent = "Demo loaded. Starting analysis now.";
         el.parseMetrics.textContent = "Parsing transcript and producing evidence-first clip + metadata output.";
-        el.ingestStatus.textContent = "Demo flow running: inputs → analysis → suggestions → export.";
+        el.ingestStatus.textContent = "Demo flow running: inputs \u2192 analysis \u2192 suggestions \u2192 export.";
         setDemoButtonState(true);
         el.demoState.textContent = "RUNNING";
         persistProject();
@@ -3699,6 +3791,10 @@
           project.metadata.seo = makeSeoSuggestions(project);
           project.metadata.seoGeneratedAt = new Date().toISOString();
           project.lastHandoffCaptureAt = new Date().toISOString();
+          const demoPacket = makeLiveDemoPacket(project, { runId: demoRunId, status: "completed", mode: getCompetitionMode() });
+          const testFileName = `${demoRunId}.json`;
+          downloadFile(testFileName, JSON.stringify(demoPacket, null, 2), "application/json");
+          addHandoffActivity(project, "download-demo-test-packet", "Live demo output generated.");
           persistProject();
           renderIngestPanels(project);
           addHandoffActivity(project, "run-demo-workflow");
@@ -3706,9 +3802,19 @@
           el.demoState.textContent = "DONE";
           el.parseStatus.textContent = "Demo complete. Export and handoff artifacts are ready.";
         } catch (error) {
+          const message = error?.message || "Demo flow did not complete. Please try again.";
+          const failedPacket = makeLiveDemoPacket(project, {
+            runId: demoRunId,
+            status: "failed",
+            mode: getCompetitionMode(),
+            error: message,
+          });
+          const failFileName = `${demoRunId}-failed.json`;
+          downloadFile(failFileName, JSON.stringify(failedPacket, null, 2), "application/json");
+          addHandoffActivity(project, "download-demo-test-packet", "Live demo fallback output generated.");
           el.demoState.textContent = "IDLE";
-          el.parseStatus.textContent = error.message || "Demo flow did not complete. Please try again.";
-          setIngestError(error.message || "Demo flow did not complete. Please try again.");
+          el.parseStatus.textContent = message;
+          setIngestError(message);
         } finally {
           setDemoButtonState(false);
         }
@@ -3869,19 +3975,13 @@
 
       document.querySelectorAll(".tab-btn").forEach((button) => {
         button.addEventListener("click", () => {
-          if (button.disabled) {
-            return;
-          }
-          switchTab(button.dataset.tab);
+          tryWorkspaceStepSwitch(button.dataset.tab);
         });
       });
 
       el.flowSteps.forEach((step) => {
         step.addEventListener("click", () => {
-          if (step.disabled) {
-            return;
-          }
-          switchTab(step.dataset.step);
+          tryWorkspaceStepSwitch(step.dataset.step);
         });
       });
 
@@ -4127,6 +4227,11 @@
     </script>
   </body>
 </html>
+
+
+
+
+
 
 
 
