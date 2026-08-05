@@ -6369,6 +6369,818 @@
       initFromWorkspace();
       switchTab(state.activeTab);
     </script>
+    <style>
+      .studio-import-feedback {
+        display: grid;
+        gap: 0.3rem;
+        margin-top: 0.7rem;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-left: 3px solid #8e8e88;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.035);
+        color: #c9c9c4;
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .studio-import-feedback[data-state="ready"] { border-left-color: #58c78c; }
+      .studio-import-feedback[data-state="error"] { border-left-color: #ff4054; color: #ffdadd; }
+      .studio-import-feedback strong { color: #f5f5ef; font-size: 0.84rem; }
+    </style>
+    <script>
+      (() => {
+        const input = document.querySelector(".file-input");
+        const sourceType = document.getElementById("source-type");
+        const transcript = document.getElementById("transcript");
+        const parseStatus = document.getElementById("parse-status");
+        const parseMetrics = document.getElementById("parse-metrics");
+        const ingestStatus = document.getElementById("ingest-status");
+
+        if (!input || !sourceType) return;
+
+        const feedback = document.createElement("div");
+        feedback.id = "studio-import-feedback";
+        feedback.className = "studio-import-feedback";
+        feedback.hidden = true;
+        feedback.setAttribute("role", "status");
+        feedback.setAttribute("aria-live", "polite");
+        input.closest("label, .file-upload, .dropzone")?.insertAdjacentElement("afterend", feedback);
+
+        const setFeedback = (state, title, detail) => {
+          feedback.hidden = sourceType.value !== "studio-csv";
+          feedback.dataset.state = state;
+          feedback.innerHTML = `<strong>${title}</strong><span>${detail}</span>`;
+        };
+
+        const normalizeHeader = (value) => String(value || "")
+          .toLowerCase()
+          .replace(/\u00a0/g, " ")
+          .replace(/[^a-z0-9%]+/g, " ")
+          .trim();
+
+        const parseCsv = (text) => {
+          const rows = [];
+          let row = [];
+          let value = "";
+          let quoted = false;
+          for (let index = 0; index < text.length; index += 1) {
+            const char = text[index];
+            const next = text[index + 1];
+            if (char === '"' && quoted && next === '"') {
+              value += '"';
+              index += 1;
+            } else if (char === '"') {
+              quoted = !quoted;
+            } else if (char === "," && !quoted) {
+              row.push(value.trim());
+              value = "";
+            } else if ((char === "\n" || char === "\r") && !quoted) {
+              if (char === "\r" && next === "\n") index += 1;
+              row.push(value.trim());
+              if (row.some((cell) => cell !== "")) rows.push(row);
+              row = [];
+              value = "";
+            } else {
+              value += char;
+            }
+          }
+          row.push(value.trim());
+          if (row.some((cell) => cell !== "")) rows.push(row);
+          return rows;
+        };
+
+        const numberValue = (value) => {
+          const cleaned = String(value || "").replace(/[,\s]/g, "").replace(/%/g, "");
+          const parsed = Number(cleaned);
+          return Number.isFinite(parsed) ? parsed : null;
+        };
+
+        const timeValue = (value) => {
+          const raw = String(value || "").trim();
+          if (/^\d+(?::\d{1,2}){1,2}$/.test(raw)) {
+            return raw.split(":").map(Number).reduce((total, part) => total * 60 + part, 0);
+          }
+          const seconds = raw.match(/([\d.]+)\s*(s|sec|seconds)\b/i);
+          if (seconds) return Number(seconds[1]);
+          const numeric = numberValue(raw);
+          return numeric !== null ? numeric : null;
+        };
+
+        const findColumn = (headers, patterns) => headers.findIndex((header) => patterns.some((pattern) => pattern.test(header)));
+
+        const importStudioCsv = (file) => {
+          const reader = new FileReader();
+          reader.onerror = () => {
+            setFeedback("error", "Studio CSV could not be read", "Try exporting a CSV directly from YouTube Studio, then upload it again.");
+          };
+          reader.onload = () => {
+            try {
+              const rows = parseCsv(String(reader.result || ""));
+              if (rows.length < 3) throw new Error("The file needs a header row and at least two data rows.");
+              const headers = rows[0].map(normalizeHeader);
+              const timeColumn = findColumn(headers, [/^time$/, /timestamp/, /elapsed/, /video time/, /seconds?/]);
+              const retentionColumn = findColumn(headers, [/audience retention/, /^retention/, /average percentage viewed/, /percentage viewed/]);
+              if (retentionColumn < 0) {
+                throw new Error("No retention column found. Use a Studio export with Audience retention or Average percentage viewed.");
+              }
+
+              const points = rows.slice(1).map((row, index) => {
+                const rawRetention = numberValue(row[retentionColumn]);
+                if (rawRetention === null) return null;
+                const seconds = timeColumn >= 0 ? timeValue(row[timeColumn]) : index * 10;
+                if (seconds === null) return null;
+                const retention = rawRetention <= 1 ? rawRetention * 100 : rawRetention;
+                return {
+                  seconds: Math.max(0, Number(seconds.toFixed(2))),
+                  timestamp: Math.max(0, Number(seconds.toFixed(2))),
+                  time: Math.max(0, Number(seconds.toFixed(2))),
+                  retention: Math.max(0, Math.min(100, Number(retention.toFixed(2)))),
+                  value: Math.max(0, Math.min(100, Number(retention.toFixed(2)))),
+                };
+              }).filter(Boolean).sort((a, b) => a.seconds - b.seconds);
+
+              if (points.length < 3) throw new Error("DropFix found fewer than three valid retention points in this CSV.");
+
+              const project = typeof ensureProject === "function" ? ensureProject() : null;
+              if (!project) throw new Error("Your project could not be opened. Refresh the workspace and try again.");
+              project.sourceType = "studio-csv";
+              project.analytics = {
+                ...(project.analytics || {}),
+                source: "youtube-studio-csv",
+                sourceLabel: "YouTube Studio CSV (creator import)",
+                importedAt: new Date().toISOString(),
+                filename: file.name,
+                retention: points,
+                retentionPoints: points,
+                importReport: {
+                  rowsRead: rows.length - 1,
+                  validRetentionPoints: points.length,
+                  timeColumn: timeColumn >= 0 ? rows[0][timeColumn] : "Generated from row order",
+                  retentionColumn: rows[0][retentionColumn],
+                  usedGeneratedTime: timeColumn < 0,
+                },
+              };
+              project.status = "new";
+              project.clips = [];
+              project.qualityScore = 0;
+              if (typeof persistProject === "function") persistProject();
+              if (typeof renderIngestPanels === "function") renderIngestPanels(project);
+
+              const timing = timeColumn < 0 ? " No time column was found, so points use row order at 10-second intervals." : "";
+              setFeedback("ready", "Studio evidence imported", `${points.length} retention points from ${rows.length - 1} rows. Keep or paste the matching transcript, then run analysis.${timing}`);
+              if (parseStatus) parseStatus.textContent = `Studio CSV imported: ${file.name}. Add the matching transcript, then run analysis.`;
+              if (parseMetrics) parseMetrics.textContent = `${points.length} real retention points | ${rows.length - 1} rows | ${timeColumn < 0 ? "generated timestamps" : "timestamps matched"}`;
+              if (ingestStatus) ingestStatus.textContent = transcript?.value.trim() ? "Studio evidence and transcript are ready for analysis." : "Studio evidence is ready. Paste the matching transcript to connect moments to edits.";
+            } catch (error) {
+              const message = error?.message || "DropFix could not validate this Studio CSV.";
+              setFeedback("error", "Studio CSV needs attention", message);
+              if (parseStatus) parseStatus.textContent = message;
+              if (ingestStatus) ingestStatus.textContent = "No creator-specific evidence was imported.";
+            }
+          };
+          reader.readAsText(file);
+        };
+
+        input.addEventListener("change", (event) => {
+          if (sourceType.value !== "studio-csv") return;
+          const file = event.target.files?.[0];
+          if (!file) return;
+          event.stopImmediatePropagation();
+          if (!/\.csv$/i.test(file.name) && file.type !== "text/csv") {
+            setFeedback("error", "Choose a CSV export", "DropFix accepts a .csv file exported from YouTube Studio for this input mode.");
+            return;
+          }
+          setFeedback("loading", "Importing Studio evidence", `Reading ${file.name} and validating retention columns.`);
+          importStudioCsv(file);
+        }, true);
+
+        sourceType.addEventListener("change", () => {
+          if (sourceType.value === "studio-csv") {
+            setFeedback("idle", "Import YouTube Studio evidence", "Upload a retention CSV first. DropFix keeps it separate from your transcript and only links recommendations after both are present.");
+          } else {
+            feedback.hidden = true;
+          }
+        });
+      })();
+    </script>
+    <style>
+      .evidence-decision-studio {
+        margin: 1.35rem 0 0;
+        padding: 1.05rem;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.018));
+      }
+
+      .evidence-decision-head,
+      .evidence-decision-meta,
+      .evidence-finding-actions,
+      .evidence-finding-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .evidence-decision-head h2 { margin: 0; font-size: 1.05rem; }
+      .evidence-decision-kicker { color: #ff8490; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
+      .evidence-decision-meta { margin-top: 0.7rem; color: #bcbcb7; font-size: 0.82rem; }
+      .evidence-score { padding: 0.35rem 0.55rem; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 999px; color: #f3f3ed; font-size: 0.76rem; font-weight: 800; }
+      .evidence-finding-list { display: grid; gap: 0.75rem; margin-top: 0.95rem; }
+      .evidence-finding { padding: 0.9rem; border: 1px solid rgba(255, 255, 255, 0.11); border-radius: 14px; background: rgba(0, 0, 0, 0.2); }
+      .evidence-finding[data-kind="drop"] { border-left: 3px solid #ff4054; }
+      .evidence-finding[data-kind="spike"] { border-left: 3px solid #58c78c; }
+      .evidence-finding-title { margin: 0.2rem 0 0; color: #f5f5ef; font-size: 0.96rem; }
+      .evidence-finding p { margin: 0.48rem 0 0; color: #c2c2bd; font-size: 0.84rem; line-height: 1.5; }
+      .evidence-finding strong { color: #f5f5ef; }
+      .evidence-finding-actions { margin-top: 0.8rem; justify-content: flex-start; }
+      .evidence-finding-actions button { min-height: 34px; padding: 0.42rem 0.62rem; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 9px; background: #202020; color: #ededE8; font: inherit; font-size: 0.78rem; font-weight: 750; cursor: pointer; }
+      .evidence-finding-actions button[data-decision="accepted"] { border-color: rgba(88, 199, 140, 0.65); color: #b9f3d2; }
+      .evidence-finding-actions button[data-decision="dismissed"] { border-color: rgba(255, 64, 84, 0.58); color: #ffd4d9; }
+      .evidence-finding-actions button.is-active { background: rgba(255, 24, 48, 0.15); border-color: #ff4054; color: #fff; }
+      .evidence-finding textarea { width: 100%; min-height: 76px; margin-top: 0.75rem; box-sizing: border-box; resize: vertical; }
+      .evidence-empty { margin: 0.9rem 0 0; padding: 0.85rem; border-radius: 12px; background: rgba(255, 255, 255, 0.035); color: #c2c2bd; font-size: 0.85rem; line-height: 1.5; }
+      @media (max-width: 640px) { .evidence-decision-studio { margin-top: 1rem; padding: 0.85rem; } }
+    </style>
+    <script>
+      (() => {
+        const workspace = document.getElementById("workspace");
+        if (!workspace) return;
+
+        const panel = document.createElement("section");
+        panel.id = "evidence-decision-studio";
+        panel.className = "evidence-decision-studio";
+        panel.setAttribute("aria-live", "polite");
+        workspace.insertAdjacentElement("afterend", panel);
+
+        const escapeHtml = (value) => String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+
+        const getProject = () => {
+          if (typeof getCurrentProject === "function") return getCurrentProject();
+          if (typeof ensureProject === "function") return ensureProject();
+          return null;
+        };
+
+        const asNumber = (value) => {
+          const parsed = Number(value);
+          return Number.isFinite(parsed) ? parsed : null;
+        };
+
+        const formatTime = (seconds) => {
+          const total = Math.max(0, Math.round(seconds || 0));
+          return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+        };
+
+        const getRetentionPoints = (project) => {
+          const raw = project?.analytics?.retention || project?.analytics?.retentionPoints || [];
+          return raw.map((point, index) => {
+            const seconds = asNumber(point.seconds ?? point.timestamp ?? point.time ?? index * 10);
+            const retention = asNumber(point.retention ?? point.value ?? point.percent);
+            if (seconds === null || retention === null) return null;
+            return { seconds, retention: retention <= 1 ? retention * 100 : retention };
+          }).filter(Boolean).sort((a, b) => a.seconds - b.seconds);
+        };
+
+        const transcriptMoment = (project, seconds) => {
+          const segments = Array.isArray(project?.segments) ? project.segments : [];
+          const matchingSegment = segments.find((segment) => {
+            const start = asNumber(segment.start ?? segment.startTime ?? segment.time ?? segment.timestamp);
+            const end = asNumber(segment.end ?? segment.endTime);
+            return start !== null && (end === null ? Math.abs(start - seconds) <= 8 : seconds >= start && seconds <= end);
+          });
+          const segmentText = matchingSegment?.text || matchingSegment?.content || matchingSegment?.caption;
+          if (segmentText) return { text: String(segmentText), matched: true };
+
+          const rawTranscript = String(document.getElementById("transcript")?.value || project?.transcript || "").trim();
+          const sentences = rawTranscript.split(/(?<=[.!?])\s+/).filter(Boolean);
+          if (!sentences.length) return { text: "Add the matching transcript to connect this signal to an edit.", matched: false };
+          const duration = Math.max(seconds, ...getRetentionPoints(project).map((point) => point.seconds), 1);
+          const sentenceIndex = Math.min(sentences.length - 1, Math.floor((seconds / duration) * sentences.length));
+          return { text: sentences[sentenceIndex], matched: false };
+        };
+
+        const buildFindings = (project) => {
+          const points = getRetentionPoints(project);
+          if (points.length < 4) return [];
+          const changes = points.slice(1).map((point, index) => ({
+            point,
+            previous: points[index],
+            delta: point.retention - points[index].retention,
+          }));
+          const averageChange = changes.reduce((sum, item) => sum + item.delta, 0) / changes.length;
+          const deviation = Math.sqrt(changes.reduce((sum, item) => sum + Math.pow(item.delta - averageChange, 2), 0) / changes.length);
+          const threshold = Math.max(6, deviation * 1.15);
+          const strongestDrop = changes.filter((item) => item.delta <= -threshold).sort((a, b) => a.delta - b.delta)[0];
+          const strongestSpike = changes.filter((item) => item.delta >= threshold).sort((a, b) => b.delta - a.delta)[0];
+          const sourceIsReal = project?.analytics?.source === "youtube-studio-csv";
+
+          const makeFinding = (item, kind) => {
+            if (!item) return null;
+            const moment = transcriptMoment(project, item.point.seconds);
+            const magnitude = Math.abs(item.delta).toFixed(1);
+            const confidence = points.length >= 8 && sourceIsReal && moment.matched ? "High" : points.length >= 6 && sourceIsReal ? "Medium" : "Low";
+            const verb = kind === "drop" ? "falls" : "rises";
+            const action = kind === "drop"
+              ? `At ${formatTime(item.point.seconds)}, enter on the concrete claim and remove any repeated setup immediately before this moment.`
+              : `At ${formatTime(item.point.seconds)}, preserve the payoff pattern and consider moving a similar concrete moment earlier.`;
+            return {
+              id: `${kind}-${Math.round(item.point.seconds)}-${Math.round(Math.abs(item.delta) * 10)}`,
+              kind,
+              seconds: item.point.seconds,
+              title: kind === "drop" ? `Retention drop at ${formatTime(item.point.seconds)}` : `Retention lift at ${formatTime(item.point.seconds)}`,
+              observed: `Retention ${verb} ${magnitude} points between ${formatTime(item.previous.seconds)} and ${formatTime(item.point.seconds)}.`,
+              interpretation: kind === "drop" ? "This is a measurable behavior change; the transcript below is context, not proof of intent." : "This is a measurable positive moment worth preserving or testing elsewhere.",
+              action,
+              validation: kind === "drop" ? "Compare retention through this same interval on the next edited version." : "Reuse the pattern and compare the equivalent interval on the next upload.",
+              confidence,
+              confidenceReason: `${points.length} retention points${sourceIsReal ? ", imported from Studio" : ", from labelled demo data"}${moment.matched ? ", with a timestamp-matched transcript segment" : ", with an approximate transcript passage"}.`,
+              moment,
+            };
+          };
+
+          return [makeFinding(strongestDrop, "drop"), makeFinding(strongestSpike, "spike")].filter(Boolean);
+        };
+
+        const save = (project) => {
+          if (typeof persistProject === "function") persistProject();
+          if (typeof renderIngestPanels === "function") renderIngestPanels(project);
+        };
+
+        const assessment = (project, findings) => {
+          const points = getRetentionPoints(project);
+          const realSource = project?.analytics?.source === "youtube-studio-csv";
+          const transcriptReady = Boolean(String(document.getElementById("transcript")?.value || project?.transcript || "").trim());
+          const score = (points.length >= 8 ? 1 : 0) + (realSource ? 1 : 0) + (transcriptReady ? 1 : 0) + (findings.some((finding) => finding.moment.matched) ? 1 : 0);
+          return { score, points: points.length, realSource, transcriptReady };
+        };
+
+        const render = () => {
+          const project = getProject();
+          const findings = buildFindings(project);
+          const evidence = assessment(project, findings);
+          if (project) project.dropfixEvidenceFindings = findings;
+          const decisions = project?.dropfixDecisions || {};
+          const readyForFindings = evidence.points >= 4 && evidence.transcriptReady;
+
+          const findingMarkup = findings.map((finding) => {
+            const decision = decisions[finding.id] || { status: "open", action: finding.action };
+            const rewriteOpen = decision.status === "rewrite";
+            return `<article class="evidence-finding" data-kind="${finding.kind}">
+              <div class="evidence-finding-footer"><span class="evidence-decision-kicker">${finding.kind === "drop" ? "Priority edit" : "Positive pattern"}</span><span class="evidence-score">${finding.confidence} confidence</span></div>
+              <h3 class="evidence-finding-title">${escapeHtml(finding.title)}</h3>
+              <p><strong>Observed:</strong> ${escapeHtml(finding.observed)}</p>
+              <p><strong>Transcript moment:</strong> ${escapeHtml(finding.moment.text)}</p>
+              <p><strong>Interpretation:</strong> ${escapeHtml(finding.interpretation)}</p>
+              <p><strong>Recommended action:</strong> ${escapeHtml(decision.action || finding.action)}</p>
+              <p><strong>Validation:</strong> ${escapeHtml(finding.validation)}</p>
+              <p><strong>Why ${finding.confidence.toLowerCase()} confidence:</strong> ${escapeHtml(finding.confidenceReason)}</p>
+              ${rewriteOpen ? `<textarea data-rewrite="${finding.id}" aria-label="Rewrite recommendation">${escapeHtml(decision.action || finding.action)}</textarea>` : ""}
+              <div class="evidence-finding-actions">
+                <button type="button" data-finding="${finding.id}" data-decision="accepted" class="${decision.status === "accepted" ? "is-active" : ""}">Accept</button>
+                <button type="button" data-finding="${finding.id}" data-decision="rewrite" class="${decision.status === "rewrite" ? "is-active" : ""}">Rewrite</button>
+                <button type="button" data-finding="${finding.id}" data-decision="preserved" class="${decision.status === "preserved" ? "is-active" : ""}">Preserve</button>
+                <button type="button" data-finding="${finding.id}" data-decision="dismissed" class="${decision.status === "dismissed" ? "is-active" : ""}">Dismiss</button>
+                ${rewriteOpen ? `<button type="button" data-finding="${finding.id}" data-decision="save-rewrite">Save rewrite</button>` : ""}
+              </div>
+            </article>`;
+          }).join("");
+
+          panel.innerHTML = `<div class="evidence-decision-head"><div><div class="evidence-decision-kicker">Evidence to editor action</div><h2>Decision queue</h2></div><span class="evidence-score">Evidence coverage ${evidence.score} / 4</span></div>
+            <div class="evidence-decision-meta"><span>${evidence.points ? `${evidence.points} retention points` : "No retention evidence yet"}</span><span>${evidence.realSource ? "YouTube Studio CSV" : "Demo or unverified source"}</span><span>${evidence.transcriptReady ? "Transcript connected" : "Transcript needed"}</span></div>
+            ${readyForFindings ? `<div class="evidence-finding-list">${findingMarkup || `<div class="evidence-empty">No retention change cleared the evidence threshold. DropFix will not invent a primary recommendation from a flat or limited graph.</div>`}</div>` : `<div class="evidence-empty">Import at least four retention points and add the matching transcript. Then run analysis to generate evidence-backed editor decisions.</div>`}`;
+        };
+
+        panel.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-finding]");
+          if (!button) return;
+          const project = getProject();
+          const finding = (project?.dropfixEvidenceFindings || []).find((item) => item.id === button.dataset.finding);
+          if (!project || !finding) return;
+          project.dropfixDecisions = project.dropfixDecisions || {};
+          const existing = project.dropfixDecisions[finding.id] || { action: finding.action };
+          if (button.dataset.decision === "save-rewrite") {
+            const textarea = panel.querySelector(`textarea[data-rewrite="${finding.id}"]`);
+            const action = textarea?.value.trim();
+            if (!action) return;
+            project.dropfixDecisions[finding.id] = { ...existing, status: "accepted", action, updatedAt: new Date().toISOString() };
+          } else {
+            project.dropfixDecisions[finding.id] = { ...existing, status: button.dataset.decision, action: existing.action || finding.action, updatedAt: new Date().toISOString() };
+          }
+          save(project);
+          render();
+        });
+
+        const originalRunAnalysis = window.runAnalysis;
+        if (typeof originalRunAnalysis === "function") {
+          window.runAnalysis = function (...args) {
+            const result = originalRunAnalysis.apply(this, args);
+            window.setTimeout(render, 280);
+            return result;
+          };
+        }
+
+        document.addEventListener("change", (event) => {
+          if (event.target?.id === "source-type" || event.target?.id === "file-input") window.setTimeout(render, 120);
+        });
+
+        render();
+      })();
+    </script>
+    <style>
+      .decision-export-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.85rem;
+        padding-top: 0.85rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+      }
+
+      .decision-export-actions button {
+        min-height: 34px;
+        padding: 0.42rem 0.62rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 9px;
+        background: #202020;
+        color: #ededE8;
+        font: inherit;
+        font-size: 0.78rem;
+        font-weight: 750;
+        cursor: pointer;
+      }
+
+      .decision-export-actions button[data-export="markdown"] { border-color: rgba(255, 64, 84, 0.62); background: rgba(255, 24, 48, 0.12); color: #fff; }
+      .decision-export-actions button[data-export="clear"] { color: #d8d8d3; }
+      .decision-export-status { flex-basis: 100%; color: #bdbdb8; font-size: 0.78rem; min-height: 1.15rem; }
+    </style>
+    <script>
+      (() => {
+        const panel = document.getElementById("evidence-decision-studio");
+        if (!panel) return;
+
+        const getProject = () => {
+          if (typeof getCurrentProject === "function") return getCurrentProject();
+          if (typeof ensureProject === "function") return ensureProject();
+          return null;
+        };
+
+        const quoteCsv = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+        const formatTime = (seconds) => {
+          const total = Math.max(0, Math.round(Number(seconds) || 0));
+          return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+        };
+
+        const acceptedFindings = (project) => {
+          const findings = Array.isArray(project?.dropfixEvidenceFindings) ? project.dropfixEvidenceFindings : [];
+          const decisions = project?.dropfixDecisions || {};
+          return findings.map((finding) => ({ finding, decision: decisions[finding.id] || {} }))
+            .filter(({ decision }) => ["accepted", "preserved"].includes(decision.status));
+        };
+
+        const buildBrief = (project) => {
+          const accepted = acceptedFindings(project);
+          const source = project?.analytics?.sourceLabel || (project?.analytics?.source === "youtube-studio-csv" ? "YouTube Studio CSV" : "Labelled demo or unverified source");
+          const generatedAt = new Date().toISOString();
+          const title = project?.name || "Untitled project";
+          const markdown = [
+            "# DropFix editor brief",
+            "",
+            `**Project:** ${title}`,
+            `**Evidence source:** ${source}`,
+            `**Generated:** ${generatedAt}`,
+            "",
+            "## Accepted editor decisions",
+            "",
+            ...accepted.flatMap(({ finding, decision }, index) => [
+              `### ${index + 1}. ${finding.title} (${decision.status === "preserved" ? "Preserve" : "Edit"})`,
+              `- **Timestamp:** ${formatTime(finding.seconds)}`,
+              `- **Observed:** ${finding.observed}`,
+              `- **Transcript moment:** ${finding.moment?.text || "No matched transcript moment."}`,
+              `- **Action:** ${decision.action || finding.action}`,
+              `- **Confidence:** ${finding.confidence}. ${finding.confidenceReason}`,
+              `- **Validation:** ${finding.validation}`,
+              "",
+            ]),
+            ...(accepted.length ? [] : ["No decisions have been accepted or preserved yet.", ""]),
+            "## Evidence note",
+            "This brief records observed retention behavior and a proposed editing action. Interpretation is an inference, not proof of viewer intent.",
+          ].join("\n");
+          const csv = [
+            ["project", "evidence_source", "timestamp", "decision", "observed", "transcript_moment", "action", "confidence", "validation"],
+            ...accepted.map(({ finding, decision }) => [title, source, formatTime(finding.seconds), decision.status, finding.observed, finding.moment?.text || "", decision.action || finding.action, finding.confidence, finding.validation]),
+          ].map((row) => row.map(quoteCsv).join(",")).join("\n");
+          return { markdown, csv, acceptedCount: accepted.length, generatedAt, source };
+        };
+
+        const saveBriefDraft = (project) => {
+          if (!project) return null;
+          const brief = buildBrief(project);
+          project.editorBrief = { ...brief, updatedAt: new Date().toISOString() };
+          if (typeof persistProject === "function") persistProject();
+          return brief;
+        };
+
+        const download = (filename, content, type) => {
+          const url = URL.createObjectURL(new Blob([content], { type }));
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          link.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 0);
+        };
+
+        const status = (message) => {
+          const target = panel.querySelector("#decision-export-status");
+          if (target) target.textContent = message;
+        };
+
+        const mountControls = () => {
+          if (panel.querySelector("#decision-export-actions")) return;
+          const controls = document.createElement("div");
+          controls.id = "decision-export-actions";
+          controls.className = "decision-export-actions";
+          controls.innerHTML = `<button type="button" data-export="copy">Copy editor brief</button><button type="button" data-export="markdown">Download Markdown</button><button type="button" data-export="csv">Download CSV</button><button type="button" data-export="clear">Clear decisions</button><span id="decision-export-status" class="decision-export-status">Accepted decisions are saved with this project.</span>`;
+          panel.appendChild(controls);
+        };
+
+        const observer = new MutationObserver(mountControls);
+        observer.observe(panel, { childList: true, subtree: true });
+        mountControls();
+
+        document.addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-export]");
+          if (!button || !panel.contains(button)) return;
+          const project = getProject();
+          if (!project) return;
+
+          if (button.dataset.export === "clear") {
+            if (!window.confirm("Clear all saved editor decisions for this project? Your transcript and imported evidence will stay intact.")) return;
+            project.dropfixDecisions = {};
+            project.editorBrief = null;
+            if (typeof persistProject === "function") persistProject();
+            status("Decision queue cleared. Transcript and imported evidence were kept.");
+            window.location.reload();
+            return;
+          }
+
+          const brief = saveBriefDraft(project);
+          if (!brief?.acceptedCount) {
+            status("Accept or preserve at least one evidence-backed decision before exporting.");
+            return;
+          }
+          const slug = (project.name || "dropfix-editor-brief").trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "dropfix-editor-brief";
+          if (button.dataset.export === "copy") {
+            try {
+              await navigator.clipboard.writeText(brief.markdown);
+              status(`${brief.acceptedCount} decision${brief.acceptedCount === 1 ? "" : "s"} copied as an editor brief.`);
+            } catch {
+              const area = document.createElement("textarea");
+              area.value = brief.markdown;
+              document.body.appendChild(area);
+              area.select();
+              document.execCommand("copy");
+              area.remove();
+              status("Editor brief copied.");
+            }
+          }
+          if (button.dataset.export === "markdown") {
+            download(`${slug}-editor-brief.md`, brief.markdown, "text/markdown;charset=utf-8");
+            status("Markdown editor brief downloaded.");
+          }
+          if (button.dataset.export === "csv") {
+            download(`${slug}-editor-brief.csv`, brief.csv, "text/csv;charset=utf-8");
+            status("CSV editor brief downloaded.");
+          }
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest("button[data-decision]")) return;
+          window.setTimeout(() => saveBriefDraft(getProject()), 0);
+        });
+      })();
+    </script>
+    <style>
+      .workspace-recovery {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+        padding: 0.65rem 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.025);
+      }
+
+      .workspace-recovery strong { color: #ededE8; font-size: 0.78rem; }
+      .workspace-recovery span { flex: 1 1 180px; color: #aaa; font-size: 0.76rem; }
+      .workspace-recovery button { padding: 0.34rem 0.55rem; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; background: #202020; color: #ededE8; font: inherit; font-size: 0.74rem; font-weight: 750; cursor: pointer; }
+      .workspace-recovery[data-state="warning"] { border-left: 3px solid #ffb020; }
+      .workspace-recovery[data-state="error"] { border-left: 3px solid #ff4054; }
+    </style>
+    <script>
+      (() => {
+        const workspace = document.getElementById("workspace");
+        const sourceType = document.getElementById("source-type");
+        const transcript = document.getElementById("transcript");
+        const parseStatus = document.getElementById("parse-status");
+        const ingestStatus = document.getElementById("ingest-status");
+        if (!workspace) return;
+
+        const recovery = document.createElement("div");
+        recovery.className = "workspace-recovery";
+        recovery.dataset.state = "ready";
+        recovery.innerHTML = `<strong>Workspace recovery</strong><span id="workspace-recovery-status">Saved work restores in this browser.</span><button type="button" data-recovery="demo">Restart guided demo</button><button type="button" data-recovery="reload">Reload workspace</button>`;
+        workspace.insertAdjacentElement("afterend", recovery);
+
+        const updateRecovery = (message, state = "ready") => {
+          recovery.dataset.state = state;
+          const label = recovery.querySelector("#workspace-recovery-status");
+          if (label) label.textContent = message;
+        };
+
+        const currentProject = () => {
+          try {
+            if (typeof getCurrentProject === "function") return getCurrentProject();
+            if (typeof ensureProject === "function") return ensureProject();
+          } catch (error) {
+            updateRecovery("Saved project could not be restored. Restart the guided demo to create a clean recovery project.", "error");
+          }
+          return null;
+        };
+
+        const findDemoButton = () => [...document.querySelectorAll("button")].find((button) => /guided.*demo|run live demo|judge demo/i.test(button.textContent || ""));
+        const findRunButton = () => [...document.querySelectorAll("button")].find((button) => /^run analysis/i.test((button.textContent || "").trim()));
+
+        const storageAvailable = () => {
+          try {
+            const key = "dropfix-storage-probe";
+            localStorage.setItem(key, "1");
+            localStorage.removeItem(key);
+            return true;
+          } catch {
+            return false;
+          }
+        };
+
+        if (!storageAvailable()) {
+          updateRecovery("Browser storage is unavailable. You can still analyze, but saved projects and editor decisions may not persist.", "warning");
+        } else if (currentProject()) {
+          updateRecovery("Saved work restores in this browser. Use the guided demo any time you need a clean, labelled example.");
+        }
+
+        const runButton = findRunButton();
+        runButton?.addEventListener("click", (event) => {
+          const project = currentProject();
+          const hasTranscript = Boolean(String(transcript?.value || project?.transcript || "").trim());
+          const usingStudio = sourceType?.value === "studio-csv";
+          const hasStudioEvidence = project?.analytics?.source === "youtube-studio-csv";
+          if (!hasTranscript) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (parseStatus) parseStatus.textContent = "Add the matching transcript before analysis. DropFix needs text to connect evidence to an editor action.";
+            if (ingestStatus) ingestStatus.textContent = "Analysis paused: transcript required.";
+            updateRecovery("Analysis was safely paused because the transcript is missing.", "warning");
+            return;
+          }
+          if (usingStudio && !hasStudioEvidence) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (parseStatus) parseStatus.textContent = "Upload a valid YouTube Studio retention CSV before analysis in Studio CSV mode.";
+            if (ingestStatus) ingestStatus.textContent = "Analysis paused: Studio evidence required for this input mode.";
+            updateRecovery("Analysis was safely paused because Studio CSV mode has no validated retention evidence.", "warning");
+          }
+        }, true);
+
+        recovery.addEventListener("click", (event) => {
+          const action = event.target.closest("button[data-recovery]")?.dataset.recovery;
+          if (action === "reload") window.location.reload();
+          if (action === "demo") {
+            const demo = findDemoButton();
+            if (!demo) {
+              updateRecovery("Guided demo control was not found. Reload the workspace and try again.", "error");
+              return;
+            }
+            demo.click();
+            updateRecovery("Guided demo is rebuilding a clean sample project.");
+          }
+        });
+
+        window.addEventListener("unhandledrejection", () => {
+          updateRecovery("A workspace action did not finish. Reload restores the last saved project; the guided demo creates a clean recovery project.", "error");
+        });
+      })();
+    </script>
+    <style>
+      .judge-proof-card {
+        margin-top: 0.75rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+      }
+
+      .judge-proof-card summary {
+        padding: 0.72rem 0.8rem;
+        color: #ededE8;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 800;
+      }
+
+      .judge-proof-body { display: grid; gap: 0.68rem; padding: 0 0.8rem 0.8rem; }
+      .judge-proof-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+      .judge-proof-metric { padding: 0.58rem; border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; background: rgba(0,0,0,0.16); }
+      .judge-proof-metric span { display: block; color: #aaa; font-size: 0.7rem; }
+      .judge-proof-metric strong { display: block; margin-top: 0.2rem; color: #f5f5ef; font-size: 0.82rem; }
+      .judge-proof-body p, .judge-proof-body li { margin: 0; color: #bdbdb8; font-size: 0.78rem; line-height: 1.45; }
+      .judge-proof-body ol { display: grid; gap: 0.28rem; margin: 0; padding-left: 1.05rem; }
+      .judge-proof-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+      .judge-proof-actions button { padding: 0.38rem 0.56rem; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; background: #202020; color: #ededE8; font: inherit; font-size: 0.74rem; font-weight: 750; cursor: pointer; }
+      .judge-proof-actions button:first-child { border-color: rgba(255,64,84,0.62); color: #fff; }
+      .judge-proof-status { min-height: 1.1rem; color: #aaa; font-size: 0.74rem; }
+      @media (max-width: 640px) { .judge-proof-grid { grid-template-columns: 1fr; } }
+    </style>
+    <script>
+      (() => {
+        const evidencePanel = document.getElementById("evidence-decision-studio");
+        if (!evidencePanel) return;
+        const proof = document.createElement("details");
+        proof.id = "judge-proof-card";
+        proof.className = "judge-proof-card";
+        evidencePanel.insertAdjacentElement("afterend", proof);
+
+        const getProject = () => {
+          if (typeof getCurrentProject === "function") return getCurrentProject();
+          if (typeof ensureProject === "function") return ensureProject();
+          return null;
+        };
+
+        const summaryText = (project) => {
+          const findings = Array.isArray(project?.dropfixEvidenceFindings) ? project.dropfixEvidenceFindings : [];
+          const decisions = project?.dropfixDecisions || {};
+          const accepted = findings.filter((finding) => ["accepted", "preserved"].includes(decisions[finding.id]?.status));
+          const source = project?.analytics?.sourceLabel || (project?.analytics?.source === "youtube-studio-csv" ? "YouTube Studio CSV" : "Labelled demo data");
+          const evidenceType = project?.analytics?.source === "youtube-studio-csv" ? "Creator-imported Studio evidence" : "Synthetic demonstration evidence";
+          return [
+            "DropFix judge proof summary",
+            `Project: ${project?.name || "Untitled project"}`,
+            `Evidence: ${source} (${evidenceType})`,
+            `Findings derived: ${findings.length}`,
+            `Editor decisions accepted or preserved: ${accepted.length}`,
+            "Workflow: retention signal -> transcript moment -> calibrated interpretation -> editor action -> validation metric.",
+            "Limitation: interpretations are hypotheses based on observed behavior, not proof of viewer intent.",
+          ].join("\n");
+        };
+
+        const render = () => {
+          const project = getProject();
+          const findings = Array.isArray(project?.dropfixEvidenceFindings) ? project.dropfixEvidenceFindings : [];
+          const decisions = project?.dropfixDecisions || {};
+          const accepted = findings.filter((finding) => ["accepted", "preserved"].includes(decisions[finding.id]?.status));
+          const points = (project?.analytics?.retention || project?.analytics?.retentionPoints || []).length;
+          const realEvidence = project?.analytics?.source === "youtube-studio-csv";
+          const transcriptReady = Boolean(String(document.getElementById("transcript")?.value || project?.transcript || "").trim());
+          const readiness = realEvidence && transcriptReady && findings.length ? "Creator-ready evidence path" : "Labelled demo / incomplete evidence path";
+          proof.innerHTML = `<summary>Judge proof and data boundaries</summary><div class="judge-proof-body">
+            <div class="judge-proof-grid"><div class="judge-proof-metric"><span>Evidence source</span><strong>${realEvidence ? "Studio CSV" : "Labelled demo"}</strong></div><div class="judge-proof-metric"><span>Retention points</span><strong>${points || "Not imported"}</strong></div><div class="judge-proof-metric"><span>Handoff state</span><strong>${accepted.length} decision${accepted.length === 1 ? "" : "s"}</strong></div></div>
+            <p><strong>${readiness}</strong>. DropFix does not present demo data as creator analytics and does not treat inference as fact.</p>
+            <ol><li><strong>Observed:</strong> a measured retention change is selected only when it clears the local threshold.</li><li><strong>Connected:</strong> the signal is paired with a timestamp and the closest transcript moment.</li><li><strong>Actioned:</strong> the editor accepts, rewrites, preserves, or dismisses the recommendation.</li><li><strong>Validated:</strong> every accepted action carries a future retention comparison to test.</li></ol>
+            <p>Limitation: a transcript can support context, but it cannot prove why viewers behaved a certain way. DropFix labels that explanation as an interpretation.</p>
+            <div class="judge-proof-actions"><button type="button" data-proof="copy">Copy proof summary</button><button type="button" data-proof="demo">Restart labelled demo</button></div><span id="judge-proof-status" class="judge-proof-status"></span>
+          </div>`;
+        };
+
+        proof.addEventListener("click", async (event) => {
+          const action = event.target.closest("button[data-proof]")?.dataset.proof;
+          if (!action) return;
+          const status = proof.querySelector("#judge-proof-status");
+          if (action === "copy") {
+            try {
+              await navigator.clipboard.writeText(summaryText(getProject()));
+              if (status) status.textContent = "Proof summary copied.";
+            } catch {
+              if (status) status.textContent = "Clipboard access was unavailable. Use the editor-brief download instead.";
+            }
+          }
+          if (action === "demo") {
+            const demo = [...document.querySelectorAll("button")].find((button) => /guided.*demo|run live demo|judge demo/i.test(button.textContent || ""));
+            if (demo) demo.click();
+            if (status) status.textContent = demo ? "Guided demo is rebuilding the labelled sample project." : "Guided demo control was not found. Reload the workspace and try again.";
+          }
+        });
+
+        new MutationObserver(render).observe(evidencePanel, { childList: true, subtree: true });
+        render();
+      })();
+    </script>
   </body>
 </html>
 
