@@ -6642,7 +6642,7 @@
           const raw = project?.analytics?.retention || project?.analytics?.retentionPoints || [];
           return raw.map((point, index) => {
             const seconds = asNumber(point.seconds ?? point.timestamp ?? point.time ?? index * 10);
-            const retention = asNumber(point.retention ?? point.value ?? point.percent);
+            const retention = asNumber(point.retention ?? point.value ?? point.percent ?? point.ratio);
             if (seconds === null || retention === null) return null;
             return { seconds, retention: retention <= 1 ? retention * 100 : retention };
           }).filter(Boolean).sort((a, b) => a.seconds - b.seconds);
@@ -6679,7 +6679,7 @@
           const threshold = Math.max(6, deviation * 1.15);
           const strongestDrop = changes.filter((item) => item.delta <= -threshold).sort((a, b) => a.delta - b.delta)[0];
           const strongestSpike = changes.filter((item) => item.delta >= threshold).sort((a, b) => b.delta - a.delta)[0];
-          const sourceIsReal = project?.analytics?.source === "youtube-studio-csv";
+          const sourceIsReal = project?.analytics?.source === "youtube-studio-csv" || (Boolean(project?.analytics?.sourceKind) && project.analytics.sourceKind !== "demo");
 
           const makeFinding = (item, kind) => {
             if (!item) return null;
@@ -6715,7 +6715,7 @@
 
         const assessment = (project, findings) => {
           const points = getRetentionPoints(project);
-          const realSource = project?.analytics?.source === "youtube-studio-csv";
+          const realSource = project?.analytics?.source === "youtube-studio-csv" || (Boolean(project?.analytics?.sourceKind) && project.analytics.sourceKind !== "demo");
           const transcriptReady = Boolean(String(document.getElementById("transcript")?.value || project?.transcript || "").trim());
           const score = (points.length >= 8 ? 1 : 0) + (realSource ? 1 : 0) + (transcriptReady ? 1 : 0) + (findings.some((finding) => finding.moment.matched) ? 1 : 0);
           return { score, points: points.length, realSource, transcriptReady };
