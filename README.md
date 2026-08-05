@@ -1,103 +1,74 @@
 # DropFix
 
-## Quick Overview
+**Find where viewers leave, why they leave, and what to edit.**
 
-DropFix is a **browser-only YouTube creator workflow app** built for the Devpost YouTube Automation Hackathon.
+DropFix is a browser-native YouTube creator workflow for the YouTube Automation Hackathon. It turns a transcript plus YouTube Studio retention data into a ranked, timestamped editing handoff.
 
-It helps creators and editors automate three pain points:
+> Retention signal -> exact moment -> edit decision.
 
-- Clip selection from transcript structure and timestamps
-- Metadata generation for titles, descriptions, tags, and hashtags
-- Workflow clarity with transparent scoring and actionable recommendations
+## Live project
 
-## Live demo
+- [Open DropFix](https://ezrawestover1-hub.github.io/youtube-automation-hackathon/)
+- [Devpost submission kit](DEVPOST_SUBMISSION.md)
 
-- Public site: https://ezrawestover1-hub.github.io/youtube-automation-hackathon/
-- Primary repo: https://github.com/ezrawestover1-hub/youtube-automation-hackathon
+## The problem
 
-## Why judges care
+Creators can already see a retention graph in YouTube Studio, but a graph does not tell an editor what to change. Analytics and editing decisions live in separate tools, leaving creators to guess whether a drop came from a slow setup, weak payoff, confusing section, or something else.
 
-### Functionality
+## What DropFix does
 
-- Full upload flow for transcript files and pasted transcript text
-- Transcript parser, segment scoring, clip ranking, and metadata pack generation
-- Persistent local workspace (no account needed)
-- Export/copy actions for metadata JSON and summary text
+1. Import a transcript and paste it directly, upload subtitles, or use a transcript CSV.
+2. Optionally import a YouTube Studio CSV containing retention points and performance metrics.
+3. Detect timestamped retention changes and align them with the matching transcript passage.
+4. Produce evidence-first recommendations: observed signal, comparison, interpretation, exact edit, confidence, and validation path.
+5. Accept, rewrite, or dismiss each recommendation.
+6. Export an editor brief, summary, JSON, or judge evidence packet.
 
-### Creativity
+The included labeled demo is synthetic and clearly marked. It demonstrates the workflow without presenting demo numbers as a creator's real channel performance.
 
-- Evidence-first workflow: each recommendation is tied to parsed evidence (segment timecode, score, rationale)
-- Profile presets + adjustable weighting for creator style control
-- “Quality narrative” panel explains why clips were recommended
+## Why it is different
 
-### Technical execution
+Most analytics surfaces explain *what* happened. DropFix bridges the operational gap between analytics and editing:
 
-- Single-page implementation with predictable state model (projects, tabs, workflow progression)
-- Clear edge-case handling for empty/invalid transcripts and oversized files
-- Deterministic transforms in a standalone client environment
-- Minimal architecture with one primary surface (`index.html`) for faster judge review
+| Analytics alone | DropFix |
+| --- | --- |
+| Retention fell around a point | Retention fell from one measured point to the next, linked to the corresponding transcript moment |
+| "Improve the hook" | A timestamped instruction to cut, move, rewrite, preserve, or test a specific moment |
+| A graph to interpret | An editor decision queue and handoff brief |
 
-### Real-world usefulness
+## Evidence and scoring
 
-- Useful for real creators in pre-edit planning: faster candidate clip discovery and description/title ideation
-- Fast enough for hourly use while still remaining reviewable and understandable
-- No external API account or service dependency required to test core features
+Recommendations use a fixed 40-point internal quality check. It evaluates evidence quality, specificity, actionability, goal alignment, confidence calibration, expected usefulness, novelty, and validation quality. The number is a recommendation-quality check, not a prediction of video performance or hackathon placement.
 
-## How to run (fastest path)
+DropFix intentionally distinguishes observation from inference. When there is not enough evidence, it discloses the limitation instead of claiming a channel-level conclusion.
 
-### Option A — one-command local launch (recommended)
+## Quick demo path
 
-```powershell
-npm start
-```
+1. Open the [live project](https://ezrawestover1-hub.github.io/youtube-automation-hackathon/#workspace).
+2. Select **Load labelled demo data** or choose **YouTube Studio CSV (real analytics)** and upload an export alongside its transcript.
+3. Click **Run analysis ->**.
+4. Review a primary finding and choose **Accept edit**, **Mark for rewrite**, or **Dismiss**.
+5. Open **Export** and download the editor brief or judge packet.
 
-Then open:
+## Technical approach
 
-```
-http://localhost:3000
-```
+- A static, client-side application built around a deterministic workflow state.
+- Local parsing for transcript formats and Studio-style CSV exports.
+- Deterministic retention-event detection plus transcript-to-timestamp alignment.
+- Structured recommendation schema with source labels, confidence language, and validation guidance.
+- Local workspace persistence for projects and editor decisions.
+- No account, server, scraping, or YouTube credential is required to test the core workflow.
 
-### Option B — direct file open (no install)
+## Run locally
 
-Open `index.html` directly in any modern browser.
-
-### Option C — GitHub Pages
-
-Open the public site link above.
-
-## What to test in 60 seconds
-
-1. Click **+ New project** and load sample data with **Load sample transcript**.
-2. Click **Run analysis**.
-3. Review:
-   - Top clips list
-   - Reason bullets and score bars
-   - Metadata pack (title, description variants, tags, hashtags)
-4. Export JSON or summary using the panel buttons.
+Open `index.html` in a modern browser, or serve the repository with any static HTTP server. The deployed GitHub Pages version is the recommended judge path.
 
 ## Repository layout
 
-- `index.html` — app UI and all in-browser logic
-- `index.js` — tiny static server for local serving
-- `highlights/` — optional demo/video helpers (nonessential for core app logic)
-- `backend/` — legacy workspace from earlier iterations (kept for continuity, not required for judging)
-- `outputs/` — gitignored generated local outputs
-- `work/` — working scratch space (not part of submission)
-- `local-dev.md` — local run notes
+- `index.html` - DropFix interface, analysis logic, import handling, and exports.
+- `index.js` - minimal local static server.
+- `DEVPOST_SUBMISSION.md` - paste-ready submission copy and demo plan.
 
-## Deployment
+## Data boundary
 
-- Static GitHub Pages workflow is enabled from `.github/workflows/gh-pages.yml`.
-- Deployment source is the repository `main` branch; site content is built from `index.html`.
-
-## Submission notes for Devpost
-
-- Include the GitHub repo and demo link in your submission form.
-- Mention that the app is browser-native and works without a dedicated backend.
-- In judging video, show:
-  - upload path,
-  - analysis output,
-  - one clip edit decision, and
-  - generated metadata usage.
-
-
+DropFix can ingest creator-provided YouTube Studio CSV exports. It does **not** connect directly to a YouTube account, scrape YouTube, or claim API integration. That makes the live demo account-free while keeping the creator-data path honest and reproducible.
