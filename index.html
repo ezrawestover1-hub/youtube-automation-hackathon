@@ -1181,6 +1181,17 @@
         color: var(--text-strong);
       }
 
+      .assessment-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.45rem;
+        padding-top: 0.45rem;
+        border-top: 1px solid var(--line);
+        color: var(--text);
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
       .recommendation-details {
         margin-top: 0.68rem;
         color: var(--muted);
@@ -5108,13 +5119,14 @@
         const hasChannelBaseline = Boolean(project?.analytics?.baselinePoints?.length);
         return (project?.evidenceFindings || []).map((finding) => {
           const isActionableEvent = finding.type === "drop" || finding.type === "spike";
+          const signalMagnitude = Math.abs(Number(finding.priority) || 0) / 2;
           const assessment = {
-            evidenceQuality: hasChannelBaseline ? 5 : isDemoEvidence ? 3 : pointCount >= 12 ? 4 : pointCount >= 6 ? 3 : 2,
+            evidenceQuality: hasChannelBaseline ? 5 : signalMagnitude >= 14 ? 3 : signalMagnitude >= 8 ? 2 : pointCount >= 12 ? 4 : pointCount >= 6 ? 3 : 2,
             specificity: finding.segmentIndex >= 0 ? 5 : 4,
             actionability: isActionableEvent ? 4 : 1,
             goalAlignment: goal ? 4 : 2,
             confidenceCalibration: finding.confidence?.includes("Low") ? 2 : hasChannelBaseline ? 5 : isDemoEvidence ? 3 : 4,
-            expectedUsefulness: finding.type === "drop" ? 4 : finding.type === "spike" ? 3 : 2,
+            expectedUsefulness: finding.type === "drop" ? (signalMagnitude >= 12 ? 4 : signalMagnitude >= 8 ? 3 : 2) : finding.type === "spike" ? (signalMagnitude >= 8 ? 3 : 2) : 2,
             novelty: finding.segmentIndex >= 0 ? 3 : 2,
             validationQuality: isActionableEvent ? 4 : 2,
           };
@@ -5172,7 +5184,7 @@
                   <div class="evidence-cell"><span>Why this confidence</span><p>${escapeFeedbackHtml(`Based on ${item.assessment.evidenceQuality}/5 evidence quality, ${item.assessment.specificity}/5 specificity, and available transcript alignment.`)}</p></div>
                   <div class="evidence-cell"><span>Validation</span><p>${escapeFeedbackHtml(item.validation)}</p></div>
                 </div>
-                <details class="recommendation-details"><summary>How this recommendation was assessed</summary><div class="assessment-grid">${RECOMMENDATION_DIMENSIONS.map(([label, key]) => `<span>${label}<b>${item.assessment[key]}/5</b></span>`).join("")}</div></details>
+                <details class="recommendation-details"><summary>How this recommendation was assessed</summary><div class="assessment-grid">${RECOMMENDATION_DIMENSIONS.map(([label, key]) => `<span>${label}<b>${item.assessment[key]}/5</b></span>`).join("")}</div><div class="assessment-total"><span>Assessment total</span><b>${item.score} / 40</b></div></details>
                 <div class="decision-actions">
                   ${["accepted", "revise", "dismissed"].map((status) => `<button class="small-btn subtle ${getRecommendationDecision(project, item.id) === status ? "is-selected" : ""}" type="button" data-recommendation-decision="${item.id}" data-decision-status="${status}" aria-pressed="${getRecommendationDecision(project, item.id) === status}">${status === "accepted" ? "Accept edit" : status === "revise" ? "Mark for rewrite" : "Dismiss"}</button>`).join("")}
                 </div>
