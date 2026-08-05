@@ -6790,6 +6790,12 @@
           if (event.target?.id === "source-type" || event.target?.id === "file-input") window.setTimeout(render, 120);
         });
 
+        document.addEventListener("click", (event) => {
+          const button = event.target.closest("button");
+          if (!button || !/^run analysis/i.test((button.textContent || "").trim())) return;
+          window.setTimeout(render, 360);
+        });
+
         render();
       })();
     </script>
