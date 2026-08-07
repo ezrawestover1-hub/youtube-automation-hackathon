@@ -2924,6 +2924,81 @@
           margin-top: 2rem;
         }
       }
+
+      /* Judge-ready clarity pass: keep the core evidence-to-edit path dominant. */
+      .demo-proof-note {
+        margin: 0.65rem 0 0;
+        padding-top: 0.65rem;
+        border-top: 1px solid var(--line);
+      }
+
+      .product-loop {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.9rem;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.045em;
+        text-transform: uppercase;
+      }
+
+      .product-loop strong {
+        padding: 0.34rem 0.5rem;
+        border-radius: 6px;
+        background: #ff2020;
+        color: #fff;
+      }
+
+      .advanced-tools,
+      .secondary-tools,
+      .judge-evidence-tools {
+        margin-top: 0.9rem;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.018);
+      }
+
+      .advanced-tools > summary,
+      .secondary-tools > summary,
+      .judge-evidence-tools > summary {
+        padding: 0.8rem 0.9rem;
+        color: var(--text);
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.01em;
+      }
+
+      .advanced-tools[open] > summary,
+      .secondary-tools[open] > summary,
+      .judge-evidence-tools[open] > summary {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .advanced-tools-body {
+        padding: 0.9rem;
+      }
+
+      #evidence-timeline,
+      #demo-walkthrough,
+      #export .export-actions {
+        scroll-margin-top: 9rem;
+      }
+
+      @media (max-width: 640px) {
+        .product-loop {
+          gap: 0.36rem;
+          font-size: 0.68rem;
+        }
+
+        .product-loop strong {
+          flex-basis: 100%;
+          width: fit-content;
+        }
+      }
     </style>
   </head>
   <body>
@@ -2971,22 +3046,22 @@
         <section class="hero">
         <div class="hero-grid">
           <div class="hero-copy">
-            <h1>DropFix turns raw transcript into a judge-ready creator handoff.</h1>
+            <h1>Find where viewers leave, why they leave, and what to edit.</h1>
             <p class="lead">
-              Run transcript analysis, clip ranking, and SEO drafting entirely in-browser.
-              No installs, no setup, no API keys required to demo.
+              DropFix pairs YouTube Studio retention with the matching transcript, turns each
+              behavior change into a timestamped edit decision, and exports a brief an editor can use.
             </p>
             <div class="cta-row">
-              <a class="btn primary" href="#workspace">Open production workspace</a>
-              <a class="btn secondary" href="#judge-demo">View demo flow</a>
-              <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">Open source repo</a>
+              <a class="btn primary" href="#workspace">Open workspace</a>
+              <a class="btn secondary" href="#judge-demo">Run guided demo</a>
+              <a class="btn secondary" href="https://github.com/ezrawestover1-hub/youtube-automation-hackathon">View source</a>
             </div>
           </div>
           <aside class="pillboard">
             <ul>
-              <li>In-browser workflow for transcript ingestion, clip scoring, and SEO + metadata output.</li>
-              <li>Audit-ready judge handoff package with one-click copy/download and traceable actions.</li>
-              <li>Project workspace with autosave so creators can continue long-running sessions from one browser.</li>
+              <li><strong>Retention signal → transcript moment → edit decision.</strong></li>
+              <li>Every finding separates observation, interpretation, confidence, and validation.</li>
+              <li>Try clearly labelled sample data or import a Studio CSV. Work stays in this browser.</li>
             </ul>
           </aside>
         </div>
@@ -2994,18 +3069,18 @@
 
         <section class="section-title" id="judge-demo">Judge Demo (One click)</section>
         <section class="proof">
-        <p style="margin: 0 0 0.85rem">Use this to show the full claim-to-action loop in under 30 seconds:</p>
+        <p style="margin: 0 0 0.85rem">See the complete evidence-to-edit workflow in under 30 seconds:</p>
         <div class="inline-row" style="align-items: center; justify-content: flex-start; gap: 0.6rem; margin-bottom: 0.75rem">
-          <button id="run-demo" class="btn primary" type="button">Run live demo workflow</button>
-          <span class="tag" id="demo-state">IDLE</span>
+          <button id="run-demo" class="btn primary" type="button">Start guided judge demo</button>
+          <span class="tag" id="demo-state" role="status" aria-live="polite">READY</span>
         </div>
         <ol class="helper" style="margin: 0; padding-left: 1.1rem; line-height: 1.55">
-          <li>Loads a realistic transcript into Inputs</li>
-          <li>Parses segments, scores clip candidates, and records rationale</li>
-          <li>Builds ranked clip picks plus metadata and SEO variants</li>
-          <li>Moves into Suggestions and Export tabs with handoff-ready artifacts</li>
+          <li>Loads a matching transcript and clearly labelled synthetic retention data</li>
+          <li>Detects a timestamped behavior change and opens the first editor action</li>
+          <li>Shows the evidence, confidence, and validation path behind the recommendation</li>
+          <li>Lets you accept the edit and export an editor-ready brief</li>
         </ol>
-        <p class="helper" style="margin: 0.55rem 0 0">Designed for judges and creators who want to verify workflow value immediately.</p>
+        <p class="helper demo-proof-note">Sample data demonstrates the live workflow only. Import a Studio CSV for creator-specific findings.</p>
         </section>
       </section>
 
@@ -3075,15 +3150,8 @@
               <div class="two-col">
                 <article class="input-grid">
                   <div class="input-guide">
-                    <p class="input-guide-title">New to DropFix? Do this first:</p>
-                    <ol class="guide-list">
-                      <li><strong>Pick your creator profile</strong> so scoring maps to your format.</li>
-                      <li><strong>Paste transcript text</strong> or use <strong>Upload file</strong>.</li>
-                      <li><strong>Run analysis</strong> to generate clips, confidence, and metadata-ready signals.</li>
-                    </ol>
-                    <p class="helper" style="margin: 0.28rem 0 0;">
-                      Tip: if you want a quick first run, click <strong>Load sample</strong>.
-                    </p>
+                    <p class="input-guide-title">Start here</p>
+                    <p class="helper" style="margin: 0;">Choose a goal, add the transcript, then import Studio data if available. <strong>Run analysis</strong> connects the evidence to editable moments.</p>
                   </div>
 
                   <label class="workspace-label" for="profile">Creator profile</label>
@@ -3110,17 +3178,15 @@
                     <option value="vtt">VTT file</option>
                     <option value="csv">Transcript CSV</option>
                     <option value="studio-csv">YouTube Studio CSV (real analytics)</option>
-                    <option value="url">YouTube URL (preview)</option>
                   </select>
-                  <p class="helper">URL mode now gives transcript-ready fallback guidance until YouTube API integration is connected.</p>
 
                   <label class="workspace-label" for="transcript">Transcript content</label>
                   <textarea id="transcript" placeholder="Paste transcript or subtitle text here to begin."></textarea>
 
                   <div class="input-actions">
                     <button id="run-analysis" class="small-btn primary" type="button">Run analysis</button>
-                    <button id="load-sample" class="small-btn subtle" type="button">Load transcript sample</button>
-                    <button id="load-studio-sample" class="small-btn subtle" type="button">Load labelled demo data</button>
+                    <button id="load-studio-sample" class="small-btn subtle" type="button">Load demo transcript + retention</button>
+                    <button id="load-sample" class="small-btn ghost" type="button">Load transcript only</button>
                     <label class="small-btn file-upload subtle">
                       <input id="file-input" class="file-input" type="file" accept=".txt,.srt,.vtt,.csv" />
                       Upload selected source
@@ -3180,6 +3246,9 @@
 
             <section class="tab-panel" id="analysis">
               <div class="analysis">
+                <div class="product-loop" aria-label="DropFix workflow">
+                  <span>Retention signal</span><span aria-hidden="true">→</span><span>Transcript moment</span><span aria-hidden="true">→</span><strong>Edit decision</strong>
+                </div>
                 <label class="workspace-label">Evidence timeline</label>
                 <div class="evidence-timeline" id="evidence-timeline">
                   <div class="timeline-heading"><strong>Waiting for evidence</strong><span>Import Studio data in Inputs</span></div>
@@ -3190,6 +3259,9 @@
                   <p class="muted">Analyze a transcript with Studio evidence to detect timestamped signals.</p>
                 </div>
                 <div class="demo-guide" id="demo-guide" hidden></div>
+                <details class="advanced-tools">
+                  <summary>Optional transcript scoring controls</summary>
+                  <div class="advanced-tools-body">
                 <label class="workspace-label">Scoring mode presets</label>
                 <div class="preset-row">
                   <button class="small-btn" data-preset="balanced" type="button">Balanced (default)</button>
@@ -3230,7 +3302,7 @@
                 <div class="analysis-notice" id="weight-total">Weights total: 100</div>
                 <div class="summary-grid" style="margin-top: 0.9rem">
                   <div class="metric">
-                    <strong>Predicted video quality</strong>
+                    <strong>Transcript structure score</strong>
                     <div class="meter"><div id="quality-meter" class="meter-fill" style="width: 0%"></div></div>
                     <p class="helper" id="quality-summary">No run yet.</p>
                   </div>
@@ -3240,8 +3312,10 @@
                   </div>
                 </div>
                 <div class="analysis-notice">
-                  Slide any slider to instantly rerank clip suggestions. Use rerun controls if settings changed.
+                  Adjusting these controls reranks transcript candidates; it does not change imported retention evidence.
                 </div>
+                  </div>
+                </details>
               </div>
             </section>
 
@@ -3261,6 +3335,9 @@
         <div id="clip-cards" class="clip-list">
           <p class="muted">Run analysis to build your first editing decision queue.</p>
         </div>
+        <details class="secondary-tools">
+          <summary>Optional: title, description, and SEO tools</summary>
+          <div class="advanced-tools-body">
         <label class="workspace-label" style="margin-top: 0.8rem;">Metadata suggestions</label>
         <div class="export-box">
           <div class="tag-cloud" id="metadata-cloud">
@@ -3316,10 +3393,12 @@
 
           <p class="helper" id="seo-rationale" style="margin: 0.35rem 0 0">Generate metadata only after analysis for transcript-aware output.</p>
         </div>
+          </div>
+        </details>
       </section>
 
                 <section class="tab-panel" id="export">
-                  <h3 class="panel-title">Ready-to-use outputs</h3>
+                  <h3 class="panel-title">Editor-ready outputs</h3>
                     <div class="summary-grid">
                     <div class="metric">
                       <strong>Export package summary</strong>
@@ -3345,12 +3424,15 @@
                     <div class="export-actions">
                       <button id="copy-metadata" class="small-btn subtle" type="button">Copy metadata JSON</button>
                       <button id="copy-session" class="small-btn subtle" type="button">Copy full session</button>
-                      <button id="copy-judge-handoff" class="small-btn primary" type="button">Copy judge handoff bundle</button>
+                      <button id="copy-judge-handoff" class="small-btn subtle" type="button">Copy judge handoff bundle</button>
                       <button id="download-json" class="small-btn subtle" type="button">Download JSON</button>
                       <button id="download-summary" class="small-btn subtle" type="button">Download summary</button>
                       <button id="download-editor-brief" class="small-btn primary" type="button">Download editor brief</button>
                       <button id="download-judge-packet" class="small-btn subtle" type="button">Download judge packet</button>
                     </div>
+                    <details class="judge-evidence-tools">
+                      <summary>Hackathon evidence tools</summary>
+                      <div class="advanced-tools-body">
                     <div class="export-box">
                       <label class="workspace-label" for="competition-mode">Handoff mode</label>
                       <div class="verdict-row">
@@ -3371,6 +3453,8 @@
                       <pre id="judge-scorecard" class="judge-pack">No evidence rubric available.</pre>
                       <button id="copy-judge-scorecard" class="small-btn subtle" type="button">Copy evidence rubric</button>
                     </div>
+                      </div>
+                    </details>
                   </div>
                 </section>
           </div>
@@ -5119,19 +5203,26 @@
         const hasChannelBaseline = Boolean(project?.analytics?.baselinePoints?.length);
         return (project?.evidenceFindings || []).map((finding) => {
           const isActionableEvent = finding.type === "drop" || finding.type === "spike";
-          const signalMagnitude = Math.abs(Number(finding.priority) || 0) / 2;
+          const fallbackMagnitude = finding.type === "drop"
+            ? Math.abs(Number(finding.priority) || 0) / 2
+            : Math.abs(Number(finding.priority) || 0);
+          const signalMagnitude = Number(finding.magnitude) || fallbackMagnitude;
+          const densityScore = pointCount >= 12 ? 4 : pointCount >= 8 ? 3 : pointCount >= 5 ? 2 : 1;
+          const magnitudeScore = signalMagnitude >= 14 ? 4 : signalMagnitude >= 9 ? 3 : signalMagnitude >= 5 ? 2 : 1;
+          const confidenceText = String(finding.confidence || "").toLowerCase();
           const assessment = {
-            evidenceQuality: hasChannelBaseline ? 5 : signalMagnitude >= 14 ? 3 : signalMagnitude >= 8 ? 2 : pointCount >= 12 ? 4 : pointCount >= 6 ? 3 : 2,
-            specificity: finding.segmentIndex >= 0 ? 5 : 4,
-            actionability: isActionableEvent ? 4 : 1,
+            evidenceQuality: hasChannelBaseline ? 5 : Math.min(4, Math.max(1, Math.round((densityScore + magnitudeScore) / 2))),
+            specificity: finding.segmentIndex >= 0 ? 5 : 2,
+            actionability: finding.type === "drop" ? 5 : finding.type === "spike" ? 4 : 1,
             goalAlignment: goal ? 4 : 2,
-            confidenceCalibration: finding.confidence?.includes("Low") ? 2 : hasChannelBaseline ? 5 : isDemoEvidence ? 3 : 4,
+            confidenceCalibration: hasChannelBaseline ? 5 : isDemoEvidence ? 3 : confidenceText.includes("high") ? 4 : confidenceText.includes("low") ? 2 : 3,
             expectedUsefulness: finding.type === "drop" ? (signalMagnitude >= 12 ? 4 : signalMagnitude >= 8 ? 3 : 2) : finding.type === "spike" ? (signalMagnitude >= 8 ? 3 : 2) : 2,
-            novelty: finding.segmentIndex >= 0 ? 3 : 2,
+            novelty: finding.segmentIndex >= 0 && isActionableEvent ? 4 : 2,
             validationQuality: isActionableEvent ? 4 : 2,
           };
-          const scoreCeiling = hasChannelBaseline ? 34 : isDemoEvidence ? 30 : 32;
-          const score = Math.min(scoreCeiling, Object.values(assessment).reduce((sum, value) => sum + value, 0));
+          const rawScore = Object.values(assessment).reduce((sum, value) => sum + value, 0);
+          const provenancePenalty = isDemoEvidence ? 2 : hasChannelBaseline ? 0 : 1;
+          const score = Math.min(40, Math.max(0, rawScore - provenancePenalty));
           const compared = "No matched channel baseline is imported yet. This is a within-video event, not an underperformance claim.";
           const recommendedAction = isActionableEvent ? getActionForFinding(finding, goal) : "Do not make a primary edit decision from this checkpoint alone. Import comparable videos before testing a packaging or opening diagnosis.";
           const expectedImpact = finding.type === "drop"
@@ -5148,6 +5239,7 @@
             ...finding,
             id: `rec-${finding.type}-${finding.segmentIndex}-${String(finding.title).replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`,
             assessment,
+            assessmentContext: { pointCount, signalMagnitude, provenancePenalty },
             score,
             isPrimary: isActionableEvent && score >= RECOMMENDATION_MIN_SCORE,
             isTopPriority: isActionableEvent && score >= RECOMMENDATION_TOP_SCORE,
@@ -5181,7 +5273,7 @@
                   <div class="evidence-cell"><span>Recommended action</span><p>${escapeFeedbackHtml(item.recommendedAction)}</p></div>
                   <div class="evidence-cell"><span>Expected impact</span><p>${escapeFeedbackHtml(item.expectedImpact)}</p></div>
                   <div class="evidence-cell"><span>Confidence</span><p>${escapeFeedbackHtml(item.confidence)}</p></div>
-                  <div class="evidence-cell"><span>Why this confidence</span><p>${escapeFeedbackHtml(`Based on ${item.assessment.evidenceQuality}/5 evidence quality, ${item.assessment.specificity}/5 specificity, and available transcript alignment.`)}</p></div>
+                  <div class="evidence-cell"><span>Why this confidence</span><p>${escapeFeedbackHtml(`Based on ${item.assessmentContext?.pointCount || 0} retention points, a ${Number(item.assessmentContext?.signalMagnitude || 0).toFixed(1)}-point local change, transcript alignment, and source provenance.${item.assessmentContext?.provenancePenalty ? ` A ${item.assessmentContext.provenancePenalty}-point provenance adjustment prevents sample or unmatched data from reading as perfect evidence.` : ""}`)}</p></div>
                   <div class="evidence-cell"><span>Validation</span><p>${escapeFeedbackHtml(item.validation)}</p></div>
                 </div>
                 <details class="recommendation-details"><summary>How this recommendation was assessed</summary><div class="assessment-grid">${RECOMMENDATION_DIMENSIONS.map(([label, key]) => `<span>${label}<b>${item.assessment[key]}/5</b></span>`).join("")}</div><div class="assessment-total"><span>Assessment total</span><b>${item.score} / 40</b></div></details>
@@ -5462,7 +5554,7 @@
         const isDemo = project?.analytics?.sourceKind === "demo" && project?.status === "analyzed";
         el.demoGuide.hidden = !isDemo;
         if (!isDemo) return;
-        el.demoGuide.innerHTML = "<strong>Guided workflow demonstration</strong><p>1. Inspect the labelled sample retention timeline. 2. Open a timestamped drop and review its transcript source. 3. Go to Suggestions, save an editor decision, then download the editor brief. The data is synthetic and cannot prove creator performance; the detection, source links, saved decisions, and export are live browser functionality.</p>";
+        el.demoGuide.innerHTML = "<strong>Guided workflow demonstration</strong><p>1. Review the proposed edit. 2. Inspect the labelled synthetic retention timeline and matching transcript moment. 3. Accept, rewrite, or dismiss the action, then export the editor brief. The sample cannot prove creator performance; the detection, source links, decisions, and export are live browser functionality.</p>";
       }
 
       function renderDemoWalkthrough(project) {
@@ -5472,7 +5564,7 @@
         const activeStep = state.activeTab;
         el.demoWalkthrough.innerHTML = `
           <strong>Guided judge demo</strong>
-          <p>Start here: DropFix found a real timestamped change in labelled demo evidence and converted it into an editor-ready action. Follow the three steps in order.</p>
+          <p>Start here: DropFix found a timestamped change in labelled synthetic evidence and converted it into an editor-ready action. Follow the three steps in order.</p>
           <div class="demo-step-row">
             <button class="demo-step-button ${activeStep === "suggestions" ? "active" : ""}" type="button" data-demo-step="suggestions"><span>01</span><b>Review the recommended edit</b></button>
             <button class="demo-step-button ${activeStep === "analysis" ? "active" : ""}" type="button" data-demo-step="analysis"><span>02</span><b>See the evidence behind it</b></button>
@@ -5484,7 +5576,12 @@
       function navigateDemoStep(step) {
         setActivePage("workspace", null, true);
         switchTab(step);
-        document.getElementById("workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const target = step === "analysis"
+          ? el.evidenceTimeline
+          : step === "suggestions"
+            ? el.demoWalkthrough
+            : document.querySelector("#export .export-actions");
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
       function renderEvidenceTimeline(project) {
@@ -5566,6 +5663,7 @@
             findings.push({
               type: "drop",
               priority: Math.abs(delta) * 2,
+              magnitude: Math.abs(delta),
               segmentIndex: match.index,
               title: `Retention drop at ${formatDuration(previous.time)}-${formatDuration(current.time)}`,
               observed: `Retention fell ${Math.abs(delta)} percentage points, from ${previous.ratio}% to ${current.ratio}%, across one imported data interval.`,
@@ -5576,6 +5674,7 @@
             findings.push({
               type: "spike",
               priority: delta,
+              magnitude: Math.abs(delta),
               segmentIndex: match.index,
               title: `Interest spike at ${formatDuration(previous.time)}-${formatDuration(current.time)}`,
               observed: `Retention increased ${delta} percentage points, from ${previous.ratio}% to ${current.ratio}%. This can indicate replaying, seeking, or segment value.`,
@@ -5739,12 +5838,13 @@
         el.demoButton.disabled = isRunning;
         el.demoButton.classList.toggle("working", isRunning);
         el.demoButton.textContent = isRunning ? "Opening guided demo..." : "Start guided judge demo";
-        el.demoState.textContent = isRunning ? "RUNNING" : "IDLE";
+        if (isRunning) el.demoState.textContent = "RUNNING";
       }
 
       function makeLiveDemoPacket(project, options = {}) {
         const safeProject = project || {};
         const clips = safeProject.clips || [];
+        const rubric = assessHackathonRubric(safeProject);
         const safeMode = options.mode || getCompetitionMode();
         const safeStatus = options.status || "completed";
         const safeError = typeof options.error === "string" ? options.error : "";
@@ -5833,7 +5933,7 @@
           project.evidenceFindings = detectEvidenceOpportunities(project);
           project.recommendations = buildActionableRecommendations(project);
           project.qualityExplanations = qualityRationale(result.ordered, result.quality);
-          project.qualityLabel = `Quality score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
+          project.qualityLabel = `Transcript structure score ${project.qualityScore}/100. ${project.qualityExplanations[0]}`;
           project.lastEdited = new Date().toISOString();
           project.confidence = project.confidence || clampPercent(65);
           project.warnings = [];
@@ -5875,9 +5975,9 @@
         el.profile.value = "shorts";
         el.creatorGoal.value = "watch-time";
         el.transcript.value = DEMO_TRANSCRIPT;
-        el.parseStatus.textContent = "Live demo loaded with sample transcript. Running the full workflow now.";
-        el.parseMetrics.textContent = "Auto-loading, analyzing, then building SEO recommendations.";
-        el.ingestStatus.textContent = "Demo flow: Inputs -> Analysis -> Suggestions -> Export.";
+        el.parseStatus.textContent = "Labelled demo evidence loaded. Connecting retention signals to transcript moments now.";
+        el.parseMetrics.textContent = "Auto-detecting behavior changes, building editor actions, and preparing the brief.";
+        el.ingestStatus.textContent = "Guided demo: evidence → moment → edit → export.";
         setDemoButtonState(true);
         el.demoState.textContent = "RUNNING";
         persistProject();
@@ -5897,13 +5997,13 @@
           renderIngestPanels(project);
           addHandoffActivity(project, "run-demo-workflow");
           switchTab("suggestions");
-          document.getElementById("workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          el.demoWalkthrough?.scrollIntoView({ behavior: "smooth", block: "start" });
           el.demoState.textContent = "DONE";
           el.parseStatus.textContent = "Guided demo ready. Start with the first editor action below, then use the three demo steps when you want to inspect evidence or export the brief.";
           el.workflowHint.textContent = "You are in step 1 of 3: review the recommended editor action. Use Guided judge demo above to inspect its evidence or export the brief.";
         } catch (error) {
           const message = error?.message || "Demo flow did not complete. Please try again.";
-          el.demoState.textContent = "IDLE";
+          el.demoState.textContent = "READY";
           el.parseStatus.textContent = message;
           setIngestError(message);
         } finally {
