@@ -2998,6 +2998,17 @@
           flex-basis: 100%;
           width: fit-content;
         }
+
+        .flow-step {
+          min-width: 0;
+          padding-inline: 0.32rem;
+          font-size: 0.68rem;
+          white-space: nowrap;
+        }
+
+        .flow-step span {
+          display: none;
+        }
       }
     </style>
   </head>
@@ -3970,11 +3981,18 @@
         export: "Export"
       };
       const WORKFLOW_HINTS = {
-        inputs: "New creator path: pick profile, then add transcript (paste, upload, or drop), then click Run analysis.",
-        analysis: "Tune your scoring profile and rerun if needed to prioritize your best clips.",
-        suggestions: "Review ranked clips, then generate metadata packs that match your selected tone.",
-        export: "Copy or download the export package and move directly into your publishing handoff."
+        inputs: "Choose a goal, add the transcript, optionally import Studio data, then click Run analysis.",
+        analysis: "Inspect the retention signal and matching transcript moment, then review the proposed edit.",
+        suggestions: "Accept, rewrite, or dismiss evidence-backed edits before building the editor brief.",
+        export: "Download the editor brief and move the accepted decisions into the editing handoff."
       };
+
+      function getWorkflowHint(stepKey, project = getCurrentProject()) {
+        if (stepKey === "inputs" && project?.status === "analyzed") {
+          return "Source and analysis are saved. Edit and rerun, or continue to Suggestions or Export.";
+        }
+        return WORKFLOW_HINTS[stepKey] || WORKFLOW_HINTS.inputs;
+      }
       const WORKFLOW_STEP_HINTS = {
         inputs: "Inputs is available. Paste text, upload a transcript, or use sample to complete your first run.",
         analysis: "Run analysis now to unlock clip scoring and confidence indicators.",
@@ -4032,7 +4050,7 @@
           return false;
         }
         if (el.workflowHint) {
-          el.workflowHint.textContent = WORKFLOW_HINTS[targetStep] || WORKFLOW_HINTS.inputs;
+          el.workflowHint.textContent = getWorkflowHint(targetStep, project);
         }
         switchTab(targetStep);
         return true;
@@ -4570,7 +4588,7 @@
         el.segmentsState.textContent = `Segments: ${totalSegments}`;
         el.fileState.textContent = `Source: ${fileType}`;
         el.profileQuick.textContent = `${el.profile.options[el.profile.selectedIndex].text}`;
-        el.workflowHint.textContent = WORKFLOW_HINTS[state.activeTab] || WORKFLOW_HINTS.inputs;
+        el.workflowHint.textContent = getWorkflowHint(state.activeTab, project);
         const completed = Object.values(stepCompletion).filter(Boolean).length;
         const totalSteps = Object.keys(stepCompletion).length;
         const progressPercent = Math.round((completed / totalSteps) * 100);
